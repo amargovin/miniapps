@@ -1,0 +1,7 @@
+[build]
+builder = "RAILPACK"
+
+[deploy]
+startCommand = "bun src/index.ts"
+cronSchedule = "30 23 * * *"
+restartPolicyType = "NEVER"

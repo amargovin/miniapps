@@ -1,0 +1,24 @@
+{
+  "name": "x-tweet-tracker",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun src/index.ts",
+    "add-user": "bun scripts/add-user.ts",
+    "add-url": "bun scripts/add-url.ts",
+    "list": "bun scripts/list.ts",
+    "digest": "bun src/briefing.ts",
+    "stories": "bun src/stories.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.87.0",
+    "postgres": "^3.4.9"
+  }
+}
