@@ -9,7 +9,8 @@
     "add-url": "bun scripts/add-url.ts",
     "list": "bun scripts/list.ts",
     "digest": "bun src/briefing.ts",
-    "stories": "bun src/stories.ts"
+    "stories": "bun src/stories.ts",
+    "leads": "bun src/leads.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

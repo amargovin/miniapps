@@ -48,7 +48,7 @@ async function run() {
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 6000,
+    max_tokens: 10000,
     messages: [
       {
         role: "user",
@@ -77,7 +77,7 @@ For each story idea, output this exact HTML structure. No preamble, no wrapper:
 </div>
 
 Rules:
-- Extract 5-10 story ideas. Quality over quantity.
+- Extract 15-20 story ideas. Aim for breadth — each distinct topic or claim worth investigating should be its own story idea.
 - Each story must be anchored in SPECIFIC data points or claims from the tweets — not generic topics.
 - Merge tweets from different users about the same theme into one story idea.
 - Prioritize stories where multiple users are discussing the same issue (cross-signal).
