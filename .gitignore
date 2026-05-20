@@ -1,0 +1,19 @@
+EPF/
+
+# macOS
+.DS_Store
+
+# Python
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+
+# Node
+**/node_modules/
+
+# Heritageverse binary assets
+heritageverse_grab/glb/
+heritageverse_grab/stl/
+heritageverse_grab/textures/
+heritageverse_grab/intermediate/
