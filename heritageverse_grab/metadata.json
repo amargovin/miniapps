@@ -1,0 +1,261 @@
+{
+  "ganesha-441": {
+    "uuid": "nwgqcAC1SmL7tq8uonzZ9R",
+    "slug": "ganesha-441",
+    "mesh": "AHQkykZt0tGj6qiOl5hduf-bake-3WrMI.glb",
+    "texture": "AHQkykZt0tGj6qiOl5hduf-bake-3WrMI_baseTexBaked-4096.webp",
+    "normal_map": "AHQkykZt0tGj6qiOl5hduf-bake-3WrMI_normals-4096.webp",
+    "name": "Ganesha",
+    "material": "Stone",
+    "museum": "Department of Archaeology and Museums",
+    "size": "32x0x0",
+    "files": {
+      "glb": "glb/ganesha-441.glb",
+      "stl": "stl/ganesha-441.stl",
+      "texture": "textures/ganesha-441_albedo.webp",
+      "normal": "textures/ganesha-441_normal.webp"
+    },
+    "faces": 501036,
+    "extents": [
+      30.53,
+      11.74,
+      38.53
+    ]
+  },
+  "ganesha-463": {
+    "name": "Ganesha (six-armed standing)",
+    "uuid": "pltsW1MFfYLqLsLkQJZjiP",
+    "mesh": "v_WZwSClt_mucoEL85HQS5-bake-DBk76.glb",
+    "museum": "Rissala Collection",
+    "material": "Iron",
+    "size": "68x26x25.2",
+    "note": "Pre-existing \u2014 first artifact downloaded in this session; not in the user-supplied list",
+    "files": {
+      "glb": "glb/ganesha-463.glb",
+      "stl": "stl/ganesha-463.stl",
+      "texture": "textures/ganesha-463_albedo.webp",
+      "normal": "textures/ganesha-463_normal.webp"
+    }
+  },
+  "kartikey-with-spear-1013": {
+    "uuid": "44X95wuNOGE9Wu_ZzI7HR6",
+    "slug": "kartikey-with-spear-1013",
+    "mesh": "ZMqDmzwqmWJsG8jnyD0zpW_simplify_xBMR9_1000000.glb",
+    "texture": "ZMqDmzwqmWJsG8jnyD0zpW_simplify_xBMR9_1000000_u1_v1_diffuse-4096.jpg",
+    "normal_map": "ZMqDmzwqmWJsG8jnyD0zpW_simplify_xBMR9_1000000_u1_v1_normal-4096.jpg",
+    "name": "Kartikey With Spear",
+    "material": "",
+    "museum": "Government Museum",
+    "size": "84x31x13.5",
+    "files": {
+      "glb": "glb/kartikey-with-spear-1013.glb",
+      "stl": "stl/kartikey-with-spear-1013.stl",
+      "texture": "textures/kartikey-with-spear-1013_albedo.jpg",
+      "normal": "textures/kartikey-with-spear-1013_normal.jpg"
+    },
+    "faces": 1000016,
+    "extents": [
+      13.98,
+      10.23,
+      35.34
+    ]
+  },
+  "narasimha-486": {
+    "name": "Narasimha",
+    "uuid": "PfQYXkDQ4VRfr5aO2LY8wq",
+    "mesh": "tcOeEiKOMwFlYNSidm0YXy-bake-h3Ikj.glb",
+    "note": "Pre-existing \u2014 second artifact downloaded; includes a print-ready oriented + scaled STL",
+    "files": {
+      "glb": "glb/narasimha-486.glb",
+      "stl": "stl/narasimha-486.stl",
+      "stl_print_ready": "stl/narasimha-486_print-ready.stl",
+      "bambu_project": "stl/narasimha-486_bambu-project.3mf",
+      "texture": "textures/narasimha-486_albedo.jpg",
+      "normal": "textures/narasimha-486_normal.jpg"
+    }
+  },
+  "narvaraha-1119": {
+    "uuid": "AS3advMurAdoyun2y9IZd7",
+    "slug": "narvaraha-1119",
+    "mesh": "e65qHAmqpQ3iK9CM6x5vMG-simplify-tj_Lr-1000000-512.glb",
+    "texture": "e65qHAmqpQ3iK9CM6x5vMG-simplify-tj_Lr-1000000_u1_v1_diffuse-4096.jpg",
+    "normal_map": "e65qHAmqpQ3iK9CM6x5vMG-simplify-tj_Lr-1000000_u1_v1_normal-4096.jpg",
+    "name": "Narvaraha",
+    "material": "Stone",
+    "museum": "Bhopal State Museum",
+    "size": "133x69.5x45",
+    "files": {
+      "glb": "glb/narvaraha-1119.glb",
+      "stl": "stl/narvaraha-1119.stl",
+      "texture": "textures/narvaraha-1119_albedo.jpg",
+      "normal": "textures/narvaraha-1119_normal.jpg"
+    },
+    "faces": 1000034,
+    "extents": [
+      0.76,
+      0.35,
+      1.28
+    ]
+  },
+  "nataraj-small-977": {
+    "uuid": "Yi8a9e2s1hPu6h0VEJEIK7",
+    "slug": "nataraj-small-977",
+    "mesh": "XtMFkxq00wh_X8jVA6ki2I-bake-bGe5q.glb",
+    "texture": "XtMFkxq00wh_X8jVA6ki2I-bake-bGe5q_baseTexBaked-4096.jpg",
+    "normal_map": "XtMFkxq00wh_X8jVA6ki2I-bake-bGe5q_normals-4096.jpg",
+    "name": "Nataraj Small",
+    "material": "Copper",
+    "museum": "Rissala Collection",
+    "size": "77x35x21",
+    "files": {
+      "glb": "glb/nataraj-small-977.glb",
+      "stl": "stl/nataraj-small-977.stl",
+      "texture": "textures/nataraj-small-977_albedo.jpg",
+      "normal": "textures/nataraj-small-977_normal.jpg"
+    },
+    "faces": 500474,
+    "extents": [
+      39.86,
+      19.0,
+      60.83
+    ]
+  },
+  "nataraja-626": {
+    "uuid": "P7QDoRv9LUCHrOGysodPfP",
+    "slug": "nataraja-626",
+    "mesh": "LMG0022-draco.glb",
+    "texture": "LMG022_Albedo_large.jpg",
+    "normal_map": "LMG022_Normal_large.jpg",
+    "name": "Nataraja",
+    "material": "Stone",
+    "museum": "National Museum",
+    "size": "0x0x0",
+    "files": {
+      "glb": "glb/nataraja-626.glb",
+      "stl": "stl/nataraja-626.stl",
+      "texture": "textures/nataraja-626_albedo.jpg",
+      "normal": "textures/nataraja-626_normal.jpg"
+    },
+    "faces": 214373,
+    "extents": [
+      0.29,
+      0.57,
+      0.1
+    ]
+  },
+  "natesh-1118": {
+    "uuid": "pKPcC0iDewESv3oJP0HvQ6",
+    "slug": "natesh-1118",
+    "mesh": "e0w7ZIWhNQesJzaxxV2NyM_simplify_6dGDz_200000.glb",
+    "texture": "e0w7ZIWhNQesJzaxxV2NyM_simplify_6dGDz_200000_u1_v1_diffuse-4096.jpg",
+    "normal_map": "e0w7ZIWhNQesJzaxxV2NyM_simplify_6dGDz_200000_u1_v1_normal-4096.jpg",
+    "name": "Natesh",
+    "material": "",
+    "museum": "Bhopal State Museum",
+    "size": "82x48x17.8",
+    "files": {
+      "glb": "glb/natesh-1118.glb",
+      "stl": "stl/natesh-1118.stl",
+      "texture": "textures/natesh-1118_albedo.jpg",
+      "normal": "textures/natesh-1118_normal.jpg"
+    },
+    "faces": 200000,
+    "extents": [
+      0.74,
+      0.33,
+      1.2
+    ]
+  },
+  "saraswati-1061": {
+    "uuid": "t_3X2BYcE29qQWlU3TpOne",
+    "slug": "saraswati-1061",
+    "mesh": "8wxwIRCSq7NEVm60WUOeuu_simplify_UCv1v_500000.glb",
+    "texture": "8wxwIRCSq7NEVm60WUOeuu_simplify_UCv1v_500000_u1_v1_diffuse-4096.jpg",
+    "normal_map": "8wxwIRCSq7NEVm60WUOeuu_simplify_UCv1v_500000_u1_v1_normal-4096.jpg",
+    "name": "Saraswati",
+    "material": "",
+    "museum": "State Museum Lucknow",
+    "size": "92.3x26.5x19",
+    "files": {
+      "glb": "glb/saraswati-1061.glb",
+      "stl": "stl/saraswati-1061.stl",
+      "texture": "textures/saraswati-1061_albedo.jpg",
+      "normal": "textures/saraswati-1061_normal.jpg"
+    },
+    "faces": 500043,
+    "extents": [
+      10.77,
+      6.95,
+      32.24
+    ]
+  },
+  "sheshashayi-vishnu-1047": {
+    "uuid": "ak12VdPh6wvMEZ1sOJPecG",
+    "slug": "sheshashayi-vishnu-1047",
+    "mesh": "c56kd4cjUaIcqje8vAo4ew_simplify_oQW5K_500000.glb",
+    "texture": "c56kd4cjUaIcqje8vAo4ew_simplify_oQW5K_500000_u1_v1_diffuse-4096.jpg",
+    "normal_map": "c56kd4cjUaIcqje8vAo4ew_simplify_oQW5K_500000_u1_v1_normal-4096.jpg",
+    "name": "Sheshashayi Vishnu",
+    "material": "",
+    "museum": "Government Museum",
+    "size": "36x51x18.5",
+    "files": {
+      "glb": "glb/sheshashayi-vishnu-1047.glb",
+      "stl": "stl/sheshashayi-vishnu-1047.stl",
+      "texture": "textures/sheshashayi-vishnu-1047_albedo.jpg",
+      "normal": "textures/sheshashayi-vishnu-1047_normal.jpg"
+    },
+    "faces": 500041,
+    "extents": [
+      22.47,
+      9.53,
+      15.88
+    ]
+  },
+  "uma-maheshvara-beri-400": {
+    "uuid": "owWaizPczYAF4Px27vDLoX",
+    "slug": "uma-maheshvara-beri-400",
+    "mesh": "wIfcdJNBFHShFaV6o4Dwo7-bake-lbdpK.glb",
+    "texture": "wIfcdJNBFHShFaV6o4Dwo7-bake-lbdpK_baseTexBaked-4096.webp",
+    "normal_map": "wIfcdJNBFHShFaV6o4Dwo7-bake-lbdpK_normals-4096.webp",
+    "name": "Uma Maheshvara",
+    "material": "Sandstone",
+    "museum": "Department of Archaeology and Museums",
+    "size": "56x34x0",
+    "files": {
+      "glb": "glb/uma-maheshvara-beri-400.glb",
+      "stl": "stl/uma-maheshvara-beri-400.stl",
+      "texture": "textures/uma-maheshvara-beri-400_albedo.webp",
+      "normal": "textures/uma-maheshvara-beri-400_normal.webp"
+    },
+    "faces": 500030,
+    "extents": [
+      26.29,
+      9.63,
+      39.58
+    ]
+  },
+  "vishnu-461": {
+    "uuid": "DdOf742OxpuvK0r3rTDmKk",
+    "slug": "vishnu-461",
+    "mesh": "s7MACcpYRZPxsXtz6wPHMG-bake-izhFu.glb",
+    "texture": "s7MACcpYRZPxsXtz6wPHMG-bake-izhFu_baseTexBaked-4096.webp",
+    "normal_map": "s7MACcpYRZPxsXtz6wPHMG-bake-izhFu_normals-4096.webp",
+    "name": "Vishnu",
+    "material": "Copper",
+    "museum": "Rissala Collection",
+    "size": "73x38.5x36",
+    "files": {
+      "glb": "glb/vishnu-461.glb",
+      "stl": "stl/vishnu-461.stl",
+      "texture": "textures/vishnu-461_albedo.webp",
+      "normal": "textures/vishnu-461_normal.webp"
+    },
+    "faces": 200126,
+    "extents": [
+      22.87,
+      22.35,
+      41.56
+    ]
+  }
+}
