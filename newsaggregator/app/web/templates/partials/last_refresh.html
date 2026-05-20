@@ -1,0 +1,5 @@
+<span class="last-refresh"
+      hx-get="/partials/last-refresh" hx-trigger="every 30s" hx-swap="outerHTML"
+      {% if last_refresh_at %}title="{{ last_refresh_at.strftime('%H:%M %d %b %Y UTC') }}"{% endif %}>
+    Last refreshed {{ last_refresh_label }}
+</span>

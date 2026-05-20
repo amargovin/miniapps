@@ -1,0 +1,18 @@
+{# Single inline status line. Hidden when idle. Polled while running.
+   When phase is "done" we also trigger a one-shot sections refresh. #}
+<span id="refresh-status" class="refresh-status-inline phase-{{ refresh.phase }}"
+     {% if refresh.running %}
+     hx-get="/refresh/status" hx-trigger="every 1500ms" hx-swap="outerHTML"
+     {% elif refresh.phase == 'done' %}
+     hx-get="/partials/stories" hx-target="#sections" hx-swap="outerHTML" hx-trigger="load delay:200ms"
+     {% endif %}>
+    {% if refresh.running %}
+        <span class="spinner" aria-hidden="true"></span>
+        <span class="phase-text">{{ phase_label }}…</span>
+    {% elif refresh.phase == 'done' %}
+        <span class="ok-mark">✓</span>
+        <span class="phase-text">Refreshed</span>
+    {% elif refresh.phase == 'error' %}
+        <span class="phase-text error">✗ {{ refresh.error or 'error' }}</span>
+    {% endif %}
+</span>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}News Suggestor{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/htmx.min.js" defer></script>
+</head>
+<body>
+    <header class="topbar">
+        <a href="/" class="brand">News Suggestor</a>
+        {% block topbar_extra %}{% endblock %}
+        {% if request and authed %}
+        <nav class="topbar-right">
+            <form method="post" action="/logout" style="display:inline">
+                <button type="submit" class="link-button">Logout</button>
+            </form>
+        </nav>
+        {% endif %}
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

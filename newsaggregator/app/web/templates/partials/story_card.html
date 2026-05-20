@@ -1,0 +1,27 @@
+<article class="story-card{% if s.swarajya_covered %} sw-covered{% endif %}"
+         id="story-{{ s.id }}"
+         hx-get="/stories/{{ s.id }}/detail" hx-target="#modal-content" hx-swap="innerHTML"
+         hx-trigger="click" style="cursor: pointer">
+    <span class="rank">#{{ rank or '?' }}</span>
+    <h2 class="title" title="{{ s.canonical_title }}">{{ s.canonical_title }}</h2>
+    <div class="card-meta">
+        {% if s.editorial_significance %}
+        <span class="sig sig-{{ s.editorial_significance }}" title="AI significance: {{ s.editorial_significance }}/5">
+            {{ '★' * s.editorial_significance }}{{ '☆' * (5 - s.editorial_significance) }}
+        </span>
+        {% endif %}
+        <span class="beat beat-{{ s.beat }}">{{ s.beat }}</span>
+        {% if s.age_label %}
+        <span class="age {{ s.age_class }}" title="Updated {{ s.last_updated_at.strftime('%H:%M %d %b') }}">{{ s.age_label }}</span>
+        {% endif %}
+        {% if s.member_count > 1 %}
+        <span class="member-count">{{ s.member_count }} outlets</span>
+        {% endif %}
+        {% if s.swarajya_covered %}
+        <span class="sw-covered-mini" title="Already covered by Swarajya">✓ SW</span>
+        {% endif %}
+        {% if s.editorial_pass == 0 %}
+        <span class="ai-excluded-mini" title="AI-excluded: {{ s.editorial_reason }}">✗ AI</span>
+        {% endif %}
+    </div>
+</article>

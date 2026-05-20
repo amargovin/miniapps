@@ -1,0 +1,19 @@
+<div id="sections" class="sections">
+    {% if not sections %}
+    <p class="empty">No stories match these filters yet. Try widening the time window or lowering the score threshold.</p>
+    {% else %}
+    {% for sec in sections %}
+    <section class="beat-section">
+        <header class="beat-section-head">
+            <h2>{{ sec.label }} <span class="count">top {{ sec.stories|length }}</span></h2>
+        </header>
+        <div class="story-grid">
+            {% for s in sec.stories %}
+            {% set rank = loop.index %}
+            {% include "partials/story_card.html" %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+    {% endif %}
+</div>
