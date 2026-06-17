@@ -1,0 +1,12 @@
+FROM oven/bun:1
+
+WORKDIR /app
+
+COPY package.json .
+COPY server.ts .
+COPY triage-rules.md .
+
+# Railway sets PORT dynamically
+EXPOSE 3847
+
+CMD ["bun", "run", "server.ts"]

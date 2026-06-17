@@ -1,0 +1,11 @@
+# Railway Nixpacks configuration for Bun runtime
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["bun"]
+
+[phases.install]
+cmds = ["bun install"]
+
+[start]
+cmd = "bun run server.ts"

@@ -1,0 +1,12 @@
+{
+  "name": "swarajyapix",
+  "version": "1.0.0",
+  "description": "Bulk image generator using Gemini 3 Pro",
+  "scripts": {
+    "start": "bun run server.ts",
+    "dev": "bun --watch run server.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0"
+  }
+}

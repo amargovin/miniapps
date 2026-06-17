@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SwarajyaPix - Batch Mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-elevated: rgba(255,255,255,0.04);
+    --bg-glass: rgba(255,255,255,0.06);
+    --bg-glass-hover: rgba(255,255,255,0.1);
+    --border: rgba(255,255,255,0.08);
+    --border-focus: rgba(249,115,22,0.5);
+    --text: #e4e4e7;
+    --text-muted: #71717a;
+    --text-dim: #52525b;
+    --accent: #f97316;
+    --accent-hover: #ea580c;
+    --accent-glow: rgba(249,115,22,0.15);
+    --success: #22c55e;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: 0.2s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .view { display: none; opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; transform: translateY(8px); }
+  .view.active { display: block; opacity: 1; transform: translateY(0); }
+
+  /* Login */
+  #loginView {
+    min-height: 100vh; display: none; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 30% 20%, rgba(249,115,22,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(99,102,241,0.06) 0%, transparent 50%), var(--bg);
+  }
+  #loginView.active { display: flex; opacity: 1; transform: none; }
+
+  .login-card { width: 100%; max-width: 400px; padding: 2.5rem; background: var(--bg-glass); border: 1px solid var(--border); border-radius: 16px; backdrop-filter: blur(20px); }
+  .login-brand { text-align: center; margin-bottom: 2rem; }
+  .login-brand h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; }
+  .login-brand h1 span { color: var(--accent); }
+  .login-brand p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.4rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-group label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem; }
+  .form-input { width: 100%; padding: 0.7rem 0.9rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: inherit; font-size: 0.9rem; outline: none; transition: border-color var(--transition), box-shadow var(--transition); }
+  .form-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .form-input::placeholder { color: var(--text-dim); }
+  .login-error { display: none; padding: 0.6rem 0.8rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius-sm); color: var(--error); font-size: 0.8rem; margin-bottom: 1rem; }
+  .login-error.visible { display: block; }
+  .btn-login { width: 100%; padding: 0.75rem; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background var(--transition), opacity var(--transition); }
+  .btn-login:hover { background: var(--accent-hover); }
+  .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Topbar */
+  .topbar { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; background: rgba(10,10,15,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+  .topbar-brand { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; }
+  .topbar-brand span { color: var(--accent); }
+  .topbar-right { display: flex; align-items: center; gap: 1rem; }
+  .topbar-user { font-size: 0.8rem; color: var(--text-muted); }
+
+  .nav-link {
+    padding: 0.35rem 0.8rem; background: var(--bg-glass); border: 1px solid var(--border); border-radius: 20px;
+    color: var(--text-muted); font-size: 0.75rem; font-weight: 500; text-decoration: none; transition: all var(--transition);
+  }
+  .nav-link:hover { color: var(--accent); border-color: rgba(249,115,22,0.3); background: var(--accent-glow); }
+
+  .btn-logout { padding: 0.35rem 0.8rem; background: var(--bg-glass); border: 1px solid var(--border); border-radius: 6px; color: var(--text-muted); font-family: inherit; font-size: 0.75rem; cursor: pointer; transition: all var(--transition); }
+  .btn-logout:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* Container */
+  .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+
+  /* Info banner */
+  .info-banner {
+    padding: 0.75rem 1rem; margin-bottom: 1.5rem;
+    background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15); border-radius: var(--radius);
+    font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+  }
+  .info-banner strong { color: var(--text); }
+
+  /* Panels */
+  .panel {
+    background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.25rem; margin-bottom: 1.5rem; backdrop-filter: blur(12px);
+  }
+  .panel-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+
+  /* Create batch */
+  textarea#batchPrompts {
+    width: 100%; height: 140px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 0.75rem; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; color: var(--text); resize: vertical; outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  textarea#batchPrompts:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); }
+  textarea#batchPrompts::placeholder { color: var(--text-dim); }
+
+  .file-upload { position: relative; margin-top: 0.5rem; }
+  .file-upload input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+  .file-upload-btn { display: block; width: 100%; padding: 0.5rem; background: transparent; border: 1px dashed rgba(255,255,255,0.12); border-radius: var(--radius-sm); text-align: center; color: var(--text-dim); font-size: 0.8rem; cursor: pointer; transition: all var(--transition); }
+  .file-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .create-controls { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; align-items: flex-end; }
+  .create-controls > div { flex: 1; min-width: 140px; }
+
+  .aspect-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.35rem; font-weight: 500; }
+  .aspect-pills { display: flex; gap: 0; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); }
+  .aspect-pill, .res-pill {
+    flex: 1; padding: 0.45rem 0.6rem; border: none; background: transparent; color: var(--text-muted);
+    font-family: inherit; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all var(--transition);
+  }
+  .aspect-pill.active, .res-pill.active { background: var(--accent); color: white; }
+  .aspect-pill:hover:not(.active), .res-pill:hover:not(.active) { background: var(--bg-glass-hover); }
+
+  .create-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+
+  .btn { padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all var(--transition); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+  .btn-secondary { background: var(--bg-glass-hover); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.15); }
+
+  .validation-result { margin-top: 0.75rem; padding: 0.7rem 0.9rem; border-radius: var(--radius-sm); font-size: 0.8rem; display: none; }
+  .validation-result.success { display: block; background: rgba(34,197,94,0.08); color: var(--success); border: 1px solid rgba(34,197,94,0.15); }
+  .validation-result.error { display: block; background: rgba(239,68,68,0.08); color: var(--error); border: 1px solid rgba(239,68,68,0.15); }
+  .prompt-preview { margin-top: 0.4rem; max-height: 100px; overflow-y: auto; font-size: 0.75rem; }
+  .prompt-preview li { margin-left: 1.2rem; margin-bottom: 0.15rem; color: var(--text-muted); }
+
+  /* Batch cards grid */
+  .batch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+
+  .batch-card {
+    background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem;
+    transition: transform var(--transition), border-color var(--transition);
+  }
+  .batch-card:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.12); }
+
+  .batch-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+  .batch-id { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.78rem; color: var(--text); font-weight: 600; }
+
+  .batch-meta { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem; }
+  .batch-meta span { margin-right: 1rem; }
+
+  .batch-actions { display: flex; gap: 0.5rem; }
+  .batch-btn { padding: 0.35rem 0.7rem; border-radius: 6px; font-family: inherit; font-size: 0.72rem; font-weight: 500; cursor: pointer; transition: all var(--transition); }
+  .batch-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .batch-btn-poll { background: var(--bg-glass-hover); border: 1px solid var(--border); color: var(--text); }
+  .batch-btn-poll:hover:not(:disabled) { border-color: rgba(255,255,255,0.2); }
+  .batch-btn-view { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: var(--success); }
+  .batch-btn-view:hover:not(:disabled) { background: rgba(34,197,94,0.2); }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-flex; align-items: center; padding: 0.15rem 0.55rem; border-radius: 20px;
+    font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .badge-pending { background: rgba(113,113,122,0.15); color: var(--text-dim); }
+  .badge-running { background: rgba(245,158,11,0.12); color: var(--warning); animation: pulse 1.5s ease-in-out infinite; }
+  .badge-succeeded { background: rgba(34,197,94,0.12); color: var(--success); }
+  .badge-failed { background: rgba(239,68,68,0.12); color: var(--error); }
+  .badge-expired { background: rgba(113,113,122,0.1); color: var(--text-dim); opacity: 0.6; }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  /* Results gallery */
+  .results-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(20px); z-index: 200; overflow-y: auto;
+  }
+  .results-overlay.open { display: block; }
+
+  .results-container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .results-title { font-size: 1.1rem; font-weight: 700; }
+  .results-close { background: var(--bg-glass); border: 1px solid var(--border); border-radius: 6px; color: var(--text-muted); font-size: 0.8rem; padding: 0.4rem 0.8rem; cursor: pointer; font-family: inherit; transition: all var(--transition); }
+  .results-close:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+
+  .card { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition); }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(249,115,22,0.06); border-color: rgba(255,255,255,0.12); }
+
+  .card-image { width: 100%; aspect-ratio: 3/2; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; }
+  .card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+  .card:hover .card-image img { transform: scale(1.03); }
+  .card-body { padding: 0.75rem; }
+  .card-prompt { font-size: 0.78rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
+
+  /* Lightbox */
+  .lightbox {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(20px); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; padding: 2rem; opacity: 0; transition: opacity 0.3s ease;
+  }
+  .lightbox.open { display: flex; opacity: 1; }
+  .lightbox-close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 2rem; cursor: pointer; transition: color var(--transition); z-index: 1001; }
+  .lightbox-close:hover { color: white; }
+  .lightbox-img { max-width: 90vw; max-height: 70vh; border-radius: var(--radius); box-shadow: 0 16px 64px rgba(0,0,0,0.6); }
+  .lightbox-prompt { color: var(--text-muted); margin-top: 1rem; text-align: center; max-width: 600px; font-size: 0.85rem; line-height: 1.6; }
+  .lightbox-download { margin-top: 0.75rem; padding: 0.5rem 1.2rem; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-size: 0.8rem; font-weight: 600; transition: background var(--transition); }
+  .lightbox-download:hover { background: var(--accent-hover); }
+
+  .lightbox-nav {
+    position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    color: white; font-size: 1.5rem; cursor: pointer; padding: 0.8rem 0.6rem; border-radius: var(--radius-sm); opacity: 0.6;
+    transition: opacity var(--transition), background var(--transition); z-index: 1001;
+  }
+  .lightbox-nav:hover { opacity: 1; background: rgba(255,255,255,0.12); }
+  .lightbox-prev { left: 1rem; }
+  .lightbox-next { right: 1rem; }
+
+  .lightbox-edit {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .lightbox-edit-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  .lightbox-edit-input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .lightbox-edit-input::placeholder { color: var(--text-dim); }
+
+  .lightbox-edit-btn {
+    padding: 0.5rem 1rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background var(--transition), opacity var(--transition);
+  }
+
+  .lightbox-edit-btn:hover:not(:disabled) { background: var(--accent-hover); }
+  .lightbox-edit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .lightbox-edit-error {
+    color: var(--error);
+    font-size: 0.75rem;
+    margin-top: 0.35rem;
+    text-align: center;
+    max-width: 600px;
+    min-height: 1.1em;
+  }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 3rem 2rem; color: var(--text-dim); }
+  .empty-state svg { width: 48px; height: 48px; margin-bottom: 0.75rem; opacity: 0.2; stroke: var(--text-dim); }
+  .empty-state p { font-size: 0.85rem; }
+
+  /* Spinner */
+  .spinner-sm { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 0.4rem; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .batch-grid { grid-template-columns: 1fr; }
+    .gallery { grid-template-columns: 1fr; }
+    .create-controls { flex-direction: column; }
+    .topbar { padding: 0.75rem 1rem; }
+    .container { padding: 1rem; }
+    .login-card { margin: 1rem; }
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<!-- Login View -->
+<div class="view" id="loginView">
+  <div class="login-card">
+    <div class="login-brand">
+      <h1>Swarajya<span>Pix</span></h1>
+      <p>Batch Mode</p>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm" autocomplete="off">
+      <div class="form-group">
+        <label for="loginUsername">Username</label>
+        <input class="form-input" id="loginUsername" type="text" placeholder="Enter username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <input class="form-input" id="loginPassword" type="password" placeholder="Enter password" required>
+      </div>
+      <button class="btn-login" type="submit" id="loginBtn">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<!-- App View -->
+<div class="view" id="appView">
+  <div class="topbar">
+    <div class="topbar-brand">Swarajya<span>Pix</span> Batch</div>
+    <div class="topbar-right">
+      <a href="/" class="nav-link">Real-time Mode</a>
+      <span class="topbar-user" id="displayUser"></span>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="info-banner">
+      <strong>Batch mode</strong> uses the Gemini Batch API for 50% lower costs. Processing typically takes minutes to hours.
+      Data is cleared on server redeployment.
+    </div>
+
+    <!-- Create Batch Panel -->
+    <div class="panel">
+      <div class="panel-title">Create Batch</div>
+      <textarea id="batchPrompts" placeholder='Enter prompts (JSON array, free text, CSV, or article)...&#10;&#10;JSON: ["a red apple on white background", "a blue sky with clouds"]&#10;Free text: one prompt per line&#10;Article: paste any text and click Validate for AI extraction'></textarea>
+      <div class="file-upload">
+        <div class="file-upload-btn" id="fileLabel">Upload .json or .txt file</div>
+        <input type="file" id="fileInput" accept=".json,.txt,text/plain,application/json">
+      </div>
+      <div class="create-controls">
+        <div>
+          <div class="aspect-label">Aspect Ratio</div>
+          <div class="aspect-pills">
+            <button class="aspect-pill active" data-ratio="3:2">3:2</button>
+            <button class="aspect-pill" data-ratio="16:9">16:9</button>
+            <button class="aspect-pill" data-ratio="4:3">4:3</button>
+            <button class="aspect-pill" data-ratio="1:1">1:1</button>
+            <button class="aspect-pill" data-ratio="9:16">9:16</button>
+          </div>
+        </div>
+        <div>
+          <div class="aspect-label">Resolution</div>
+          <div class="aspect-pills">
+            <button class="res-pill active" data-size="1K">1K</button>
+            <button class="res-pill" data-size="2K">2K</button>
+            <button class="res-pill" data-size="4K">4K</button>
+          </div>
+        </div>
+      </div>
+      <div class="create-actions">
+        <button class="btn btn-secondary" id="validateBtn">Validate</button>
+        <button class="btn btn-primary" id="submitBatchBtn" disabled>Submit Batch</button>
+      </div>
+      <div class="validation-result" id="validationResult"></div>
+    </div>
+
+    <!-- Batches List -->
+    <div class="panel">
+      <div class="panel-title">Your Batches</div>
+      <div class="batch-grid" id="batchGrid">
+        <div class="empty-state" id="batchEmptyState">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M3 9h18M9 3v18"/>
+          </svg>
+          <p>No batches yet. Create one above.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Results Overlay -->
+<div class="results-overlay" id="resultsOverlay">
+  <div class="results-container">
+    <div class="results-header">
+      <div class="results-title" id="resultsTitle">Batch Results</div>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-secondary" id="downloadZipBtn" style="font-size:0.8rem;padding:0.4rem 0.8rem;">Download ZIP</button>
+        <button class="results-close" id="resultsClose">Close</button>
+      </div>
+    </div>
+    <div class="gallery" id="resultsGallery"></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">&times;</button>
+  <button class="lightbox-nav lightbox-prev" id="lightboxPrev">&#8249;</button>
+  <button class="lightbox-nav lightbox-next" id="lightboxNext">&#8250;</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <div class="lightbox-prompt" id="lightboxPrompt"></div>
+  <div class="lightbox-edit">
+    <input class="lightbox-edit-input" id="lightboxEditInput" type="text" placeholder="Edit: e.g. &quot;make sky more blue&quot;, &quot;remove text&quot;">
+    <button class="lightbox-edit-btn" id="lightboxEditBtn">Submit</button>
+  </div>
+  <div class="lightbox-edit-error" id="lightboxEditError"></div>
+  <button class="lightbox-download" id="lightboxDownload">Download Image</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+(function() {
+  // ===== AUTH =====
+  let authToken = localStorage.getItem('swarajyapix_token');
+  let currentUser = localStorage.getItem('swarajyapix_user');
+
+  const loginView = document.getElementById('loginView');
+  const appView = document.getElementById('appView');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginUsername = document.getElementById('loginUsername');
+  const loginPassword = document.getElementById('loginPassword');
+  const displayUser = document.getElementById('displayUser');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  function showLogin() { appView.classList.remove('active'); loginView.classList.add('active'); loginUsername.focus(); }
+  function showApp(username) { loginView.classList.remove('active'); appView.classList.add('active'); displayUser.textContent = username; loadBatches(); }
+
+  async function checkAuth() {
+    if (!authToken) { showLogin(); return; }
+    try {
+      const res = await fetch('/api/me', { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (res.ok) { const data = await res.json(); currentUser = data.username; localStorage.setItem('swarajyapix_user', currentUser); showApp(currentUser); }
+      else { logout(); }
+    } catch { logout(); }
+  }
+
+  function logout() { authToken = null; currentUser = null; localStorage.removeItem('swarajyapix_token'); localStorage.removeItem('swarajyapix_user'); showLogin(); }
+  logoutBtn.addEventListener('click', logout);
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
+    if (!username || !password) return;
+    loginBtn.disabled = true; loginBtn.textContent = 'Signing in...'; loginError.classList.remove('visible');
+    try {
+      const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        authToken = data.token; currentUser = data.username;
+        localStorage.setItem('swarajyapix_token', authToken); localStorage.setItem('swarajyapix_user', currentUser);
+        loginPassword.value = ''; showApp(currentUser);
+      } else { loginError.textContent = data.error || 'Login failed'; loginError.classList.add('visible'); }
+    } catch { loginError.textContent = 'Connection error'; loginError.classList.add('visible'); }
+    loginBtn.disabled = false; loginBtn.textContent = 'Sign in';
+  });
+
+  // ===== APP STATE =====
+  let parsedPrompts = [];
+  let selectedRatio = '3:2';
+  let selectedResolution = '1K';
+  let currentResults = [];
+  let currentLightboxIndex = -1;
+  let loadedBatches = [];
+  let currentBatchMeta = null; // { aspectRatio, imageSize } of currently viewed batch
+
+  // Elements
+  const batchPromptsEl = document.getElementById('batchPrompts');
+  const fileInput = document.getElementById('fileInput');
+  const fileLabel = document.getElementById('fileLabel');
+  const validateBtn = document.getElementById('validateBtn');
+  const submitBatchBtn = document.getElementById('submitBatchBtn');
+  const validationResult = document.getElementById('validationResult');
+  const batchGrid = document.getElementById('batchGrid');
+  const batchEmptyState = document.getElementById('batchEmptyState');
+
+  // Aspect ratio pills
+  document.querySelectorAll('.aspect-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.aspect-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedRatio = btn.dataset.ratio;
+    });
+  });
+
+  // Resolution pills
+  document.querySelectorAll('.res-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.res-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedResolution = btn.dataset.size;
+    });
+  });
+
+  // File upload
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    fileLabel.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (ev) => { batchPromptsEl.value = ev.target.result; };
+    reader.readAsText(file);
+  });
+
+  // Parse prompts (client-side)
+  function parsePrompts(raw) {
+    let data;
+    try { data = JSON.parse(raw); } catch { throw new Error('not_json'); }
+    if (typeof data === 'string') return [data];
+    if (Array.isArray(data)) {
+      return data.map((item, i) => {
+        if (typeof item === 'string') return item;
+        if (typeof item === 'object' && item !== null) {
+          return item.prompt || item.text || item.description || (() => { throw new Error('Item ' + i + ': no prompt key'); })();
+        }
+        throw new Error('Item ' + i + ': expected string or object');
+      });
+    }
+    if (typeof data === 'object' && data !== null) {
+      const arrayKey = ['prompts', 'items', 'data', 'images'].find(k => Array.isArray(data[k]));
+      if (arrayKey) return parsePrompts(JSON.stringify(data[arrayKey]));
+      throw new Error('Object has no array property');
+    }
+    throw new Error('Unexpected type');
+  }
+
+  function parseLinePrompts(raw) {
+    return raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#') && !l.startsWith('//'));
+  }
+
+  // Validate
+  validateBtn.addEventListener('click', async () => {
+    const raw = batchPromptsEl.value.trim();
+    if (!raw) { showValidation('error', 'Please enter or upload prompts'); return; }
+
+    let parsed = null;
+    let aiParsed = false;
+
+    // Try JSON parse
+    try { parsed = parsePrompts(raw); } catch { /* not JSON */ }
+
+    // Try line-by-line
+    if (!parsed) {
+      const lines = parseLinePrompts(raw);
+      if (lines.length > 0 && lines.every(l => l.length > 3)) {
+        parsed = lines;
+      }
+    }
+
+    // AI fallback
+    if (!parsed) {
+      validateBtn.disabled = true; validateBtn.textContent = 'AI is parsing...';
+      showValidation('success', 'Asking AI to extract prompts...');
+      try {
+        const res = await fetch('/api/parse-prompts', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+          body: JSON.stringify({ text: raw }),
+        });
+        if (res.status === 401) { logout(); return; }
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        parsed = data.prompts; aiParsed = true;
+      } catch (err) {
+        showValidation('error', 'Could not parse input: ' + err.message);
+        submitBatchBtn.disabled = true; parsedPrompts = [];
+        validateBtn.disabled = false; validateBtn.textContent = 'Validate'; return;
+      }
+      validateBtn.disabled = false; validateBtn.textContent = 'Validate';
+    }
+
+    if (!parsed || parsed.length === 0) {
+      showValidation('error', 'No prompts found'); submitBatchBtn.disabled = true; parsedPrompts = []; return;
+    }
+
+    parsedPrompts = parsed;
+    const label = aiParsed ? ' (AI-parsed)' : '';
+    let html = '<strong>' + parsedPrompts.length + ' prompt' + (parsedPrompts.length > 1 ? 's' : '') + ' found' + label + ':</strong>';
+    html += '<ol class="prompt-preview">';
+    parsedPrompts.forEach(p => { html += '<li>' + escapeHtml(p.length > 100 ? p.slice(0, 100) + '...' : p) + '</li>'; });
+    html += '</ol>';
+    showValidation('success', html);
+    submitBatchBtn.disabled = false;
+  });
+
+  batchPromptsEl.addEventListener('paste', () => { setTimeout(() => validateBtn.click(), 100); });
+
+  function showValidation(type, html) { validationResult.className = 'validation-result ' + type; validationResult.innerHTML = html; }
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // Submit batch
+  submitBatchBtn.addEventListener('click', async () => {
+    if (parsedPrompts.length === 0) return;
+    submitBatchBtn.disabled = true; submitBatchBtn.textContent = 'Submitting...';
+    try {
+      const res = await fetch('/api/batch/create', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+        body: JSON.stringify({ prompts: parsedPrompts, aspectRatio: selectedRatio, imageSize: selectedResolution }),
+      });
+      if (res.status === 401) { logout(); return; }
+      const data = await res.json();
+      if (data.error) { showValidation('error', 'Batch creation failed: ' + data.error); }
+      else {
+        showValidation('success', 'Batch <strong>' + escapeHtml(data.id) + '</strong> created with ' + data.totalRequests + ' requests.');
+        batchPromptsEl.value = ''; parsedPrompts = [];
+        loadBatches();
+      }
+    } catch (err) { showValidation('error', 'Error: ' + err.message); }
+    submitBatchBtn.disabled = false; submitBatchBtn.textContent = 'Submit Batch';
+  });
+
+  // ===== BATCHES LIST =====
+  async function loadBatches() {
+    try {
+      const res = await fetch('/api/batch/list', { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (res.status === 401) { logout(); return; }
+      const data = await res.json();
+      renderBatches(data.batches || []);
+    } catch { /* ignore */ }
+  }
+
+  function renderBatches(batches) {
+    loadedBatches = batches;
+    batchGrid.innerHTML = '';
+    if (batches.length === 0) { batchGrid.appendChild(batchEmptyState); batchEmptyState.style.display = ''; return; }
+    batches.forEach(b => batchGrid.appendChild(createBatchCard(b)));
+  }
+
+  function createBatchCard(batch) {
+    const card = document.createElement('div');
+    card.className = 'batch-card';
+    card.id = 'batch-' + batch.id;
+
+    const header = document.createElement('div');
+    header.className = 'batch-card-header';
+
+    const idEl = document.createElement('span');
+    idEl.className = 'batch-id';
+    idEl.textContent = batch.id;
+
+    const badge = document.createElement('span');
+    badge.className = 'status-badge badge-' + batch.state;
+    badge.textContent = batch.state;
+
+    header.appendChild(idEl);
+    header.appendChild(badge);
+
+    const meta = document.createElement('div');
+    meta.className = 'batch-meta';
+    const created = new Date(batch.createdAt);
+    meta.innerHTML = '<span>' + batch.totalRequests + ' prompts</span><span>' + batch.aspectRatio + '</span><span>' + formatTime(created) + '</span>';
+
+    const actions = document.createElement('div');
+    actions.className = 'batch-actions';
+
+    const pollBtn = document.createElement('button');
+    pollBtn.className = 'batch-btn batch-btn-poll';
+    pollBtn.textContent = 'Check Status';
+    pollBtn.disabled = (batch.state === 'succeeded' || batch.state === 'failed' || batch.state === 'expired');
+    pollBtn.addEventListener('click', () => pollBatch(batch.id, pollBtn));
+
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'batch-btn batch-btn-view';
+    viewBtn.textContent = 'View Results';
+    viewBtn.disabled = batch.state !== 'succeeded';
+    viewBtn.addEventListener('click', () => viewResults(batch.id));
+
+    actions.appendChild(pollBtn);
+    actions.appendChild(viewBtn);
+
+    if (batch.error) {
+      const errEl = document.createElement('div');
+      errEl.style.cssText = 'font-size:0.72rem;color:var(--error);margin-top:0.5rem;';
+      errEl.textContent = batch.error;
+      card.appendChild(header);
+      card.appendChild(meta);
+      card.appendChild(errEl);
+      card.appendChild(actions);
+    } else {
+      card.appendChild(header);
+      card.appendChild(meta);
+      card.appendChild(actions);
+    }
+
+    return card;
+  }
+
+  function formatTime(date) {
+    const now = new Date();
+    const diff = now - date;
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    return date.toLocaleDateString();
+  }
+
+  // Poll batch
+  async function pollBatch(batchId, btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span>Checking...';
+    try {
+      const res = await fetch('/api/batch/' + batchId + '/poll', {
+        method: 'POST', headers: { 'Authorization': 'Bearer ' + authToken },
+      });
+      if (res.status === 401) { logout(); return; }
+      const data = await res.json();
+      if (data.error && !data.state) {
+        btn.textContent = 'Error'; btn.disabled = false;
+        setTimeout(() => { btn.textContent = 'Check Status'; }, 2000);
+        return;
+      }
+      // Refresh the list to show updated state
+      loadBatches();
+    } catch {
+      btn.textContent = 'Error'; btn.disabled = false;
+      setTimeout(() => { btn.textContent = 'Check Status'; }, 2000);
+    }
+  }
+
+  // View results
+  async function viewResults(batchId) {
+    const overlay = document.getElementById('resultsOverlay');
+    const gallery = document.getElementById('resultsGallery');
+    const title = document.getElementById('resultsTitle');
+
+    // Store batch metadata for edit-image calls
+    const batchInfo = loadedBatches.find(b => b.id === batchId);
+    currentBatchMeta = batchInfo ? { aspectRatio: batchInfo.aspectRatio, imageSize: batchInfo.imageSize } : { aspectRatio: '3:2', imageSize: '1K' };
+
+    gallery.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-dim)"><span class="spinner-sm"></span> Loading results...</div>';
+    title.textContent = 'Results: ' + batchId;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    try {
+      const res = await fetch('/api/batch/' + batchId + '/results', { headers: { 'Authorization': 'Bearer ' + authToken } });
+      if (res.status === 401) { logout(); return; }
+      const data = await res.json();
+      if (data.error) { gallery.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--error)">' + escapeHtml(data.error) + '</div>'; return; }
+
+      currentResults = data.results || [];
+      gallery.innerHTML = '';
+
+      if (currentResults.length === 0) {
+        gallery.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-dim)">No images in this batch.</div>';
+        return;
+      }
+
+      currentResults.forEach((r, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const imageDiv = document.createElement('div');
+        imageDiv.className = 'card-image';
+        const img = document.createElement('img');
+        img.src = 'data:' + r.mimeType + ';base64,' + r.image;
+        img.alt = r.prompt;
+        img.id = 'result-img-' + i;
+        imageDiv.appendChild(img);
+        imageDiv.addEventListener('click', () => openLightbox(i));
+
+        card.appendChild(imageDiv);
+        gallery.appendChild(card);
+      });
+    } catch (err) {
+      gallery.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--error)">Failed to load: ' + escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  // Results overlay close
+  document.getElementById('resultsClose').addEventListener('click', () => {
+    document.getElementById('resultsOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  });
+
+  // Download ZIP
+  document.getElementById('downloadZipBtn').addEventListener('click', async () => {
+    if (currentResults.length === 0) return;
+    const btn = document.getElementById('downloadZipBtn');
+    btn.disabled = true; btn.textContent = 'Creating ZIP...';
+    try {
+      const zip = new JSZip();
+      currentResults.forEach((r, i) => {
+        const ext = r.mimeType.includes('png') ? 'png' : 'jpg';
+        const filename = 'batch-' + (i + 1) + '-' + slugify(r.prompt) + '.' + ext;
+        zip.file(filename, r.image, { base64: true });
+      });
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = 'swarajyapix-batch-' + new Date().toISOString().slice(0, 10) + '.zip';
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e) { alert('ZIP failed: ' + e.message); }
+    btn.disabled = false; btn.textContent = 'Download ZIP';
+  });
+
+  function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40).replace(/-$/, ''); }
+
+  // ===== LIGHTBOX =====
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxPrompt = document.getElementById('lightboxPrompt');
+  const lightboxClose = document.getElementById('lightboxClose');
+  const lightboxDownload = document.getElementById('lightboxDownload');
+  const lightboxPrev = document.getElementById('lightboxPrev');
+  const lightboxNext = document.getElementById('lightboxNext');
+
+  const lightboxEditInput = document.getElementById('lightboxEditInput');
+  const lightboxEditBtn = document.getElementById('lightboxEditBtn');
+  const lightboxEditError = document.getElementById('lightboxEditError');
+
+  function openLightbox(index) {
+    currentLightboxIndex = index;
+    renderLightbox();
+    lightbox.classList.add('open');
+  }
+
+  function renderLightbox() {
+    const r = currentResults[currentLightboxIndex];
+    if (!r) return;
+    lightboxImg.src = 'data:' + r.mimeType + ';base64,' + r.image;
+    lightboxPrompt.textContent = r.prompt;
+    lightboxPrev.style.display = currentLightboxIndex > 0 ? 'block' : 'none';
+    lightboxNext.style.display = currentLightboxIndex < currentResults.length - 1 ? 'block' : 'none';
+
+    // Clear edit state on navigation
+    if (lightboxEditInput) lightboxEditInput.value = '';
+    if (lightboxEditError) lightboxEditError.textContent = '';
+  }
+
+  function closeLightbox() { lightbox.classList.remove('open'); currentLightboxIndex = -1; }
+
+  // Lightbox edit handler
+  lightboxEditBtn.addEventListener('click', handleLightboxEdit);
+  lightboxEditInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleLightboxEdit();
+  });
+
+  async function handleLightboxEdit() {
+    const editPrompt = lightboxEditInput.value.trim();
+    if (!editPrompt) {
+      lightboxEditError.textContent = 'Please enter an edit instruction';
+      return;
+    }
+    if (currentLightboxIndex < 0) return;
+
+    const r = currentResults[currentLightboxIndex];
+    if (!r) return;
+
+    lightboxEditInput.disabled = true;
+    lightboxEditBtn.disabled = true;
+    lightboxEditBtn.textContent = 'Editing...';
+    lightboxEditError.textContent = '';
+
+    try {
+      const res = await fetch('/api/edit-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + authToken,
+        },
+        body: JSON.stringify({
+          image: r.image,
+          mimeType: r.mimeType,
+          prompt: editPrompt,
+          aspectRatio: currentBatchMeta ? currentBatchMeta.aspectRatio : '3:2',
+          imageSize: currentBatchMeta ? currentBatchMeta.imageSize : '1K',
+        }),
+      });
+
+      if (res.status === 401) { logout(); return; }
+
+      const data = await res.json();
+      if (data.error) {
+        lightboxEditError.textContent = data.error;
+      } else {
+        // Update the result with edited image
+        currentResults[currentLightboxIndex].image = data.image;
+        currentResults[currentLightboxIndex].mimeType = data.mimeType || 'image/png';
+
+        // Update gallery card image
+        const cardImg = document.getElementById('result-img-' + currentLightboxIndex);
+        if (cardImg) cardImg.src = 'data:' + currentResults[currentLightboxIndex].mimeType + ';base64,' + currentResults[currentLightboxIndex].image;
+
+        // Re-render lightbox with new image
+        renderLightbox();
+      }
+    } catch (e) {
+      lightboxEditError.textContent = 'Edit failed: ' + e.message;
+    }
+
+    lightboxEditInput.disabled = false;
+    lightboxEditBtn.disabled = false;
+    lightboxEditBtn.textContent = 'Submit';
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  lightboxPrev.addEventListener('click', () => { if (currentLightboxIndex > 0) { currentLightboxIndex--; renderLightbox(); } });
+  lightboxNext.addEventListener('click', () => { if (currentLightboxIndex < currentResults.length - 1) { currentLightboxIndex++; renderLightbox(); } });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft' && currentLightboxIndex > 0) { currentLightboxIndex--; renderLightbox(); }
+    if (e.key === 'ArrowRight' && currentLightboxIndex < currentResults.length - 1) { currentLightboxIndex++; renderLightbox(); }
+  });
+
+  lightboxDownload.addEventListener('click', () => {
+    if (currentLightboxIndex < 0) return;
+    const r = currentResults[currentLightboxIndex];
+    const ext = r.mimeType.includes('png') ? 'png' : 'jpg';
+    const filename = 'swarajyapix-batch-' + (currentLightboxIndex + 1) + '-' + slugify(r.prompt) + '.' + ext;
+    const link = document.createElement('a');
+    link.href = 'data:' + r.mimeType + ';base64,' + r.image;
+    link.download = filename;
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  });
+
+  // ===== INIT =====
+  checkAuth();
+})();
+</script>
+
+</body>
+</html>
