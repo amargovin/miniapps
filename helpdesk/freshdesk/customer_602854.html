@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer history — #602854</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; max-width: 880px; margin: 1.5rem auto; padding: 0 1.4rem 4rem; color: #1c1c28; background: #f6f6f8; line-height: 1.45; font-size: 14px; }
+  h1 { font-size: 1.35rem; margin: 0 0 0.2rem; font-weight: 600; }
+  h2 { font-size: 0.95rem; margin: 0 0 0.7rem; color: #1c1c28; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #585866; }
+  .subtitle { color: #888894; font-size: 0.82rem; margin-bottom: 1.2rem; }
+  .link { color: #4a5db8; text-decoration: none; font-weight: 500; font-family: ui-monospace, SF Mono, monospace; }
+  .link:hover { text-decoration: underline; }
+  .muted { color: #888894; font-size: 0.82rem; }
+
+  /* Headline */
+  .headline { background: #1c1c28; color: #fff; border-radius: 8px; padding: 1.1rem 1.3rem; margin-bottom: 1rem; font-size: 1.05rem; font-weight: 500; line-height: 1.4; }
+
+  /* Cards */
+  .card { background: #fff; border: 1px solid #dbdbe1; border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 0.8rem; }
+  .card.accent-blue { border-left: 4px solid #4a5db8; }
+  .card.accent-amber { border-left: 4px solid #b89530; background: #fdfaef; }
+  .card ul { margin: 0; padding-left: 1.3rem; }
+  .card li { margin-bottom: 0.4rem; }
+  .card li:last-child { margin-bottom: 0; }
+
+  /* Meta */
+  .meta { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1rem; font-size: 0.88rem; }
+  .meta dt { color: #585866; font-weight: 500; }
+  .meta dd { margin: 0; }
+  .meta .ticket-list { list-style: none; padding: 0; margin: 0; }
+  .meta .ticket-list li { padding: 0.15rem 0; font-size: 0.87rem; }
+
+  /* Timeline */
+  .timeline { list-style: none; padding: 0; margin: 0; }
+  .timeline li { display: grid; grid-template-columns: 90px 1fr; gap: 0.7rem; padding: 0.35rem 0; border-bottom: 1px dashed #ebebf0; font-size: 0.87rem; align-items: baseline; }
+  .timeline li:last-child { border-bottom: none; }
+  .tl-date { color: #585866; font-family: ui-monospace, SF Mono, monospace; font-size: 0.78rem; }
+  .tl-label { color: #1c1c28; }
+
+  /* Messages */
+  .messages-wrap { margin-top: 1rem; }
+  .msg { background: #fff; border: 1px solid #dbdbe1; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid #4a5db8; font-size: 0.86rem; }
+  .msg.outgoing { border-left-color: #888894; background: #fafafd; }
+  .msg.private_note { border-left-color: #b89530; background: #fdfaef; }
+  .msg.original { border-left-color: #c73a3a; }
+  .msg-header { display: flex; gap: 0.6rem; flex-wrap: wrap; padding: 0.5rem 0.8rem; border-bottom: 1px solid #ebebf0; align-items: center; font-size: 0.78rem; }
+  .badge { background: #4a5db8; color: #fff; padding: 0.08rem 0.5rem; border-radius: 99px; font-size: 0.66rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge.outgoing { background: #888894; }
+  .badge.private_note { background: #b89530; }
+  .badge.original { background: #c73a3a; }
+  .msg-header .from { color: #1c1c28; font-weight: 500; }
+  .msg .body { padding: 0.6rem 0.8rem; white-space: pre-wrap; word-wrap: break-word; color: #2a2a35; line-height: 1.5; font-size: 0.86rem; }
+  .msg .body em.muted { font-style: italic; }
+  .fold { margin-top: 0.4rem; }
+  .fold summary { cursor: pointer; color: #4a5db8; font-size: 0.78rem; padding: 0.2rem 0; user-select: none; list-style: none; }
+  .fold summary::-webkit-details-marker { display: none; }
+  .fold summary::before { content: "▸ "; }
+  .fold[open] summary::before { content: "▾ "; }
+  .fold .rest { white-space: pre-wrap; padding-top: 0.4rem; color: #2a2a35; border-top: 1px dashed #ebebf0; margin-top: 0.4rem; }
+
+  /* Section spacing */
+  section { margin-bottom: 1.4rem; }
+  section h2 { padding-bottom: 0; }
+</style>
+</head>
+<body>
+<h1>Customer history</h1>
+<div class="subtitle">Seed: ticket #602854 · Sudhir Joshi · generated 2026-06-19</div>
+
+<div class="headline">Customer bought a lifetime subscription but faced repeated failures: wrong email assigned at purchase, no confirmation sent, and then continued to receive subscription marketing emails for weeks afterward.</div>
+
+<section>
+  <div class="card accent-blue">
+    <h2>What happened</h2>
+    <ul><li>Customer Sudhir Joshi paid for a lifetime subscription ~2026-05-31 but received no confirmation email and saw nothing in his account (Ticket #590831, 2026-06-02).</li><li>Support found the subscription had been registered under quad@tritek.in instead of the customer's intended and previously used email tritekindia@gmail.com — a system or data-entry error (Ticket #590831, 2026-06-02).</li><li>Customer had to explicitly request a transfer; support corrected it and moved the subscription to tritekindia@gmail.com the same day (Ticket #590831, 2026-06-02).</li><li>Two weeks later, customer was still receiving daily subscription-promotion emails despite now holding a lifetime membership, and threatened to block Swarajya (Ticket #602854, 2026-06-17).</li><li>Support acknowledged the cause was the two email IDs still present in their mailing list and removed tritekindia@gmail.com from marketing communications only after the second complaint (Ticket #602854, 2026-06-18).</li></ul>
+  </div>
+</section>
+
+<section>
+  <div class="card accent-amber">
+    <h2>What the agent should have done</h2>
+    <ul><li>When the lifetime subscription was created, the system should have confirmed the email address with the customer before activating under quad@tritek.in, preventing the wrong-email assignment entirely.</li><li>A confirmation email should have been sent immediately upon successful payment; the failure to send one should have been caught and corrected before the customer had to chase it.</li><li>When the subscription was transferred to tritekindia@gmail.com on 2026-06-02 (Ticket #590831), the support agent should have simultaneously flagged or removed that address from the marketing/promotional mailing list.</li><li>Support should not have waited for a second complaint (Ticket #602854) 15 days later to suppress promotional emails for a customer who had just paid for a lifetime plan.</li><li>After resolving the email-transfer in Ticket #590831, a follow-up check should have been scheduled to confirm both the subscription display and mailing-list status were correct.</li></ul>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h2>Key moments</h2>
+    <ol class="timeline"><li><span class="tl-date">2026-05-31</span><span class="tl-label">Customer purchases lifetime subscription; system assigns it to wrong email (quad@tritek.in) with no confirmation sent</span></li><li><span class="tl-date">2026-06-02</span><span class="tl-label">Customer emails support reporting missing confirmation and subscription not visible in account (Ticket #590831 opened)</span></li><li><span class="tl-date">2026-06-02</span><span class="tl-label">Support confirms subscription exists but under wrong email; customer disputes and requests transfer to tritekindia@gmail.com</span></li><li><span class="tl-date">2026-06-02</span><span class="tl-label">Support transfers subscription to correct email but fails to remove it from marketing mailing lists</span></li><li><span class="tl-date">2026-06-17</span><span class="tl-label">Customer complains of daily promotional bombardment 15 days after buying lifetime plan, threatens to block Swarajya (Ticket #602854 opened)</span></li><li><span class="tl-date">2026-06-18</span><span class="tl-label">Support removes tritekindia@gmail.com from email communications, attributing the issue to two email IDs in the system</span></li></ol>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h2>Customer profile</h2>
+    <dl class="meta">
+      <dt>Name</dt><dd>Sudhir Joshi</dd>
+      <dt>Emails</dt><dd><code>tritekindia@gmail.com</code>, <code>quad@tritek.in</code></dd>
+      <dt>Tickets (2)</dt><dd><ul class="ticket-list"><li><a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/590831" target="_blank">#590831</a> <span class="muted">2026-06-02</span> · Lifetime Subscription not showing in the account</li><li><a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/602854" target="_blank">#602854</a> <span class="muted">2026-06-17</span> · Still being bombarded by your promotions.</li></ul></dd>
+      <dt>Messages</dt><dd>6</dd>
+    </dl>
+  </div>
+</section>
+
+<section class="messages-wrap">
+  <h2>Full thread (6)</h2>
+  
+<article class="msg original">
+  <header class="msg-header">
+    <span class="badge original">original</span>
+    <a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/590831" target="_blank">#590831</a>
+    <span class="muted">2026-06-02 06:28</span>
+    <span class="from">tritekindia@gmail.com</span>
+  </header>
+  <div class="body">Hello,
+
+2 days back I made payment for Lifetime Subscription.
+Payment ID: pay_SvzOIGt7AokIZX
+I have neither received confirmation email, nor it is reflecting in my 
+account.<details class="fold"><summary>Show full message (36 lines)</summary><div class="rest">Request please check and correct this.
+
+Thanks and regards
+
+Sudhir Joshi
+
+
+
+
+-- 
+
+*Rtn. Sudhir Joshi*
+
+*Rotary Club of Mulund*
+
+5060, Bhandup Industrial Estate,
+
+Pannalal Compound, LBS Road,
+
+Bhandup West,
+
+Mumbai 400078, INDIA
+
+Mobile: 98201 60005
+
+Tel Board Lines: +91-22-4015 9411, 4015 9509, 4015 4859
+
+Tel Direct: +91-22-4972 4760, 4004 4898
+
+www.tritek.in</div></details></div>
+</article>
+<article class="msg outgoing">
+  <header class="msg-header">
+    <span class="badge outgoing">outgoing</span>
+    <a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/590831" target="_blank">#590831</a>
+    <span class="muted">2026-06-02 08:49</span>
+    <span class="from">Swarajya &lt;subscriptions@swarajyamag.com&gt;</span>
+  </header>
+  <div class="body">Dear Sir,     Thank you for reaching out to us and for subscribing to our Lifetime Membership.     We have checked our records and can confirm that your Lifetime Membership is active under the email address quad@tritek.in. Your subscription is currently active and valid until 31-May-2036.     We have also sent an acknowledgment email to quad@tritek.in. Kindly check your Inbox as well as your Spam/Junk folder for the confirmation email.     Regarding your concern that the subscription is not reflecting in your account, we kindly request that you sign out of your account and then sign in again using the email address quad@tritek.in. This should refresh your account and allow the active subscription to be displayed correctly.     If the issue persists after signing out and signing back in, please let us know, and we will be happy to assist you further.     Thank you for your patience and support.     Warm regards, Jai Hind!<details class="fold"><summary>Show full message (1 lines)</summary><div class="rest"></div></details></div>
+</article>
+<article class="msg incoming">
+  <header class="msg-header">
+    <span class="badge incoming">incoming</span>
+    <a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/590831" target="_blank">#590831</a>
+    <span class="muted">2026-06-02 09:20</span>
+    <span class="from">tritekindia@gmail.com</span>
+  </header>
+  <div class="body">Hello,
+
+Thanks for your reply.
+
+I have always used this email id, tritekindia@gmail.com,
+which is my personal email, to access Swarajya. I had<details class="fold"><summary>Show full message (20 lines)</summary><div class="rest">earlier subscription under the same email.
+
+This time also, I had given tritekindia@gmail.com as email, while
+filling in the details. I don't know, from where your system has picked 
+up the other id.
+
+Anyway, I request you to kindly transfer my subscription to my correct
+email id, tritekindia@gmail.com.
+
+Hope this will be done immediately.
+
+Thanks and regards
+
+Sudhir Joshi</div></details></div>
+</article>
+<article class="msg outgoing">
+  <header class="msg-header">
+    <span class="badge outgoing">outgoing</span>
+    <a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/590831" target="_blank">#590831</a>
+    <span class="muted">2026-06-02 10:37</span>
+    <span class="from">Swarajya &lt;subscriptions@swarajyamag.com&gt;</span>
+  </header>
+  <div class="body">Dear Sir,     Thank you for letting us know.     We have now transferred your Lifetime Subscription to your preferred email address, tritekindia@gmail.com.     Please sign out of your account and sign in again using tritekindia@gmail.com. Your active subscription should now be reflected correctly in your account.     If you continue to experience any issues, please feel free to contact us, and we will be happy to assist you.  Thank you for your patience and support.     Warm regards,  Jai Hind!</div>
+</article>
+<article class="msg original">
+  <header class="msg-header">
+    <span class="badge original">original</span>
+    <a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/602854" target="_blank">#602854</a>
+    <span class="muted">2026-06-17 16:25</span>
+    <span class="from">tritekindia@gmail.com</span>
+  </header>
+  <div class="body">Hello,
+
+Last month I purchased life subscription of Swarajya Online access.
+Then why am I still being bombarded with request for subscription everyday?
+Don't you have any coordination amongst your own departments?
+Please stop this else I will have no option but to block you.<details class="fold"><summary>Show full message (37 lines)</summary><div class="rest">
+Thanks and regards
+
+Sudhir Joshi
+
+
+
+
+
+
+-- 
+
+*Rtn. Sudhir Joshi*
+
+*Rotary Club of Mulund*
+
+5060, Bhandup Industrial Estate,
+
+Pannalal Compound, LBS Road,
+
+Bhandup West,
+
+Mumbai 400078, INDIA
+
+Mobile: 98201 60005
+
+Tel Board Lines: +91-22-4015 9411, 4015 9509, 4015 4859
+
+Tel Direct: +91-22-4972 4760, 4004 4898
+
+www.tritek.in</div></details></div>
+</article>
+<article class="msg outgoing">
+  <header class="msg-header">
+    <span class="badge outgoing">outgoing</span>
+    <a class="link" href="https://swarajyasubscriptions.freshdesk.com/a/tickets/602854" target="_blank">#602854</a>
+    <span class="muted">2026-06-18 04:22</span>
+    <span class="from">Swarajya &lt;subscriptions@swarajyamag.com&gt;</span>
+  </header>
+  <div class="body">Hi Sudhir, ​​we just found out the reason why this happened despite discussing this earlier this month.     ​This was only because there were two email IDs of yours in our records, but we've now removed tritekindia@gmail.com from email communications - this should not happen hereon.  We are updating this currently and will come into effect straightaway.  Thanks a lot for your patience.  Ticket: https://swarajyasubscriptions.freshdesk.com/helpdesk/tickets/602854   Always here to help, Raghu R Subscriber &amp; Reader Support Executive<details class="fold"><summary>Show full message (1 lines)</summary><div class="rest"></div></details></div>
+</article>
+</section>
+
+</body>
+</html>
