@@ -1,0 +1,15 @@
+# Swarajya MCP — Phase 1 dependencies
+fastapi>=0.115
+uvicorn[standard]>=0.30
+httpx>=0.27
+pydantic>=2.7
+pydantic-settings>=2.3
+anthropic>=0.40
+# FastMCP lives in the official `mcp` package. Pin <2: the v2 rework (MCPServer
+# API, ~July 2026) changes imports we depend on. Revisit when v2 is stable.
+mcp>=1.9,<2
+# Client/token store (spec §8)
+sqlalchemy[asyncio]>=2.0
+aiosqlite>=0.20            # local dev SQLite async driver
+asyncpg>=0.29             # Postgres async driver (Railway / production)
+bcrypt>=4.1               # token secret hashing
