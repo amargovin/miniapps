@@ -1,0 +1,12 @@
+{
+  "name": "swarajya-pro-pages",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Swarajya PRO — sales site for the group subscription + Swarajya MCP bundle.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

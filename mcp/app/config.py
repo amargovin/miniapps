@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./swarajya_mcp.db"
     # Admin API key gating /admin (client + token management). Unset => admin off.
     admin_api_key: str = ""
+    # Bearer token gating the machine-to-machine provisioning webhook
+    # (POST /provision/groups -> mints a group + access URL). Sent as
+    # `Authorization: Bearer <key>`. Unset => the webhook is disabled (503).
+    provision_api_key: str = ""
     # Skip client-bearer auth on /api and /mcp (local dev only).
     disable_auth: bool = False
     # Defaults applied to any grant that has no explicit override. The

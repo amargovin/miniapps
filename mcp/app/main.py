@@ -16,7 +16,7 @@ from app.auth import GatewayMiddleware
 from app.db import dispose_engine, init_db
 from app.mcp.server import mcp
 from app.ratelimit import RateLimiter
-from app.routers import admin, ask
+from app.routers import admin, ask, provision
 from app.runtime import get_orchestrator, get_settings
 
 settings = get_settings()
@@ -42,6 +42,7 @@ app.add_middleware(GatewayMiddleware, settings=settings, limiter=_limiter)
 
 app.include_router(ask.router)
 app.include_router(admin.router)
+app.include_router(provision.router)
 
 # Mount the MCP server at root. The FastMCP app serves its endpoint at the
 # absolute path "/mcp"; /health, /api/*, /admin/* are registered above and match

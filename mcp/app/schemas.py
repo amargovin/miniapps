@@ -111,3 +111,34 @@ class MemberCreated(BaseModel):
     expires_at: datetime | None = None
     # Ready-to-share connector URL (token embedded in the path).
     subscriber_url: str
+
+
+# --- provisioning webhook DTOs ---
+
+
+class ProvisionAccessReq(BaseModel):
+    """Create (or extend) a group and mint access URL(s) in one call.
+
+    Supply `group` to create a new group, OR `group_id` to add seats to an
+    existing one. `seats` controls how many connector URLs are minted.
+    """
+
+    group: str | None = Field(None, min_length=1, max_length=256)
+    group_id: str | None = None
+    contact_email: str | None = None
+    seats: int = Field(1, ge=1, le=500)
+    label: str | None = Field(None, max_length=256)
+    rate_limit_per_minute: int | None = Field(None, ge=1)
+    monthly_request_quota: int | None = Field(None, ge=1)
+    expires_in_days: int | None = Field(None, ge=1)
+
+
+class ProvisionAccessOut(BaseModel):
+    group_id: str
+    group: str
+    created_group: bool
+    seats: int
+    # Convenience: the first URL. `access_urls` holds one per seat.
+    access_url: str
+    access_urls: list[str]
+    expires_at: datetime | None = None
