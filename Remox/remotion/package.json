@@ -1,0 +1,31 @@
+{
+  "name": "remox-remotion",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "node render.mjs",
+    "validate": "node validate.mjs"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^8",
+    "@remotion/bundler": "^4",
+    "@remotion/cli": "^4",
+    "@remotion/google-fonts": "^4.0.484",
+    "@remotion/media-utils": "^4",
+    "@remotion/renderer": "^4",
+    "@remotion/shapes": "^4",
+    "@remotion/three": "^4",
+    "@remotion/transitions": "^4",
+    "react": "^18",
+    "react-dom": "^18",
+    "remotion": "^4",
+    "simplex-noise": "^4",
+    "three": "^0.160"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "@types/three": "^0.160",
+    "typescript": "^5"
+  }
+}

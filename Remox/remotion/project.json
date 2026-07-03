@@ -1,0 +1,68 @@
+{
+  "title": "The Machine India Never Built",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "scenes": [
+    {
+      "id": "Scene01",
+      "audio": "audio/scene_01.mp3",
+      "durationFrames": 1458
+    },
+    {
+      "id": "Scene02",
+      "audio": "audio/scene_02.mp3",
+      "durationFrames": 1489
+    },
+    {
+      "id": "Scene03",
+      "audio": "audio/scene_03.mp3",
+      "durationFrames": 2204
+    },
+    {
+      "id": "Scene04",
+      "audio": "audio/scene_04.mp3",
+      "durationFrames": 1055
+    },
+    {
+      "id": "Scene05",
+      "audio": "audio/scene_05.mp3",
+      "durationFrames": 2665
+    },
+    {
+      "id": "Scene06",
+      "audio": "audio/scene_06.mp3",
+      "durationFrames": 1132
+    },
+    {
+      "id": "Scene07",
+      "audio": "audio/scene_07.mp3",
+      "durationFrames": 1535
+    },
+    {
+      "id": "Scene08",
+      "audio": "audio/scene_08.mp3",
+      "durationFrames": 1420
+    },
+    {
+      "id": "Scene09",
+      "audio": "audio/scene_09.mp3",
+      "durationFrames": 2519
+    },
+    {
+      "id": "Scene10",
+      "audio": "audio/scene_10.mp3",
+      "durationFrames": 3492
+    },
+    {
+      "id": "Scene11",
+      "audio": "audio/scene_11.mp3",
+      "durationFrames": 2016
+    },
+    {
+      "id": "Scene12",
+      "audio": "audio/scene_12.mp3",
+      "durationFrames": 2219
+    }
+  ]
+}

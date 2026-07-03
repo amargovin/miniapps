@@ -1,0 +1,117 @@
+scene: scene_11
+title: "The Reactor Goes Critical"
+act: 3
+core_idea: "27 years of failure finally yields"
+approach: generated-backdrop
+techniques: [duotone-photo, kinetic-typography, spring-slam, stagger-build]
+weight: hero
+emotional_beat: release
+
+# Narrative position
+# Previous: Scene 10 — Pokhran sanctions, Kalam cuts first steel plate. Ends on K missiles stacked-reveal (cream bg).
+# This:     The reactor actually works. Kalpakkam. November 11, 2003.
+# Next:     Scene 12 — Arihant launch. The submarine finally touches water.
+# This is the EMOTIONAL CLIMAX of the engineering saga — 27 years of failure → success.
+
+# Audio narration (65.2s, 2016 frames):
+# P1 (0→18.46s): "Meanwhile at Kalpakkam, BARC built a full-scale test setup — a 42 metre section
+#                  of simulated submarine hull on land, with a real reactor installed inside.
+#                  And on November 11, 2003, that reactor went critical for the first time."
+# P2 (18.46→47.86s): "Think about what that moment meant. 27 years after the first design was
+#                       rejected in 1976. After three failures. After a frozen programme.
+#                       After the collapse of their primary technical partner.
+#                       India finally had a working submarine reactor.
+#                       Some of the scientists in that room had started as young researchers
+#                       in the 70s and were now greying men in their 50s."
+# P3 (47.86→65.2s): "They had spent their entire careers on a problem that kept defeating them.
+#                     And they had finally solved it. Now a working reactor isn't a submarine.
+#                     But for the first time, the submarine felt genuinely possible."
+
+phases:
+  - id: 1
+    duration_frames: 568
+    template: stacked-reveal
+    background: cream
+    text_overlay: "November 11, 2003 / 27 years after the first rejection"
+    entrance: spring-slam
+    drift: none
+    notes: >
+      Cream bg. Stillness — authoritative, historic. Two-line stacked reveal:
+      Large date stamp "November 11, 2003" in bronze/accent Georgia serif (96px).
+      Below, smaller "27 years after the first rejection" in navy (48px).
+      Bronze accent rule draws between. No body. Static weight. Maximum gravity.
+      Comes after Scene 10's cream K-missiles phase — contrast via stillness+size.
+
+  - id: 2
+    duration_frames: 900
+    template: focal-offset
+    background: image
+    asset: s11_reactor.png
+    text_overlay: "The reactor went critical for the first time. / Greying men in their fifties."
+    entrance: clip-path-reveal
+    drift: ken-burns-on-image
+    notes: >
+      Reactor control room duotone image on RIGHT panel (1:1, circle reveal into position).
+      LEFT text zone: label "Kalpakkam, 2003" in accent color, bronze rule, then headline
+      "The reactor went critical for the first time." (52px Georgia, navy text).
+      Body: "Some had started as young researchers in the 70s. Now greying men in their 50s."
+      Amber/bronze duotone on the image — reactor glow aesthetic. Ken Burns on image.
+      The longest phase — carries the full emotional weight of 27 years.
+
+  - id: 3
+    duration_frames: 602
+    template: centered-hero
+    background: solid
+    bg_color: navy-primary
+    text_overlay: "They had finally solved it."
+    entrance: spring-slam-scale
+    drift: none
+    notes: >
+      Navy background. Single white serif line at hero scale (88px). Maximum stillness.
+      No label. No body. No rule. Just the sentence.
+      Spring-slam scale entrance — overshoots to 1.15x, settles to 1.0.
+      Phase 3 ends here: brief coda "Now a working reactor isn't a submarine.
+      But for the first time, the submarine felt genuinely possible." adds as
+      smaller text below with stagger delay (36px, muted cream).
+      The phase holds after audio ends with breathing room built into the 602f budget.
+
+template_distribution:
+  stacked-reveal: 1
+  focal-offset: 1
+  centered-hero: 1
+
+# Template check:
+# 3 unique templates — PASS
+# centered-hero: 1/3 = 33% — PASS (<=50%)
+# No consecutive same template — PASS
+
+assets_needed:
+  images:
+    - file: s11_reactor.png
+      prompt: >
+        Nuclear reactor control room with glowing instrumentation panels and scientists
+        monitoring readouts, in Modern Vintage Poster Style — bold screen-printed aesthetic
+        with large fields of flat color, inspired by WPA National Park posters. 1:1.
+        Color palette: warm amber glow (#C4873B), deep navy shadow (#1B3A5F), teal
+        indicator lights, cream console faces. Mood: breakthrough, controlled power,
+        decades of work finally yielding. No text no words no letters.
+      aspect_ratio: "1:1"
+
+palette_emphasis: [accent, primary]
+contrast_with_previous: "Previous was cream bg stacked-reveal with bronze K letters. This opens with cream stillness then shifts to image then navy — stronger emotional arc."
+contrast_with_next: "Next is Arihant launch — image-heavy 16:9 duotone with celebration. This ends on maximum navy stillness — the setup for the release."
+
+rejected_alternatives:
+  - approach: kinetic-typography-only
+    reason: "Three text-only phases would be a slideshow. The reactor control room image is essential — it grounds the human moment in a physical setting."
+  - approach: data-visualization
+    reason: "27 years is a single number, not a trend. A counter animation serves it better than a chart. The story is human, not statistical."
+  - approach: full-image-backdrop-phase1
+    reason: "Phase 1 must be cream/stillness — the gravity of the date demands a clean stage. The image is earned in Phase 2."
+
+# TSM verification:
+# 568 + 900 + 602 - (3 × 18) = 2070 - 54 = 2016 ✓
+tsm_check: "568 + 900 + 602 - 54 = 2016 ✓"
+total_frames: 2016
+transitions: 3
+transition_duration_each: 18

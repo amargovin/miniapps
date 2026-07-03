@@ -1,0 +1,947 @@
+{
+  "totalWords": 188,
+  "audioDurationMs": 88320,
+  "words": [
+    {
+      "word": "You",
+      "startMs": 0,
+      "endMs": 220
+    },
+    {
+      "word": "know",
+      "startMs": 220,
+      "endMs": 740
+    },
+    {
+      "word": "despite",
+      "startMs": 940,
+      "endMs": 1180
+    },
+    {
+      "word": "the",
+      "startMs": 1180,
+      "endMs": 1600
+    },
+    {
+      "word": "absolute",
+      "startMs": 1600,
+      "endMs": 2140
+    },
+    {
+      "word": "pounding",
+      "startMs": 2140,
+      "endMs": 2640
+    },
+    {
+      "word": "it",
+      "startMs": 2640,
+      "endMs": 3000
+    },
+    {
+      "word": "took",
+      "startMs": 3000,
+      "endMs": 3100
+    },
+    {
+      "word": "during",
+      "startMs": 3100,
+      "endMs": 3420
+    },
+    {
+      "word": "Operation",
+      "startMs": 3420,
+      "endMs": 3980
+    },
+    {
+      "word": "Sindoor",
+      "startMs": 3980,
+      "endMs": 4400
+    },
+    {
+      "word": "Pakistan",
+      "startMs": 5360,
+      "endMs": 5680
+    },
+    {
+      "word": "went",
+      "startMs": 5680,
+      "endMs": 6000
+    },
+    {
+      "word": "ahead",
+      "startMs": 6000,
+      "endMs": 6280
+    },
+    {
+      "word": "and",
+      "startMs": 6280,
+      "endMs": 6960
+    },
+    {
+      "word": "built",
+      "startMs": 6960,
+      "endMs": 6960
+    },
+    {
+      "word": "a",
+      "startMs": 6960,
+      "endMs": 7320
+    },
+    {
+      "word": "dedicated",
+      "startMs": 7320,
+      "endMs": 7820
+    },
+    {
+      "word": "rocket",
+      "startMs": 7820,
+      "endMs": 8180
+    },
+    {
+      "word": "force",
+      "startMs": 8180,
+      "endMs": 8520
+    },
+    {
+      "word": "Three",
+      "startMs": 9800,
+      "endMs": 9980
+    },
+    {
+      "word": "months",
+      "startMs": 9980,
+      "endMs": 10260
+    },
+    {
+      "word": "That's",
+      "startMs": 11120,
+      "endMs": 11380
+    },
+    {
+      "word": "all",
+      "startMs": 11380,
+      "endMs": 11500
+    },
+    {
+      "word": "it",
+      "startMs": 11500,
+      "endMs": 11700
+    },
+    {
+      "word": "took",
+      "startMs": 11700,
+      "endMs": 11860
+    },
+    {
+      "word": "Three",
+      "startMs": 12960,
+      "endMs": 13220
+    },
+    {
+      "word": "months",
+      "startMs": 13220,
+      "endMs": 13540
+    },
+    {
+      "word": "after",
+      "startMs": 13540,
+      "endMs": 13980
+    },
+    {
+      "word": "getting",
+      "startMs": 13980,
+      "endMs": 14300
+    },
+    {
+      "word": "hit",
+      "startMs": 14300,
+      "endMs": 14680
+    },
+    {
+      "word": "harder",
+      "startMs": 14680,
+      "endMs": 15100
+    },
+    {
+      "word": "than",
+      "startMs": 15100,
+      "endMs": 15620
+    },
+    {
+      "word": "any",
+      "startMs": 15620,
+      "endMs": 16060
+    },
+    {
+      "word": "time",
+      "startMs": 16060,
+      "endMs": 16320
+    },
+    {
+      "word": "since",
+      "startMs": 16320,
+      "endMs": 16540
+    },
+    {
+      "word": "1971",
+      "startMs": 16540,
+      "endMs": 17520
+    },
+    {
+      "word": "Airbases",
+      "startMs": 18620,
+      "endMs": 19040
+    },
+    {
+      "word": "knocked",
+      "startMs": 19040,
+      "endMs": 19360
+    },
+    {
+      "word": "out",
+      "startMs": 19360,
+      "endMs": 19880
+    },
+    {
+      "word": "jets",
+      "startMs": 20460,
+      "endMs": 20460
+    },
+    {
+      "word": "shot",
+      "startMs": 20460,
+      "endMs": 20800
+    },
+    {
+      "word": "down",
+      "startMs": 20800,
+      "endMs": 21160
+    },
+    {
+      "word": "the",
+      "startMs": 21820,
+      "endMs": 22100
+    },
+    {
+      "word": "Indian",
+      "startMs": 22100,
+      "endMs": 22340
+    },
+    {
+      "word": "Navy",
+      "startMs": 22340,
+      "endMs": 22580
+    },
+    {
+      "word": "parking",
+      "startMs": 22580,
+      "endMs": 23040
+    },
+    {
+      "word": "36",
+      "startMs": 23040,
+      "endMs": 23960
+    },
+    {
+      "word": "warships",
+      "startMs": 23960,
+      "endMs": 24380
+    },
+    {
+      "word": "off",
+      "startMs": 24380,
+      "endMs": 24740
+    },
+    {
+      "word": "Karachi",
+      "startMs": 24740,
+      "endMs": 25120
+    },
+    {
+      "word": "Pakistan",
+      "startMs": 26180,
+      "endMs": 26720
+    },
+    {
+      "word": "looked",
+      "startMs": 26720,
+      "endMs": 26940
+    },
+    {
+      "word": "at",
+      "startMs": 26940,
+      "endMs": 27160
+    },
+    {
+      "word": "all",
+      "startMs": 27160,
+      "endMs": 27380
+    },
+    {
+      "word": "of",
+      "startMs": 27380,
+      "endMs": 27560
+    },
+    {
+      "word": "that",
+      "startMs": 27560,
+      "endMs": 27760
+    },
+    {
+      "word": "and",
+      "startMs": 27760,
+      "endMs": 28480
+    },
+    {
+      "word": "instead",
+      "startMs": 28480,
+      "endMs": 28740
+    },
+    {
+      "word": "of",
+      "startMs": 28740,
+      "endMs": 28940
+    },
+    {
+      "word": "just",
+      "startMs": 28940,
+      "endMs": 29440
+    },
+    {
+      "word": "licking",
+      "startMs": 29440,
+      "endMs": 29440
+    },
+    {
+      "word": "its",
+      "startMs": 29440,
+      "endMs": 29820
+    },
+    {
+      "word": "wounds",
+      "startMs": 29820,
+      "endMs": 30080
+    },
+    {
+      "word": "it",
+      "startMs": 30960,
+      "endMs": 31120
+    },
+    {
+      "word": "reorganized",
+      "startMs": 31120,
+      "endMs": 31740
+    },
+    {
+      "word": "Now",
+      "startMs": 32980,
+      "endMs": 33140
+    },
+    {
+      "word": "I",
+      "startMs": 33760,
+      "endMs": 33960
+    },
+    {
+      "word": "want",
+      "startMs": 33960,
+      "endMs": 34180
+    },
+    {
+      "word": "you",
+      "startMs": 34180,
+      "endMs": 34300
+    },
+    {
+      "word": "to",
+      "startMs": 34300,
+      "endMs": 34560
+    },
+    {
+      "word": "sit",
+      "startMs": 34560,
+      "endMs": 34720
+    },
+    {
+      "word": "with",
+      "startMs": 34720,
+      "endMs": 34920
+    },
+    {
+      "word": "that",
+      "startMs": 34920,
+      "endMs": 35100
+    },
+    {
+      "word": "for",
+      "startMs": 35100,
+      "endMs": 35240
+    },
+    {
+      "word": "a",
+      "startMs": 35240,
+      "endMs": 35660
+    },
+    {
+      "word": "second",
+      "startMs": 35660,
+      "endMs": 35660
+    },
+    {
+      "word": "Because",
+      "startMs": 36500,
+      "endMs": 37040
+    },
+    {
+      "word": "the",
+      "startMs": 37040,
+      "endMs": 37580
+    },
+    {
+      "word": "natural",
+      "startMs": 37580,
+      "endMs": 37920
+    },
+    {
+      "word": "instinct",
+      "startMs": 37920,
+      "endMs": 38260
+    },
+    {
+      "word": "is",
+      "startMs": 38260,
+      "endMs": 38480
+    },
+    {
+      "word": "to",
+      "startMs": 38480,
+      "endMs": 38640
+    },
+    {
+      "word": "say",
+      "startMs": 38640,
+      "endMs": 38820
+    },
+    {
+      "word": "so",
+      "startMs": 39420,
+      "endMs": 39520
+    },
+    {
+      "word": "what",
+      "startMs": 39520,
+      "endMs": 39880
+    },
+    {
+      "word": "We",
+      "startMs": 40580,
+      "endMs": 40760
+    },
+    {
+      "word": "won",
+      "startMs": 40760,
+      "endMs": 41040
+    },
+    {
+      "word": "We",
+      "startMs": 41820,
+      "endMs": 41940
+    },
+    {
+      "word": "hit",
+      "startMs": 41940,
+      "endMs": 42180
+    },
+    {
+      "word": "them",
+      "startMs": 42180,
+      "endMs": 42420
+    },
+    {
+      "word": "We",
+      "startMs": 43000,
+      "endMs": 43180
+    },
+    {
+      "word": "dominated",
+      "startMs": 43180,
+      "endMs": 43540
+    },
+    {
+      "word": "And",
+      "startMs": 44400,
+      "endMs": 44940
+    },
+    {
+      "word": "you'd",
+      "startMs": 44940,
+      "endMs": 45120
+    },
+    {
+      "word": "be",
+      "startMs": 45120,
+      "endMs": 45300
+    },
+    {
+      "word": "right",
+      "startMs": 45300,
+      "endMs": 45600
+    },
+    {
+      "word": "India",
+      "startMs": 46620,
+      "endMs": 46640
+    },
+    {
+      "word": "did",
+      "startMs": 46640,
+      "endMs": 47140
+    },
+    {
+      "word": "dominate",
+      "startMs": 47140,
+      "endMs": 47540
+    },
+    {
+      "word": "But",
+      "startMs": 48400,
+      "endMs": 48940
+    },
+    {
+      "word": "Pakistan",
+      "startMs": 48940,
+      "endMs": 49320
+    },
+    {
+      "word": "didn't",
+      "startMs": 49320,
+      "endMs": 49700
+    },
+    {
+      "word": "build",
+      "startMs": 49700,
+      "endMs": 49920
+    },
+    {
+      "word": "a",
+      "startMs": 49920,
+      "endMs": 50140
+    },
+    {
+      "word": "rocket",
+      "startMs": 50140,
+      "endMs": 50300
+    },
+    {
+      "word": "force",
+      "startMs": 50300,
+      "endMs": 50640
+    },
+    {
+      "word": "because",
+      "startMs": 50640,
+      "endMs": 51080
+    },
+    {
+      "word": "it",
+      "startMs": 51080,
+      "endMs": 51340
+    },
+    {
+      "word": "thinks",
+      "startMs": 51340,
+      "endMs": 51500
+    },
+    {
+      "word": "it",
+      "startMs": 51500,
+      "endMs": 51740
+    },
+    {
+      "word": "can",
+      "startMs": 51740,
+      "endMs": 51980
+    },
+    {
+      "word": "match",
+      "startMs": 51980,
+      "endMs": 52280
+    },
+    {
+      "word": "India",
+      "startMs": 52280,
+      "endMs": 52640
+    },
+    {
+      "word": "weapon",
+      "startMs": 52640,
+      "endMs": 52980
+    },
+    {
+      "word": "for",
+      "startMs": 52980,
+      "endMs": 53320
+    },
+    {
+      "word": "weapon",
+      "startMs": 53320,
+      "endMs": 53520
+    },
+    {
+      "word": "It",
+      "startMs": 54420,
+      "endMs": 54780
+    },
+    {
+      "word": "built",
+      "startMs": 54780,
+      "endMs": 55140
+    },
+    {
+      "word": "one",
+      "startMs": 55140,
+      "endMs": 55520
+    },
+    {
+      "word": "because",
+      "startMs": 55520,
+      "endMs": 56080
+    },
+    {
+      "word": "it",
+      "startMs": 56080,
+      "endMs": 56380
+    },
+    {
+      "word": "figured",
+      "startMs": 56380,
+      "endMs": 56500
+    },
+    {
+      "word": "out",
+      "startMs": 56500,
+      "endMs": 56820
+    },
+    {
+      "word": "something",
+      "startMs": 56820,
+      "endMs": 57140
+    },
+    {
+      "word": "about",
+      "startMs": 57140,
+      "endMs": 57460
+    },
+    {
+      "word": "how",
+      "startMs": 57460,
+      "endMs": 57960
+    },
+    {
+      "word": "India",
+      "startMs": 57960,
+      "endMs": 58280
+    },
+    {
+      "word": "fights",
+      "startMs": 58280,
+      "endMs": 58700
+    },
+    {
+      "word": "Something",
+      "startMs": 60360,
+      "endMs": 60360
+    },
+    {
+      "word": "that",
+      "startMs": 60360,
+      "endMs": 61100
+    },
+    {
+      "word": "should",
+      "startMs": 61100,
+      "endMs": 61420
+    },
+    {
+      "word": "genuinely",
+      "startMs": 61420,
+      "endMs": 61900
+    },
+    {
+      "word": "worry",
+      "startMs": 61900,
+      "endMs": 62200
+    },
+    {
+      "word": "you",
+      "startMs": 62200,
+      "endMs": 62560
+    },
+    {
+      "word": "It",
+      "startMs": 63660,
+      "endMs": 63780
+    },
+    {
+      "word": "figured",
+      "startMs": 63780,
+      "endMs": 63980
+    },
+    {
+      "word": "out",
+      "startMs": 63980,
+      "endMs": 64500
+    },
+    {
+      "word": "that",
+      "startMs": 64500,
+      "endMs": 65220
+    },
+    {
+      "word": "India",
+      "startMs": 65220,
+      "endMs": 65220
+    },
+    {
+      "word": "is",
+      "startMs": 65220,
+      "endMs": 66220
+    },
+    {
+      "word": "slow",
+      "startMs": 66220,
+      "endMs": 66540
+    },
+    {
+      "word": "Not",
+      "startMs": 67920,
+      "endMs": 68120
+    },
+    {
+      "word": "slow",
+      "startMs": 68120,
+      "endMs": 68340
+    },
+    {
+      "word": "in",
+      "startMs": 68340,
+      "endMs": 68480
+    },
+    {
+      "word": "the",
+      "startMs": 68480,
+      "endMs": 68960
+    },
+    {
+      "word": "cockpit",
+      "startMs": 68960,
+      "endMs": 68960
+    },
+    {
+      "word": "Not",
+      "startMs": 69800,
+      "endMs": 69980
+    },
+    {
+      "word": "slow",
+      "startMs": 69980,
+      "endMs": 70160
+    },
+    {
+      "word": "on",
+      "startMs": 70160,
+      "endMs": 70360
+    },
+    {
+      "word": "the",
+      "startMs": 70360,
+      "endMs": 70740
+    },
+    {
+      "word": "trigger",
+      "startMs": 70740,
+      "endMs": 70740
+    },
+    {
+      "word": "Slow",
+      "startMs": 72080,
+      "endMs": 72080
+    },
+    {
+      "word": "in",
+      "startMs": 72080,
+      "endMs": 72520
+    },
+    {
+      "word": "the",
+      "startMs": 72520,
+      "endMs": 72700
+    },
+    {
+      "word": "system",
+      "startMs": 72700,
+      "endMs": 73000
+    },
+    {
+      "word": "Slow",
+      "startMs": 74480,
+      "endMs": 74480
+    },
+    {
+      "word": "in",
+      "startMs": 74480,
+      "endMs": 74740
+    },
+    {
+      "word": "the",
+      "startMs": 74740,
+      "endMs": 74980
+    },
+    {
+      "word": "15",
+      "startMs": 74980,
+      "endMs": 75440
+    },
+    {
+      "word": "days",
+      "startMs": 75440,
+      "endMs": 75780
+    },
+    {
+      "word": "between",
+      "startMs": 75780,
+      "endMs": 76340
+    },
+    {
+      "word": "we",
+      "startMs": 76340,
+      "endMs": 76880
+    },
+    {
+      "word": "know",
+      "startMs": 76880,
+      "endMs": 77080
+    },
+    {
+      "word": "who",
+      "startMs": 77080,
+      "endMs": 77360
+    },
+    {
+      "word": "did",
+      "startMs": 77360,
+      "endMs": 77480
+    },
+    {
+      "word": "this",
+      "startMs": 77480,
+      "endMs": 77800
+    },
+    {
+      "word": "and",
+      "startMs": 77800,
+      "endMs": 78340
+    },
+    {
+      "word": "we",
+      "startMs": 78340,
+      "endMs": 78780
+    },
+    {
+      "word": "are",
+      "startMs": 78780,
+      "endMs": 78960
+    },
+    {
+      "word": "cleared",
+      "startMs": 78960,
+      "endMs": 79180
+    },
+    {
+      "word": "to",
+      "startMs": 79180,
+      "endMs": 79700
+    },
+    {
+      "word": "strike",
+      "startMs": 79700,
+      "endMs": 79700
+    },
+    {
+      "word": "That",
+      "startMs": 80940,
+      "endMs": 81200
+    },
+    {
+      "word": "gap",
+      "startMs": 81200,
+      "endMs": 81600
+    },
+    {
+      "word": "That",
+      "startMs": 81600,
+      "endMs": 82560
+    },
+    {
+      "word": "structural",
+      "startMs": 82560,
+      "endMs": 83260
+    },
+    {
+      "word": "bureaucratic",
+      "startMs": 83260,
+      "endMs": 84080
+    },
+    {
+      "word": "institutional",
+      "startMs": 84080,
+      "endMs": 84860
+    },
+    {
+      "word": "gap",
+      "startMs": 84860,
+      "endMs": 85180
+    },
+    {
+      "word": "is",
+      "startMs": 85180,
+      "endMs": 85920
+    },
+    {
+      "word": "what",
+      "startMs": 85920,
+      "endMs": 86160
+    },
+    {
+      "word": "Pakistan",
+      "startMs": 86160,
+      "endMs": 86620
+    },
+    {
+      "word": "is",
+      "startMs": 86620,
+      "endMs": 86980
+    },
+    {
+      "word": "now",
+      "startMs": 86980,
+      "endMs": 87400
+    },
+    {
+      "word": "designed",
+      "startMs": 87400,
+      "endMs": 87580
+    },
+    {
+      "word": "to",
+      "startMs": 87580,
+      "endMs": 88200
+    },
+    {
+      "word": "exploit",
+      "startMs": 88200,
+      "endMs": 88200
+    }
+  ],
+  "source": "openai-whisper-api"
+}
