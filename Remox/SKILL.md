@@ -150,6 +150,12 @@ Two named styles control visual density. Set in `ontology.yml`.
 
 Style files: `styles/editorial-clean.md`, `styles/cinematic-dense.md`
 
+**Palette/mood default (user preference, July 2026):** bright and colourful —
+cream-editorial palettes and DAYLIGHT imagery ("bright colours and happy
+vibes"). Dark/night-thriller moods only when the user explicitly asks. The
+PL-15 film was fully re-skinned from dark to cream at user request; keep red
+alarm beats for menace, carried on cream by red typography.
+
 ## Mandatory Reads
 
 STOP: Before writing ANY scene code, read these files in order.

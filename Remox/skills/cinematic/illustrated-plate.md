@@ -167,3 +167,29 @@ Use absolute positioning, respect safe zones (no bottom 20%, no top-right).
 
 The plate provides the environmental mood. Text provides the narration anchor.
 They are independent layers — do not bake text into the plate prompt.
+
+---
+
+## Proportion Policy (adopted July 2026, from PL-15 production research)
+
+Camera-walk phases stay special through contrast. Target **25–35% of video
+runtime** as plate/photo camera-walk phases; **hard cap 40%**. Above that the
+walk becomes the default look and the pull-wide payoff stops paying off.
+
+Rules (count WORLDS, not phases):
+1. **3–5 plate worlds per ~10-minute video.** Long consecutive runs on ONE
+   world (up to ~8 phases) are fine only with camera continuity (end zoom =
+   next start). Max 2 distinct plate worlds per scene.
+2. **One pull-wide payoff per world** — it is the climax grammar; spend it once.
+3. **A photo earns a camera walk (vs plain gentle KB)** only when it has ≥2
+   distinct focal zones AND the narration references spatial structure.
+   Single-subject photos keep ambient Ken Burns (1.02→1.08).
+   Zoom caps: ≤1.4 on 2K photos, ≤2.0 on 4K — generate at 4K when the move
+   needs more zoom.
+4. **Data never gets a camera** — dense stat narration wants a stable frame
+   (charts.md treatment). The final thesis beat stays solid typography.
+5. **A solid/chart phase must interrupt every ~90s** of continuous imagery.
+6. **Never two consecutive scenes both >50% plate** unless they form one
+   narrative unit buffered by photo/solid phases at the joint.
+7. Hero scenes: at most one full plate-journey scene per video; other hero
+   scenes get a DIFFERENT signature (chart environment, split-compare).

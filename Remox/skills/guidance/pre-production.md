@@ -94,6 +94,11 @@ Convert input into standardized `ontology.yml`:
 
 **Phase count (LEARNINGS §19):** `target_phases = ceil(duration_seconds / 6)`. Include in ontology per scene.
 
+**Plate-camera budget (illustrated-plate.md Proportion Policy):** plan 25–35% of
+runtime as camera-walk phases (hard cap 40%), organised as 3–5 plate WORLDS per
+~10 min. Assign worlds at ontology time; a photo gets a camera walk only with
+≥2 focal zones + spatial narration.
+
 **Concrete visual direction (LEARNINGS §23):** Each phase in ontology MUST specify `narration_text`, `visual_depiction`, `image_source`, `image_style`, `template`.
 
 Write `ontology.yml` to the project directory.
