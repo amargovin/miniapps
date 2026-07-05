@@ -94,6 +94,11 @@ Convert input into standardized `ontology.yml`:
 
 **Phase count (LEARNINGS §19):** `target_phases = ceil(duration_seconds / 6)`. Include in ontology per scene.
 
+**Composition default (LEARNINGS §49):** plan image phases as INTEGRATED
+full-bleed — image prompts must specify designed negative space for the text
+side; text lives in the image, not beside it. Splits only for true A-vs-B
+beats, with a live divider.
+
 **Plate-camera budget (illustrated-plate.md Proportion Policy):** plan 25–35% of
 runtime as camera-walk phases (hard cap 40%), organised as 3–5 plate WORLDS per
 ~10 min. Assign worlds at ontology time; a photo gets a camera walk only with

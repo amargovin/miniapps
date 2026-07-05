@@ -208,3 +208,22 @@ feel that suits the Remox aesthetic. Reserve fade for:
 Use `fadeThroughDark` (see Custom Presentations above) when entering
 a backdrop phase from a clean phase — the dip to near-black signals
 a world shift and prevents the image from popping in abruptly.
+
+---
+
+## Motivated Transition Vocabulary (July 2026, LEARNINGS §50)
+
+Default was 63 identical 18f fades — monotone. Pick per boundary, in the brief
+(`transition_out:` per phase), all within the standard 18f budget:
+
+| Type | Use when | Implementation |
+|---|---|---|
+| fade | calm boundary (default) | `fade()` |
+| wipe (directional) | camera just travelled that way | `wipe({direction})` — match travel |
+| zoom-through | leaving one world, entering another | custom: scale outgoing 1→1.15 + fade, incoming 1.15→1 |
+| white flash | impact beat lands at the cut | 4f white overlay straddling the boundary (max 2/scene) |
+| slide-over | list/sequence progression | `slide()` — incoming shoves outgoing |
+
+Scene-level: never butt-joint graded scenes — use
+`scripts/concat_xfade.py` (12f dissolve + audio acrossfade). RemoxScene fade
+colour = film base colour, never black on bright films.

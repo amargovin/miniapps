@@ -1,3 +1,4 @@
+import { PALETTE } from './theme';
 import React from 'react';
 import { AbsoluteFill, Audio, Img, staticFile, useCurrentFrame, useVideoConfig, interpolate } from 'remotion';
 import registry from './SceneRegistry';
@@ -22,7 +23,7 @@ export const RemoxScene: React.FC<RemoxSceneProps> = ({ sceneId, audioFile, dura
 
   if (!SceneComponent) {
     return (
-      <AbsoluteFill style={{ backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <AbsoluteFill style={{ backgroundColor: PALETTE.bg /* film base colour — never black-blink on bright films (LEARNINGS §50) */, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ color: '#ff3366', fontSize: 48, fontFamily: 'monospace' }}>
           Scene not found: {sceneId}
         </span>
@@ -36,7 +37,7 @@ export const RemoxScene: React.FC<RemoxSceneProps> = ({ sceneId, audioFile, dura
   const envelope = Math.min(fadeIn, fadeOut);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#000' }}>
+    <AbsoluteFill style={{ backgroundColor: PALETTE.bg /* film base colour — never black-blink on bright films (LEARNINGS §50) */ }}>
       <AbsoluteFill style={{ opacity: envelope }}>
         <SceneComponent />
         {sceneId !== 'Scene12' && sceneId !== 'Scene14' && sceneId !== 'Closer' && sceneId !== 'Credits' && (

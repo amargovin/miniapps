@@ -606,3 +606,45 @@ matters or there are only 2-3 items.
 
 If you cannot fit your scene into any template, the visual
 concept may be too complex. Consider simplifying.
+
+---
+
+## Integrated Full-Bleed Supersedes Focal-Offset (July 2026, LEARNINGS §49)
+
+Focal-offset and split-compare are DEMOTED from default choices. Image-beside-
+text is the boring arrangement the user has rejected. Default instead to
+**integrated full-bleed**: generate imagery with designed negative space
+(subject off-centre, clear area prompted for the text side), camera move over
+the full 16:9, composed text block set INTO the negative space, world-pinned
+callouts (§47) for anything named in the image.
+
+Reach for split-compare ONLY when the narration is an explicit A-vs-B
+comparison — and then the divider must be alive: diagonal/curved mask, subject
+breaking across the boundary, or an animated divider that moves with the
+narration. Straight static vertical divider + flat text panel = review FAIL.
+
+## Extended Composition Vocabulary (July 2026)
+
+Beyond integrated full-bleed, five sanctioned compositions — all generation +
+existing machinery, no new infrastructure:
+
+1. **Diegetic typography** — stats/labels rendered as part of the world:
+   perspective-warped type on tarmac/walls (CSS 3D transform), anchored via
+   world-pin math (§47). Text IN the world beats text OVER it.
+2. **Framed-through** — generate the shot THROUGH a foreground element
+   (canopy arch, hangar doorway); instant depth + a natural dark zone for text.
+3. **Evidence board** — for document/testimony beats: one plate of a desk with
+   scattered prints/clippings/tape; camera glides print-to-print with
+   world-pinned annotations. Investigation-scene energy.
+4. **Silhouette negative-space hero** — subject as bold dark shape against a
+   bright sky at 60-70% of frame; text inside the silhouette or the open sky.
+   Poster energy for thesis beats without going solid-bg.
+5. **Type-as-mask chapter card** — imagery visible through giant letterforms
+   (clip-path/mask). Act breaks; doubles as thumbnail material.
+
+## Broadcast Card Is the Default Image+Text Treatment (July 2026, §53)
+
+For any phase where imagery carries a sentence-level message: full-bleed image
++ `BroadcastCard` (kicker tab + main bar, 70-80% width, above subtitle floor,
+strap-style text swaps on whisper beats). Floating chips = minor annotations
+and world-pinned callouts only. See LEARNINGS §53 and src/BroadcastCard.tsx.

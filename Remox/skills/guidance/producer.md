@@ -51,6 +51,9 @@ Based on the brief's `assets_needed` section:
 - Match aspect ratio to panel: 16:9 full-bleed, 1:1 split panels, 4:5 narrow panels
 - Save to `<project>/remotion/public/images/sXX_description.png`
 - Always include "no text no words no letters" in prompts
+- **Recurring subjects (LEARNINGS §48):** if this entity appeared in an earlier
+  scene, pass that image via `--reference-image` so it looks like the SAME
+  person/aircraft/place across the film
 
 #### Videos (via Grok, max 2 per scene)
 ```bash

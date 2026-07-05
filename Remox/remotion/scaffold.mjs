@@ -87,6 +87,7 @@ const SRC_FILES = [
   'src/motion-utils.ts',
   'src/IllustratedPlate.tsx',
   'src/StandpointEndcard.tsx',
+  'src/BroadcastCard.tsx',
 ];
 
 let copied = 0;

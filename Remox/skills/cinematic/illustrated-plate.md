@@ -193,3 +193,35 @@ Rules (count WORLDS, not phases):
    narrative unit buffered by photo/solid phases at the joint.
 7. Hero scenes: at most one full plate-journey scene per video; other hero
    scenes get a DIFFERENT signature (chart environment, split-compare).
+
+---
+
+## World-Pinned Labels (v2 — adopted July 2026)
+
+Screen-fixed text blocks over moving imagery are the boring version of
+image+text: two disconnected layers. DEFAULT to pinning labels to the
+imagery's world instead — the label drifts and scales with the camera, so
+text and image read as ONE world (AR-annotation feel).
+
+`IllustratedPlate.tsx` exports the math:
+
+```tsx
+import { plateCameraState, plateToScreen } from '../IllustratedPlate';
+
+const st = plateCameraState(frame, cam, 1);        // same cam array as the plate
+const jet = plateToScreen(0.62, 0.55, st);         // subject at 62%/55% of image
+<div style={{ position: 'absolute', left: jet.x, top: jet.y }}>…callout…</div>
+```
+
+Rules:
+- Applies to ANY moving imagery — plates, full-bleed photos on camera walks,
+  even gentle Ken Burns (drive the photo with the same `cam` keyframes and the
+  pin follows). Not plate-exclusive.
+- Screen-fixed text is reserved for genuine UI: eyebrow headers, condition
+  stamps, source lines, counters. Everything that names a THING in the image
+  should pin to that thing.
+- Add a small connector rule (strokeGlow) from the pinned label to its subject
+  when the label must sit offset for legibility.
+- Clamp pinned labels to safe zones: if the camera pushes a pin into the
+  bottom 216px or the top-right logo zone, offset the label and keep the
+  connector pointing at the subject.

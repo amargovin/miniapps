@@ -1060,3 +1060,176 @@ same path survives and reads as success. After every render, verify the output
 file's MTIME is newer than the TSX that was supposed to produce it. (Hit in
 the bright re-skin: an H5 failure blocked re-render and July-2 files silently
 persisted for three scenes.)
+
+## 47. World-Pinned Labels — Default for Text Over Moving Imagery
+
+Screen-fixed label blocks over a moving image read as two disconnected layers
+— the user's "image + text composition too boring" complaint. Labels that name
+a thing IN the image must PIN to it: compute screen position from the camera
+transform each frame via `plateCameraState()` / `plateToScreen()` (exported by
+`IllustratedPlate.tsx`; same math as the render, so pins never drift). Applies
+to plates AND photos with camera moves. Screen-fixed text is reserved for UI
+(eyebrows, stamps, source lines, counters). See illustrated-plate.md →
+"World-Pinned Labels".
+
+## 48. Recurring Subjects Need Reference-Image Chaining
+
+When the same entity appears in multiple scenes (a character, a specific
+aircraft, a location), generate its later appearances with ImageGen's
+`--reference-image` pointing at the FIRST generated image of it. Continuity of
+subjects is felt even when unnoticed; two different-looking "same men"
+(S01/S10 bookends) break the callback. Track recurring entities at ontology
+time and note the reference chain in the briefs (e.g. "reuse
+s01_two_men.png as --reference-image").
+
+## 49. Side-by-Side Splits Are Boring — Integrate, Don't Divide
+
+### User-flagged (July 2026): "split compositions with image on one side and
+### text on another — very boring."
+
+The focal-offset / split layout (image column | text panel, straight vertical
+divider) is an ARRANGEMENT, not a composition: the image is cropped into a
+column, the text floats on dead flat space, and nothing interacts. Demoted
+from default status.
+
+### The default replacement: INTEGRATED FULL-BLEED
+1. **Generate the image WITH designed negative space** — prompt the subject
+   off-centre and demand clear sky / soft shadow / open ground on the side
+   where text will live ("subject in right third, vast clear sky upper-left").
+   16:9 native — no more cropping 1:1 panels out of it.
+2. Run a gentle camera move over the full-bleed image (cam keyframes).
+3. Set the composed text block INTO the negative space (scrim chip only if
+   contrast demands), and WORLD-PIN any label that names a thing (§47).
+The image becomes the environment for the words, not a neighbour.
+
+### When a split IS the story (A-vs-B comparison), make the split itself alive:
+- **Diagonal or curved divider** (clip-path), never a straight vertical rule
+- **Subject breakout**: the subject crosses the divider (nose of the jet
+  overlaps the text side) — cutout layer or generated overlap
+- **Animated divider**: the boundary MOVES during the phase as narration
+  shifts attention (55/45 → 30/70), text reflowing in choreography
+- Panels acknowledge each other: colour echo, connector, shared horizon line
+
+### Hard rule for the §34/feedback-gate review:
+A static straight-divider split with a flat text panel is a FAIL unless the
+narration is an explicit two-thing comparison AND at least one of the
+techniques above is applied.
+
+## 50. Transitions Are a Design Layer — Kill the Black Blink, Vary the Cuts
+
+### User-flagged (July 2026): "transitions are rather abrupt."
+
+Two problems, two fixes:
+
+### a. Scene boundaries: crossfade at concat, never fade-through-black
+The RemoxScene wrapper's 5f fade in/out through BLACK makes every scene
+boundary a dark blink — a slideshow tell, brutal on bright films.
+1. `RemoxScene.tsx` wrapper background must be the film's base colour
+   (PALETTE.bg / PALETTE.dark per film mood), never #000 on a bright film.
+2. Concat with soft crossfades instead of butt joints:
+   `python3 ~/.claude/skills/Remox/scripts/concat_xfade.py out.mp4 <graded scenes...>`
+   (12f video dissolve + audio acrossfade per join; the §42 silence tails make
+   the audio joins safe). Total duration shrinks by (N−1)×0.4s — fine.
+3. Reserve fade-through-black for intentional act breaks only (max 1–2 per film).
+
+### b. Phase boundaries: motivated transitions, not 63 identical fades
+All-identical 18f cross-fades read as monotone. Choose per boundary in the
+brief, same 18f budget (TSM unchanged):
+- **fade** — default for calm narration boundaries
+- **wipe, matching camera travel** — if the camera just swept left, wipe left;
+  the cut inherits the motion (never contradict the camera's direction)
+- **zoom-through** — world→world cuts (push into one image, arrive inside the next)
+- **white flash (4f)** — impact beats only, max 2 per scene
+- **slide-over** — list/sequence items shoving the previous item out
+Rule: a transition should feel CAUSED by what the imagery is doing, not
+applied to it. Brief field: `transition_out: wipe-left | fade | zoom | flash | slide`.
+
+## 51. Text Registers Only If It ARRIVES — Land It on the Whisper Beat
+
+### User-flagged (July 2026): stat chip on the opening shot "just never
+### registers at all."
+
+The chip was fully on screen by frame ~24 — present while the scene itself was
+still entering, and ~3 seconds BEFORE the narration said the number. Text that
+is already there when the viewer's eye lands is wallpaper: no entrance, no
+attention, no read.
+
+### The rule:
+1. **The image establishes ALONE first** — minimum ~1s (30f) of pure imagery
+   at every scene open and every new-world phase before any text enters.
+2. **Text lands ON its whisper beat** — the frame the narrator says the number
+   or name is the frame the text's kinetic entrance fires (count-up, scale
+   settle). The motion onset at the spoken moment is what captures the eye.
+   Entering early pre-empts the beat; entering late orphans it.
+3. **If on-beat entry leaves the text <2s of hold**, skip its exit fade and
+   let the phase cross-fade take it out — visibility comes from the tail, not
+   from entering early.
+4. Applies doubly to Phase 1 of Scene 1: the film's first seconds carry the
+   scene entrance AND the viewer's arrival; nothing textual should compete.
+5. **MINIMUM HOLD: 3 seconds (90f) on screen for any text element** (user
+   rule, July 2026). If landing exactly on the whisper beat would leave less
+   than 90f before the phase ends, enter EARLIER: enterAt = min(beat,
+   phaseDur − 90). The minimum hold outranks perfect beat alignment — text
+   that arrives on beat but vanishes in 2s registers no better than
+   wallpaper.
+
+## 52. Size by ROLE, Not by Floor — Minimums Are Not Defaults
+
+### User-flagged (July 2026), second sizing complaint of the production:
+the opening "$1.2 BN" hero stat was authored at 72px — barely above the
+statNumber floor — and read as small. Raising floors (§43) fixed illegibility
+but created a new failure: agents author AT the floor.
+
+### The rule — choose size by the element's ROLE in the phase:
+| Role in the phase | Scale |
+|---|---|
+| THE payoff of the phase (hero stat, verdict word) | heroStat 140-170px |
+| Phase headline / primary statement | 84-124px |
+| Secondary stat, callout label | 48-72px |
+| Supporting labels/eyebrows/subs | the §43 floors (34-44px) |
+
+The question is never "is it above the minimum?" but "is this the biggest
+thing in the phase when it is the most important thing in the phase?" A
+phase's single hero element should visually dominate — if the narration beat
+IS the number, the number is the composition.
+
+## 53. Broadcast Text Cards — the TV-News Grammar for Image+Text
+
+### User doctrine (July 2026): "Unlike in television programs where a text
+### card is almost 70-80% of the screen width in two parts — a caption part
+### maybe 20% of element height, and remaining 80% for text — think news
+### programs. Otherwise the graphics just look like bad PPT. And even within
+### a phase the text can change, like TV news shows."
+
+Small floating chips/labels on an image are PRINT graphics pasted on video.
+Broadcast solved image+text long ago: the two-part strap.
+
+### The grammar (component ships in scaffold: src/BroadcastCard.tsx):
+- **KICKER tab**: short accent band (~20% of card height), mono caps, brand
+  red/accent background — the category/context line
+- **MAIN bar**: the dominant text area (~80% of card height), 56-84px heading
+  type on a solid bar — the actual statement
+- **70-80% of screen width**, anchored lower-left ABOVE the subtitle floor
+- **ONE message per card per phase** (user correction, July 2026): a typical
+  phase is 5-7s and the card enters 2-3s in — there is no time for strap
+  swaps; a swapped text fragments the read and nothing registers. The items[]
+  swap API exists but is RESERVED for rare ≥10s phases where every message
+  still gets ≥3s of hold. Default: single kicker + single main, held to the
+  phase end.
+
+### Usage rules:
+- DEFAULT for image+text phases (full-bleed imagery + broadcast card).
+  Floating chips are demoted to minor in-image annotations only.
+- World-pinned callouts (§47) remain the tool for NAMING things in the image;
+  the broadcast card carries the SENTENCE-level message.
+- One message per phase. No swaps on normal-length phases (see above).
+- Card text follows §52 role sizing: main bar text is the phase's statement —
+  size it like one (56-84px; hero numbers can go larger inside the bar).
+
+### §53 reference exemplar — person-introduction phases (user: "brilliant")
+PL-15 Scene05 P1 is the canonical person-intro: full-bleed environmental
+portrait (pilot + sun-flared visor in the right third, vast open sky as
+designed negative space), slow push toward the subject, BroadcastCard with
+the person's NAME as the main line landing exactly on the spoken-name beat
+("THE FRAMEWORK / Sameer Joshi — ex-IAF Mirage pilot", 4s hold). When a
+script introduces a person, author the phase to this pattern.

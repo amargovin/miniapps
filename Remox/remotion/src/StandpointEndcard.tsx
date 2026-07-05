@@ -1,18 +1,14 @@
-// StandpointEndcard | Standpoint house end card — reusable 7s closer (210f @ 30fps)
-// SHIPS WITH THE SCAFFOLD (src/StandpointEndcard.tsx). Register as:
-//   import StandpointEndcard from './StandpointEndcard';
-//   registry['SceneEndcard'] = StandpointEndcard;
-// Add to project.json: { id: 'SceneEndcard', audio: 'audio/scene_98.mp3', durationFrames: 210 }
-// (generate silent audio: ffmpeg -f lavfi -i anullsrc=r=44100:cl=stereo -t 7 -q:a 9 scene_98.mp3)
-// RemoxScene must skip the corner logo for 'SceneEndcard' (endcard exception, LEARNINGS §7).
-// Prefer the pre-rendered copy at ~/.claude/skills/Remox/assets/standpoint_endcard.mp4 —
-// concat it directly unless the credits text needs to change.
-// Merges the credits closer + brand sting into one two-beat end card:
-//   Beat 1 (f0–105):  credits — Script by / Creative Direction by / disclaimer
-//   Beat 2 (f105–210): brand sign-off — STANDPOINT + by [Swarajya wordmark chip]
-// Bright happy language: warm white field, colour ribbons, confetti.
-// Fades in from white (cuts off any final scene); ends fading to white.
-// Silent by design — pair with a silent AAC track for concat compatibility.
+// StandpointEndcard | Standpoint house end card — BROADCAST NEWS closer (210f @ 30fps)
+// SHIPS WITH THE SCAFFOLD (src/StandpointEndcard.tsx). Register as 'SceneEndcard',
+// 210f, silent 7s audio; RemoxScene skips the corner logo for it. Prefer the
+// pre-rendered ~/.claude/skills/Remox/assets/standpoint_endcard.mp4 unless the
+// credit names change.
+// v2 (2026-07-04): "news TV show" register replacing the confetti sting.
+//   Deep navy studio field + slow sweeping diagonal light bands + grain.
+//   Beat 1 (f0-105): credit STRAPS slide in (red kicker block + glass bar).
+//   Beat 2 (f105-210): STANDPOINT slams in white 900, red rule sweep,
+//   "by [Swarajya wordmark on red chip]", specular shine pass, fade to black.
+// Silent by design — pair with silent AAC for concat.
 
 import React from 'react';
 import {
@@ -24,137 +20,129 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
-import { FONTS, EASING } from './theme';
+import { FONTS, EASING, FILM_GRAIN_SVG } from './theme';
 
 const DUR = 210;
 const BEAT2 = 105;
 
-const COLORS = ['#4F46E5', '#FF6B57', '#F5A623', '#34C182', '#5AA9FF', '#C4373B'];
-const NAVY = '#12283F';
+const NAVY_DEEP = '#081019';
+const NAVY = '#0E1E2E';
 const RED = '#C4373B';
 
-const rnd = (i: number, salt: number) => {
-  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
-  return x - Math.floor(x);
-};
-
-// Ribbons sweep in from upper-right at open; a second, reverse sweep marks beat 2.
-function Ribbons({ frame }: { frame: number }): React.ReactElement {
-  const make = (i: number, c: string, start: number, reverse: boolean) => {
-    const p = interpolate(frame, [start, start + 32], [0, 1], {
-      extrapolateLeft: 'clamp',
-      extrapolateRight: 'clamp',
-      easing: EASING.inOut,
-    });
-    const x = reverse ? -1400 + p * 3400 : 2000 - p * 3400;
-    const y = reverse ? 900 - p * 1000 : -200 + p * 1000;
-    const drift = Math.sin(frame / 26 + i * 1.7) * 8;
-    const thickness = 90 + rnd(i, 3) * 90;
-    const length = 900 + rnd(i, 4) * 700;
-    return (
-      <div
-        key={`${i}-${reverse ? 'r' : 'f'}`}
-        style={{
-          position: 'absolute',
-          left: x + (reverse ? i * 120 : -i * 120),
-          top: y + (reverse ? i * 60 : -i * 60) + drift,
-          width: length,
-          height: thickness,
-          borderRadius: thickness / 2,
-          background: c,
-          opacity: 0.85,
-          transform: 'rotate(-24deg)',
-        }}
-      />
-    );
-  };
+// ── Sweeping diagonal light bands — the broadcast studio backdrop ─────────────
+function LightBands({ frame }: { frame: number }): React.ReactElement {
+  const bands = [
+    { w: 520, o: 0.05, speed: 0.55, phase: 0, c: '#5A7BA6' },
+    { w: 340, o: 0.07, speed: 0.8, phase: 700, c: '#FFFFFF' },
+    { w: 760, o: 0.04, speed: 0.38, phase: 1400, c: RED },
+  ];
   return (
     <AbsoluteFill style={{ overflow: 'hidden' }}>
-      {COLORS.map((c, i) => make(i, c, 2 + i * 3, false))}
-      {COLORS.map((c, i) => make(i, c, BEAT2 - 4 + i * 3, true))}
+      {bands.map((b, i) => {
+        const x = ((frame * b.speed + b.phase) % 3200) - 1200;
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: x,
+              top: -400,
+              width: b.w,
+              height: 2000,
+              background: `linear-gradient(90deg, transparent 0%, ${b.c} 50%, transparent 100%)`,
+              opacity: b.o,
+              transform: 'rotate(22deg)',
+            }}
+          />
+        );
+      })}
     </AbsoluteFill>
   );
 }
 
-function Confetti({ frame }: { frame: number }): React.ReactElement {
-  const N = 70;
-  const dots: React.ReactElement[] = [];
-  for (let i = 0; i < N; i++) {
-    const c = COLORS[i % COLORS.length];
-    const x0 = rnd(i, 1) * 1920;
-    const y0 = rnd(i, 2) * 1080;
-    const rise = (frame * (0.4 + rnd(i, 5) * 0.9)) % 1160;
-    const y = ((y0 - rise) % 1160 + 1160) % 1160 - 40;
-    const wobble = Math.sin(frame / 18 + i) * 10;
-    const o = interpolate(frame, [4, 18], [0, 0.5 + rnd(i, 6) * 0.4], {
-      extrapolateLeft: 'clamp',
-      extrapolateRight: 'clamp',
-    });
-    const s = 6 + rnd(i, 7) * 10;
-    dots.push(
-      <div
-        key={i}
-        style={{
-          position: 'absolute',
-          left: x0 + wobble,
-          top: y,
-          width: s,
-          height: s,
-          borderRadius: rnd(i, 8) > 0.5 ? '50%' : 2,
-          background: c,
-          opacity: o,
-          transform: `rotate(${frame * (1 + rnd(i, 9) * 3)}deg)`,
-        }}
-      />,
-    );
-  }
-  return <AbsoluteFill style={{ overflow: 'hidden', pointerEvents: 'none' }}>{dots}</AbsoluteFill>;
-}
-
-function CreditLine({
+// ── Broadcast credit strap: red kicker block + glass bar ──────────────────────
+function CreditStrap({
   frame,
   at,
   exitAt,
-  role,
+  kicker,
   name,
+  top,
 }: {
   frame: number;
   at: number;
   exitAt: number;
-  role: string;
+  kicker: string;
   name: string;
-}): React.ReactElement {
+  top: number;
+}): React.ReactElement | null {
   const enter = interpolate(frame, [at, at + 16], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: EASING.out,
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
   });
-  const exit = interpolate(frame, [exitAt, exitAt + 14], [1, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: EASING.in,
+  const exit = interpolate(frame, [exitAt, exitAt + 14], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.in,
   });
-  const y = interpolate(frame, [at, at + 18], [18, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: EASING.out,
-  });
+  if (frame < at || exit >= 1) return null;
+  const x = (1 - enter) * -80 + exit * 90;
+  const o = enter * (1 - exit);
   return (
     <div
       style={{
-        opacity: enter * exit,
-        transform: `translateY(${y}px)`,
+        position: 'absolute',
+        left: 260,
+        top,
         display: 'flex',
-        alignItems: 'baseline',
-        gap: 18,
+        alignItems: 'stretch',
+        transform: `translateX(${x}px)`,
+        opacity: o,
       }}
     >
-      <span style={{ fontFamily: FONTS.heading, fontSize: 40, fontWeight: 600, color: 'rgba(18,40,63,0.55)' }}>
-        {role}
-      </span>
-      <span style={{ fontFamily: FONTS.heading, fontSize: 56, fontWeight: 800, letterSpacing: '0.01em', color: NAVY }}>
-        {name}
-      </span>
+      {/* red kicker block */}
+      <div
+        style={{
+          background: RED,
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 28px',
+        }}
+      >
+        <span
+          style={{
+            fontFamily: FONTS.mono,
+            fontSize: 30,
+            fontWeight: 700,
+            letterSpacing: '0.22em',
+            color: '#FFFFFF',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {kicker}
+        </span>
+      </div>
+      {/* glass name bar */}
+      <div
+        style={{
+          background: 'rgba(255,255,255,0.08)',
+          borderTop: '1px solid rgba(255,255,255,0.14)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          padding: '18px 44px',
+          backdropFilter: 'blur(6px)',
+        }}
+      >
+        <span
+          style={{
+            fontFamily: FONTS.heading,
+            fontSize: 58,
+            fontWeight: 800,
+            letterSpacing: '0.01em',
+            color: '#FFFFFF',
+            whiteSpace: 'nowrap',
+            lineHeight: 1,
+          }}
+        >
+          {name}
+        </span>
+      </div>
     </div>
   );
 }
@@ -163,88 +151,99 @@ const StandpointEndcard: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const whiteIn = interpolate(frame, [0, 10], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const whiteOut = interpolate(frame, [DUR - 12, DUR], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: EASING.in,
-  });
+  const STRAP_EXIT = BEAT2 - 18;
 
-  const CREDIT_EXIT = BEAT2 - 16;
+  // disclaimer (beat 1)
+  const discO =
+    interpolate(frame, [56, 72], [0, 1], {
+      extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
+    }) *
+    interpolate(frame, [STRAP_EXIT, STRAP_EXIT + 14], [1, 0], {
+      extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.in,
+    });
 
-  // beat 1 extras
-  const ruleP = interpolate(frame, [52, 72], [0, 1], {
+  // beat 2: STANDPOINT slam
+  const T_AT = BEAT2 + 10;
+  const sp = spring({ frame: Math.max(0, frame - T_AT), fps, config: { damping: 15, stiffness: 210 } });
+  const titleO = frame >= T_AT ? 1 : 0;
+  const titleScale = 1.4 - 0.4 * sp;
+
+  // red rule sweeps under the title
+  const ruleP = interpolate(frame, [T_AT + 10, T_AT + 30], [0, 1], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
   });
-  const ruleExit = interpolate(frame, [CREDIT_EXIT, CREDIT_EXIT + 14], [1, 0], {
+  const byO = interpolate(frame, [T_AT + 24, T_AT + 38], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
+  });
+  const byY = interpolate(frame, [T_AT + 24, T_AT + 40], [14, 0], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
+  });
+
+  // specular shine pass across the lockup
+  const shineX = interpolate(frame, [T_AT + 34, T_AT + 74], [-500, 2400], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.inOut,
+  });
+
+  // end: fade to black (broadcast sign-off)
+  const blackOut = interpolate(frame, [DUR - 14, DUR], [0, 1], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.in,
   });
-  const disclaimerO =
-    interpolate(frame, [64, 80], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out }) *
-    ruleExit;
-
-  // beat 2: brand lockup
-  const T_AT = BEAT2 + 14;
-  const sp = spring({ frame: Math.max(0, frame - T_AT), fps, config: { damping: 14, stiffness: 220 } });
-  const titleO = frame >= T_AT ? 1 : 0;
-  const titleScale = 1.5 - 0.5 * sp;
-  const rule2P = interpolate(frame, [T_AT + 12, T_AT + 32], [0, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
-  });
-  const byO = interpolate(frame, [T_AT + 22, T_AT + 34], [0, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
-  });
-  const byY = interpolate(frame, [T_AT + 22, T_AT + 36], [16, 0], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASING.out,
-  });
-
-  const breathe = 1 + 0.006 * Math.sin(frame / 14);
+  const breathe = 1 + 0.004 * Math.sin(frame / 15);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#FFFFFF' }}>
-      <AbsoluteFill
-        style={{ background: 'radial-gradient(ellipse at 50% 40%, #FFFFFF 0%, #FDF9F0 55%, #F7EFDF 100%)' }}
-      />
-      <Ribbons frame={frame} />
-      <Confetti frame={frame} />
+    <AbsoluteFill style={{ backgroundColor: NAVY_DEEP }}>
+      {/* studio field */}
       <AbsoluteFill
         style={{
-          background:
-            'radial-gradient(ellipse at 50% 47%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 30%, transparent 58%)',
+          background: `radial-gradient(ellipse at 50% 38%, ${NAVY} 0%, ${NAVY_DEEP} 62%, #050B12 100%)`,
+        }}
+      />
+      <LightBands frame={frame} />
+      {/* red baseline accent — studio floor line */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 236,
+          height: 4,
+          background: `linear-gradient(90deg, transparent 0%, ${RED} 18%, ${RED} 82%, transparent 100%)`,
+          opacity: 0.5,
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          backgroundImage: FILM_GRAIN_SVG,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '256px 256px',
+          opacity: 0.04,
+          mixBlendMode: 'overlay',
+          pointerEvents: 'none',
         }}
       />
 
-      {/* Beat 1 — credits */}
-      <AbsoluteFill
+      {/* Beat 1 — credit straps */}
+      <CreditStrap frame={frame} at={14} exitAt={STRAP_EXIT} kicker="SCRIPT" name="Prakhar Gupta" top={340} />
+      <CreditStrap frame={frame} at={34} exitAt={STRAP_EXIT + 4} kicker="CREATIVE DIRECTION" name="Raghavan S Rao" top={470} />
+      <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 34,
-          transform: `scale(${breathe})`,
+          position: 'absolute',
+          left: 260,
+          top: 620,
+          opacity: discO,
         }}
       >
-        <CreditLine frame={frame} at={14} exitAt={CREDIT_EXIT} role="Script by" name="Prakhar Gupta" />
-        <CreditLine frame={frame} at={32} exitAt={CREDIT_EXIT + 4} role="Creative Direction by" name="Raghavan S Rao" />
-        <div style={{ display: 'flex', gap: 10, marginTop: 6, width: 620, justifyContent: 'center', opacity: ruleExit }}>
-          {COLORS.map((c, i) => {
-            const segP = Math.min(1, Math.max(0, ruleP * COLORS.length - i));
-            return <div key={c} style={{ height: 8, borderRadius: 4, width: 88 * segP, background: c }} />;
-          })}
-        </div>
         <span
           style={{
             fontFamily: FONTS.body,
-            fontSize: 30,
+            fontSize: 28,
             fontStyle: 'italic',
-            color: 'rgba(18,40,63,0.5)',
-            opacity: disclaimerO,
+            color: 'rgba(255,255,255,0.55)',
           }}
         >
           Images are for illustration purposes only.
         </span>
-      </AbsoluteFill>
+      </div>
 
       {/* Beat 2 — brand sign-off */}
       <AbsoluteFill
@@ -253,16 +252,17 @@ const StandpointEndcard: React.FC = () => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          paddingBottom: 90,
           transform: `scale(${breathe})`,
         }}
       >
         <span
           style={{
             fontFamily: FONTS.heading,
-            fontSize: 170,
+            fontSize: 172,
             fontWeight: 900,
             letterSpacing: '0.02em',
-            color: NAVY,
+            color: '#FFFFFF',
             opacity: titleO,
             transform: `scale(${titleScale})`,
             lineHeight: 1,
@@ -270,35 +270,61 @@ const StandpointEndcard: React.FC = () => {
         >
           STANDPOINT
         </span>
-        <div style={{ display: 'flex', gap: 10, marginTop: 34, width: 760, justifyContent: 'center' }}>
-          {COLORS.map((c, i) => {
-            const segP = Math.min(1, Math.max(0, rule2P * COLORS.length - i));
-            return <div key={c} style={{ height: 10, borderRadius: 5, width: 110 * segP, background: c }} />;
-          })}
-        </div>
+        {/* red rule sweep */}
+        <div
+          style={{
+            width: 880 * ruleP,
+            height: 8,
+            background: RED,
+            marginTop: 30,
+            opacity: titleO,
+          }}
+        />
         <div
           style={{
             opacity: byO,
             transform: `translateY(${byY}px)`,
-            marginTop: 30,
+            marginTop: 32,
             display: 'flex',
             alignItems: 'center',
             gap: 16,
           }}
         >
-          <span style={{ fontFamily: FONTS.heading, fontSize: 44, fontWeight: 600, color: 'rgba(18,40,63,0.55)' }}>
+          <span
+            style={{
+              fontFamily: FONTS.heading,
+              fontSize: 42,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.6)',
+            }}
+          >
             by
           </span>
-          {/* official white wordmark — white-on-dark rule honoured via red chip */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', background: RED, borderRadius: 8, padding: '14px 26px' }}>
-            <Img src={staticFile('images/swarajya_logo_white.png')} style={{ height: 46, width: 'auto', display: 'block' }} />
+          <div style={{ display: 'inline-flex', alignItems: 'center', background: RED, borderRadius: 6, padding: '13px 24px' }}>
+            <Img src={staticFile('images/swarajya_logo_white.png')} style={{ height: 44, width: 'auto', display: 'block' }} />
           </div>
         </div>
       </AbsoluteFill>
 
-      <AbsoluteFill
-        style={{ backgroundColor: '#FFFFFF', opacity: Math.max(whiteIn, whiteOut), pointerEvents: 'none' }}
-      />
+      {/* specular shine pass over the lockup */}
+      {frame >= T_AT && (
+        <div
+          style={{
+            position: 'absolute',
+            left: shineX,
+            top: -300,
+            width: 260,
+            height: 1800,
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.10) 50%, transparent 100%)',
+            transform: 'rotate(18deg)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      {/* end fade to black */}
+      <AbsoluteFill style={{ backgroundColor: '#000000', opacity: blackOut, pointerEvents: 'none' }} />
     </AbsoluteFill>
   );
 };

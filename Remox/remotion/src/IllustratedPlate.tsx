@@ -37,6 +37,42 @@ const track = (frame: number, cam: CamKeyframe[], key: 'cx' | 'cy' | 'zoom') => 
   );
 };
 
+
+// ── World-pinning helpers ──────────────────────────────────────────────────
+// Compute the camera state and project plate/image coordinates (0..1 normalised)
+// to screen pixels. Lets text/callouts PIN to subjects in the imagery so they
+// move with the camera instead of floating screen-fixed. Works for plates AND
+// any full-bleed photo driven by the same cam keyframes.
+//
+//   const cam = [{frame:0,cx:.5,cy:.5,zoom:1.2}, {frame:200,cx:.3,cy:.4,zoom:1.5}];
+//   const st = plateCameraState(frame, cam, ambient);
+//   const p = plateToScreen(0.62, 0.55, st);   // subject at 62%/55% of the image
+//   <div style={{ position:'absolute', left:p.x, top:p.y }}>…label…</div>
+
+export const plateCameraState = (
+  frame: number,
+  cam: CamKeyframe[],
+  ambient = 1,
+): { left: number; top: number; zoom: number } => {
+  const zoom = track(frame, cam, 'zoom') * breathe(frame, { period: 200, amp: 0.003 * ambient });
+  const cx = track(frame, cam, 'cx');
+  const cy = track(frame, cam, 'cy') + driftY(frame, { amp: 0.002 * ambient, period: 280 });
+  const imgW = CANVAS_W * zoom;
+  const imgH = CANVAS_H * zoom;
+  const left = Math.min(0, Math.max(CANVAS_W - imgW, CANVAS_W / 2 - cx * imgW));
+  const top = Math.min(0, Math.max(CANVAS_H - imgH, CANVAS_H / 2 - cy * imgH));
+  return { left, top, zoom };
+};
+
+export const plateToScreen = (
+  px: number,
+  py: number,
+  st: { left: number; top: number; zoom: number },
+): { x: number; y: number } => ({
+  x: st.left + px * CANVAS_W * st.zoom,
+  y: st.top + py * CANVAS_H * st.zoom,
+});
+
 export const IllustratedPlate: React.FC<{
   src: string;
   cam: CamKeyframe[];
@@ -46,15 +82,10 @@ export const IllustratedPlate: React.FC<{
 }> = ({ src, cam, ambient = 1, style }) => {
   const frame = useCurrentFrame();
 
-  const zoom = track(frame, cam, 'zoom') * breathe(frame, { period: 200, amp: 0.003 * ambient });
-  const cx = track(frame, cam, 'cx');
-  const cy = track(frame, cam, 'cy') + (driftY(frame, { amp: 0.002 * ambient, period: 280 }));
-
-  // Position plate so (cx, cy) lands at canvas center, clamped to keep coverage.
+  // Shared with plateCameraState so world-pinned labels never drift from the render.
+  const { left, top, zoom } = plateCameraState(frame, cam, ambient);
   const imgW = CANVAS_W * zoom;
   const imgH = CANVAS_H * zoom;
-  const left = Math.min(0, Math.max(CANVAS_W - imgW, CANVAS_W / 2 - cx * imgW));
-  const top = Math.min(0, Math.max(CANVAS_H - imgH, CANVAS_H / 2 - cy * imgH));
 
   // Motion blur from camera translation speed
   const leftAt = (f: number) => {
