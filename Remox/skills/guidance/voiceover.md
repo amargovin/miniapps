@@ -12,6 +12,10 @@ max per API call.
 | Model ID | `eleven_v3` (was `eleven_multilingual_v3` — updated) |
 | Output format | `mp3_44100_128` |
 
+> Provider note: this voice is ElevenLabs-only. OpenRouter's TTS cannot serve
+> it (different voices, no alignment), so keep `ELEVENLABS_API_KEY` for the
+> branded voice. See `skills/guidance/providers.md`.
+
 ## Working Pattern
 
 ```python
@@ -79,11 +83,10 @@ for i, c in enumerate(chars):
 ## Trailing Silence Buffer (MANDATORY — LEARNINGS §42)
 
 ElevenLabs audio ends on the final word, which makes scenes cut abruptly.
-Immediately after generating each scene MP3, append ~1.1s of silence:
-
-```bash
-ffmpeg -y -i scene_XX.mp3 -af "apad=pad_dur=1.1" scene_XX_padded.mp3 && mv scene_XX_padded.mp3 scene_XX.mp3
-```
+Immediately after generating each scene MP3, append ~1.1s of trailing
+silence using the ffmpeg `apad` tail-pad command in
+`pre-production.md` → Step 2 (the canonical §42 rule, with the full
+rationale and the retrofit procedure for already-built scenes).
 
 Do this BEFORE Whisper transcription and duration measurement so frame counts
 include the buffer. Tail-only — never prepend silence (it shifts every

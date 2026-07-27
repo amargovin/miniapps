@@ -3,40 +3,58 @@
 (function () {
   "use strict";
 
-  var LIST_PRICE = 1999; // ₹ per seat / year, before GST
-  var GST_RATE = 0.18;
-  var MIN_SEATS = 10;
+  var LIST_PRICE = 1999; // ₹ per seat / year (digital list, before GST)
+  var GST_RATE = 0.18; // applies to DIGITAL only
+  var PRINT_ADDON = 400; // ₹ per seat / year added for print; print is GST-exempt
+  var MIN_SEATS = 5;
   var MAX_SEATS = 500;
   var RANGE_MAX = 60; // slider caps here; typed input can go higher
+  var JOIN_URL = "https://join.swarajyamag.com/pro";
 
-  // Discount tiers, exactly as specified:
-  //   10 seats → 10%   ·   11–20 → 20%   ·   21+ → 30%
+  // Discount tiers:
+  //   5–10 → 10%   ·   11–20 → 20%   ·   21+ → 30%
   function discountFor(seats) {
     if (seats <= 10) return 0.10;
     if (seats <= 20) return 0.20;
     return 0.30;
   }
 
+  // Flat indiaBUILD contribution added to the total (GST-exempt):
+  //   5–9 seats → ₹5,000   ·   10+ seats → ₹10,000
+  function indiaBuildFor(seats) {
+    return seats < 10 ? 5000 : 10000;
+  }
+
   function inr(n) {
     return "₹" + Math.round(n).toLocaleString("en-IN");
   }
+
+  var plan = "digital"; // "digital" | "print"
+  var currentSeats = MIN_SEATS;
 
   var numEl = document.getElementById("seatNum");
   var rangeEl = document.getElementById("seatRange");
   var minusEl = document.getElementById("seatMinus");
   var plusEl = document.getElementById("seatPlus");
 
-  var tierPill = document.getElementById("tierPill");
+  var planDigital = document.getElementById("planDigital");
+  var planPrint = document.getElementById("planPrint");
+
   var lineSeats = document.getElementById("lineSeats");
   var lineList = document.getElementById("lineList");
   var lineDiscLbl = document.getElementById("lineDiscLbl");
   var lineDisc = document.getElementById("lineDisc");
+  var printRow = document.getElementById("printRow");
+  var linePrintLbl = document.getElementById("linePrintLbl");
+  var linePrint = document.getElementById("linePrint");
+  var subLbl = document.getElementById("subLbl");
   var lineSub = document.getElementById("lineSub");
+  var gstRow = document.getElementById("gstRow");
   var lineGst = document.getElementById("lineGst");
+  var lineIb = document.getElementById("lineIb");
   var lineTotal = document.getElementById("lineTotal");
   var linePerSeat = document.getElementById("linePerSeat");
   var calcCta = document.getElementById("calcCta");
-  var mailtoCta = document.getElementById("mailtoCta");
   var entNote = document.getElementById("entNote");
 
   function clampSeats(v) {
@@ -47,20 +65,8 @@
     return v;
   }
 
-  function buildMailto(seats, total) {
-    var subject = "Swarajya PRO — request access (" + seats + " seats)";
-    var body =
-      "Organisation:\n" +
-      "Team size (seats): " + seats + "\n" +
-      "Estimated annual total (incl. GST): " + inr(total) + "\n" +
-      "How you'd use it:\n" +
-      "Name & role:\n";
-    return (
-      "mailto:pro@swarajyamag.com?subject=" +
-      encodeURIComponent(subject) +
-      "&body=" +
-      encodeURIComponent(body)
-    );
+  function joinUrl(seats, amount, type) {
+    return JOIN_URL + "?seats=" + seats + "&amount=" + amount + "&type=" + type;
   }
 
   function render(seats) {
@@ -68,24 +74,61 @@
     var discPct = Math.round(disc * 100);
     var list = seats * LIST_PRICE;
     var discAmt = list * disc;
-    var subtotal = list - discAmt;
-    var gst = subtotal * GST_RATE;
-    var total = subtotal + gst;
-    var perSeat = LIST_PRICE * (1 - disc);
+    var digitalSub = list - discAmt; // discounted digital, ex-GST
+    var digitalPerSeat = LIST_PRICE * (1 - disc);
 
-    tierPill.innerHTML = "Applying <b>" + discPct + "% volume discount</b>";
     lineSeats.textContent = seats + " seats × " + inr(LIST_PRICE);
     lineList.textContent = inr(list);
     lineDiscLbl.textContent = "Volume discount (" + discPct + "%)";
     lineDisc.textContent = "−" + inr(discAmt);
-    lineSub.textContent = inr(subtotal);
-    lineGst.textContent = inr(gst);
-    lineTotal.innerHTML = inr(total) + ' <small>incl. GST</small>';
-    linePerSeat.textContent = "≈ " + inr(perSeat) + " / seat / year before GST";
 
-    calcCta.textContent = "Request access for " + seats + " seats →";
-    calcCta.href = buildMailto(seats, total);
-    if (mailtoCta) mailtoCta.href = buildMailto(seats, total);
+    // Flat indiaBUILD contribution, added to the total. It is taxable, so for
+    // the digital plan GST applies to it too (it sits in the pre-GST base).
+    var indiaBuild = indiaBuildFor(seats);
+    lineIb.textContent = "+" + inr(indiaBuild);
+
+    var total, perSeat, note, type, amountBase;
+
+    if (plan === "print") {
+      // Print: digital discounted price + ₹400/seat + indiaBUILD, all GST-free.
+      var printAdd = seats * PRINT_ADDON;
+      printRow.style.display = "";
+      linePrintLbl.textContent = "Print delivery (" + seats + " × ₹400)";
+      linePrint.textContent = "+" + inr(printAdd);
+      subLbl.textContent = "Digital subtotal";
+      lineSub.textContent = inr(digitalSub);
+      gstRow.style.display = "none";
+      total = digitalSub + printAdd + indiaBuild;
+      amountBase = total; // no GST anywhere for print
+      perSeat = digitalPerSeat + PRINT_ADDON;
+      note = "GST-free";
+      type = "print";
+      linePerSeat.textContent = "≈ " + inr(perSeat) + " / seat / year (incl. print)";
+    } else {
+      // Digital: GST applies to (subscription + indiaBUILD). GST is added by the
+      // checkout, so the URL carries the PRE-GST base (both parts) to avoid
+      // double-charging.
+      printRow.style.display = "none";
+      subLbl.textContent = "Subtotal (ex-GST)";
+      lineSub.textContent = inr(digitalSub);
+      var taxable = digitalSub + indiaBuild;
+      gstRow.style.display = "";
+      lineGst.textContent = inr(taxable * GST_RATE);
+      total = taxable * (1 + GST_RATE);
+      amountBase = taxable; // pre-GST; checkout adds the 18%
+      perSeat = digitalPerSeat;
+      note = "incl. GST";
+      type = "digital";
+      linePerSeat.textContent = "≈ " + inr(perSeat) + " / seat / year + GST";
+    }
+
+    lineTotal.innerHTML = inr(total) + " <small>" + note + "</small>";
+
+    // `amount` is the full PRE-GST payable base (subscription + print + indiaBUILD
+    // as applicable); checkout adds 18% GST for digital, nothing for print.
+    var amount = Math.round(amountBase);
+    calcCta.textContent = "Buy now — " + seats + " seats →";
+    calcCta.href = joinUrl(seats, amount, type);
 
     if (seats >= 50) {
       entNote.innerHTML =
@@ -96,22 +139,33 @@
   }
 
   function setSeats(v, syncRange) {
-    var seats = clampSeats(v);
-    numEl.value = seats;
+    currentSeats = clampSeats(v);
+    numEl.value = currentSeats;
     if (syncRange !== false) {
-      rangeEl.value = Math.min(seats, RANGE_MAX);
+      rangeEl.value = Math.min(currentSeats, RANGE_MAX);
     }
-    render(seats);
+    render(currentSeats);
   }
 
-  // Wire inputs
+  function setPlan(p) {
+    plan = p;
+    planDigital.classList.toggle("active", p === "digital");
+    planPrint.classList.toggle("active", p === "print");
+    render(currentSeats);
+  }
+
+  // Plan toggle
+  planDigital.addEventListener("click", function () { setPlan("digital"); });
+  planPrint.addEventListener("click", function () { setPlan("print"); });
+
+  // Seat inputs
   rangeEl.addEventListener("input", function () {
     setSeats(rangeEl.value, false);
   });
   numEl.addEventListener("input", function () {
-    var seats = clampSeats(numEl.value);
-    rangeEl.value = Math.min(seats, RANGE_MAX);
-    render(seats);
+    currentSeats = clampSeats(numEl.value);
+    rangeEl.value = Math.min(currentSeats, RANGE_MAX);
+    render(currentSeats);
   });
   numEl.addEventListener("blur", function () {
     setSeats(numEl.value);

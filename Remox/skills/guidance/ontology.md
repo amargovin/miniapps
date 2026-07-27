@@ -11,13 +11,13 @@ ontology document. Every field must be filled.
 
 Before writing the ontology, you MUST read:
 
-1. The 8 guidance files (restraint, composition-templates, creative-direction, editorial-design, sound-design, illustration-style, typography-animation, this file)
-2. **`LEARNINGS.md`** — contains hard-won production rules from previous sessions that OVERRIDE theoretical guidance. Especially:
-   - §15: AudioSync phase duration formula (derive from Whisper, never estimate)
-   - §19: Phase count targets (audio_duration ÷ 4.5s = target phases)
+1. The 7 guidance files (composition-templates, creative-direction, editorial-design — incl. §11b "Restraint / sensibilities", sound-design, illustration-style, typography-animation, this file)
+2. **`LEARNINGS.md`** — the slim rule index; production rules OVERRIDE theoretical guidance. Follow its pointers, especially:
+   - §15: AudioSync phase duration formula — derive from Whisper, never estimate (SKILL.md → Audio-Sync Phase Timing)
+   - §19: Phase count target `ceil(duration_seconds / 6)`, 150f hard floor (SKILL.md → Phase Pacing)
    - §20: This requirement itself
-   - §21: Image density targets per scene weight class
-   - §22: India map border requirements
+   - §21: Image density targets per scene weight class (pre-production.md)
+   - §22: India map border requirements (illustrated-plate.md)
 3. The full script text
 4. Audio files (for duration via ffprobe)
 5. Style and palette choices from the user

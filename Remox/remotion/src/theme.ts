@@ -1,26 +1,17 @@
-// Theme: HYBRID (editorial-clean + dark-cinematic) — "India's PL-15 Problem"
-// Semi-thriller defence analysis. Cream editorial base + dark-thriller beats.
+// Theme: editorial-clean — "India's National Quantum Mission"
+// Style: editorial-clean | Palette: editorial (cream bg, deep blue, red, bronze)
 // 1920×1080 landscape | 30fps
-//
-// Usage:
-//   Editorial scenes  → bg: PALETTE.bg (cream), text: PALETTE.text / primary
-//   Thriller scenes   → bg: PALETTE.dark (near-black), text: #FFFFFF, glow: PALETTE.electric
-// Text color MUST adapt to background brightness (see SKILL.md contrast rule).
+
+import { Easing } from 'remotion';
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 export const PALETTE = {
-  bg: '#F5F3EE',           // cream — editorial/evidence scenes
-  primary: '#12283F',      // deep navy — headlines on cream, structural elements
-  secondary: '#C4373B',    // alert red — threat, warning, "the cliff"
-  accent: '#C4873B',       // bronze/amber — works on both cream and dark
+  bg: '#F5F3EE',
+  primary: '#1B3A5F',      // deep editorial blue
+  secondary: '#C4373B',    // crimson — crisis / China / disruption
+  accent: '#C4873B',       // bronze — capital, R&D, premium
   text: '#1A1A1A',
   textMuted: 'rgba(26,26,26,0.55)',
-  // ── dark-thriller extensions ──
-  dark: '#0B1622',         // near-black navy — thriller backgrounds
-  darkAlt: '#0E1E2E',      // slightly lifted panel navy for depth
-  electric: '#5AA9FF',     // radar/network glow (electric blue) — dark scenes only
-  onDark: '#FFFFFF',       // headline text on dark
-  onDarkMuted: 'rgba(255,255,255,0.68)',
 } as const;
 
 // ── Tonal Ramps ───────────────────────────────────────────────────────────────
@@ -29,25 +20,16 @@ export const PALETTE = {
 export const RAMP = {
   navy: ['#081019', '#0B1622', '#0E1E2E', '#132A40', '#1B3A5F'] as const,
   cream: ['#ECE8DE', '#F1EEE7', '#F5F3EE', '#FAF8F3'] as const,
-  shadowOnCream: 'rgba(18, 40, 63, 0.14)',   // navy-tinted shadow for cream scenes
+  shadowOnCream: 'rgba(27, 58, 95, 0.14)',   // navy-tinted shadow for cream scenes
   shadowOnDark: 'rgba(0, 8, 16, 0.5)',        // deep blue-black for dark scenes
 } as const;
 
 // ── Fonts ─────────────────────────────────────────────────────────────────────
-// Body stays Helvetica per Swarajya brand guide (LEARNINGS §6).
-// Display: Archivo — same grotesk family as Helvetica but with true 800/900
-// display weights, loaded via @remotion/google-fonts (v2 pilot upgrade).
-import { loadFont as loadArchivo } from '@remotion/google-fonts/Archivo';
-import { loadFont as loadJetBrainsMono } from '@remotion/google-fonts/JetBrainsMono';
-import { Easing } from 'remotion';
-
-const archivo = loadArchivo('normal', { weights: ['500', '600', '700', '800', '900'] });
-const jbMono = loadJetBrainsMono('normal', { weights: ['400', '500', '700'] });
-
+// Helvetica per Swarajya brand guide (LEARNINGS §6)
 export const FONTS = {
-  heading: `'${archivo.fontFamily}', Helvetica, Arial, sans-serif`,
+  heading: 'Helvetica, Arial, sans-serif',
   body: 'Helvetica, Arial, sans-serif',
-  mono: `'${jbMono.fontFamily}', monospace`,
+  mono: '"JetBrains Mono", monospace',
 } as const;
 
 // ── Easing Palette ────────────────────────────────────────────────────────────
@@ -70,20 +52,17 @@ export const MOTION = {
 } as const;
 
 // ── Typography Scale ──────────────────────────────────────────────────────────
-// Label-class floors per LEARNINGS §43 (landscape): labels/eyebrows/mono ≥34,
-// stat sub-labels ≥36, captions/source credits ≥28, lower-third names ≥56.
 export const TYPE_SCALE = {
-  heroStat:      { size: 168, weight: 700, tracking: '-0.03em' },
-  heroHeadline:  { size: 92,  weight: 700, tracking: '-0.02em' },
+  heroStat:      { size: 156, weight: 700, tracking: '-0.03em' },
+  heroHeadline:  { size: 88,  weight: 700, tracking: '-0.02em' },
   headline:      { size: 64,  weight: 700, tracking: '-0.01em' },
   headlineMd:    { size: 56,  weight: 700, tracking: '-0.01em' },
   headlineSm:    { size: 48,  weight: 700, tracking: '0' },
   subheading:    { size: 36,  weight: 600, tracking: '0' },
-  statLabel:     { size: 36,  weight: 500, tracking: '0.12em' },
   bodyLg:        { size: 32,  weight: 400, tracking: '0.01em' },
   body:          { size: 28,  weight: 400, tracking: '0.01em' },
-  label:         { size: 34,  weight: 500, tracking: '0.18em' },
-  citation:      { size: 28,  weight: 400, tracking: '0.02em' },
+  label:         { size: 24,  weight: 500, tracking: '0.18em' },
+  citation:      { size: 20,  weight: 400, tracking: '0.02em' },
 } as const;
 
 // ── Layout Constants ──────────────────────────────────────────────────────────

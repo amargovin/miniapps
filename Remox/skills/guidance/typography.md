@@ -18,19 +18,116 @@ load a REAL display grotesk with true 800/900 weights via
 voice as Helvetica, actual display weights). System Helvetica at weight 700
 for hero type is a confirmed amateur tell.
 
-## Text Sizing Rules (1920x1080)
+## Bronze on cream fails — use a darker text-bronze (canonical for §60)
+
+The brand bronze (`#C4873B`) is only ~2.75:1 on cream (`#F5F3EE`) — well below
+the 4.5:1 body-text minimum. As TEXT it is effectively unreadable (user-flagged
+across a full film). Split the bronze into two roles:
+
+- **Decorative bronze** (`#C4873B`, the bright brand bronze) — rules, dots,
+  borders, chart bars, arrows, badges, underline accents, indicator glyphs.
+  Anything that is a GRAPHIC element, not something you read.
+- **Text bronze** — a darker `accentInk` (`#8A5E22`, ~5.11:1 on cream) for any
+  bronze-colored TEXT on cream. Passes contrast; still unmistakably bronze.
+
+Add `accentInk` to the theme palette convention (a 7th key alongside the six
+in editorial-design.md → "Palette Presets"):
+
+```ts
+// theme.ts — PALETTE, editorial preset
+accent:    '#C4873B',  // DECORATIVE bronze only (rules, dots, bars, arrows)
+accentInk: '#8A5E22',  // bronze TEXT on cream (~5.11:1) — never use bright accent for text
+```
+
+Rule: **never set body/label/stat text in `PALETTE.accent`.** Bronze text uses
+`PALETTE.accentInk`. Bright `accent` is for graphics only. (This is a specific
+instance of editorial-design.md §10.3 — accent colors are for
+highlights/borders/fills, not primary text — that repeatedly failed in
+practice because bronze LOOKS dark enough to trust. It is not.)
+
+## Text Sizing — THE Authority
+
+This file is the canonical and SOLE home of the size floors. SKILL.md and
+editorial-design.md point here rather than restating the tables — keep the
+numbers in this one place.
+
+### Landscape floors (1920×1080) — canonical for LEARNINGS §43
+
+The original skill minimums (labels/eyebrows 20px, captions 18px) produced
+near-illegible text at real viewing sizes — a rendered 20px mono eyebrow over
+a photographic background disappears (user-flagged, PL-15 July 2026). Floors
+for label-class text (hero headlines and stat numbers at skill defaults are
+fine — this is about the SMALL classes):
 
 ```
 Hero / Title:      72–120px   — full-screen statements, single line
 Subheading:        48–64px    — section labels, supporting headers
 Body:              36–48px    — readable at standard viewing distance
-Labels / eyebrows / mono: ≥34px — floor raised July 2026 (LEARNINGS §43)
+Labels / eyebrows / mono data: ≥34px  — floor raised from 20px (§43)
 Stat sub-labels:   ≥36px      — must pair legibly with the stat number
-Caption / source:  ≥28px      — floor raised from 18px (LEARNINGS §43)
-Lower-third names: ≥56px
+Caption / source:  ≥28px      — floor raised from 18px (§43)
+Lower-third names: ≥56px      — raised from 48px (§43)
 MINIMUM any text:  28px       — author to this floor; the mechanical audit's
                                 24px hard-fail is only a legacy backstop
 ```
+
+Also re-check placement when bumping sizes: small labels tend to sit low in
+the frame, and after enlargement they can breach the bottom-20% subtitle zone.
+
+### Size by ROLE, not by floor — minimums are not defaults (canonical for §52)
+
+Raising the floors fixed illegibility but created a new failure: agents
+authoring AT the floor (an opening hero stat at 72px — barely above the
+statNumber floor — read as small; user-flagged, July 2026). Choose size by
+the element's ROLE in the phase:
+
+| Role in the phase | Scale |
+|---|---|
+| THE payoff of the phase (hero stat, verdict word) | heroStat 140-170px |
+| Phase headline / primary statement | 84-124px |
+| Secondary stat, callout label | 48-72px |
+| Supporting labels/eyebrows/subs | the §43 floors (34-44px) |
+
+The question is never "is it above the minimum?" but "is this the biggest
+thing in the phase when it is the most important thing in the phase?" A
+phase's single hero element should visually dominate — if the narration beat
+IS the number, the number is the composition.
+
+**Err large, and NEVER render a killer stat faint (§52 reinforcement).**
+Repeated across a full film: a hero stat or thesis line must be UNMISSABLE.
+Two ways teams accidentally kill the payoff element:
+
+1. **Faint / low-opacity.** A stat rendered at reduced opacity (holding it at
+   0.4–0.6 for "subtlety") reads as *small and unimportant* — the opposite of
+   its role. The hero number lands at FULL opacity and full weight.
+2. **Too small / too timid.** Sizing the payoff near the floor because the
+   number "feels big enough" in the code preview. Err LARGE — at render
+   resolution, on phones and TVs, the payoff can take far more scale than
+   instinct suggests. When in doubt, go bigger.
+
+Floors are for supporting classes. The payoff element is sized (and lit) by
+its role: the most important thing in the phase is the biggest, brightest,
+heaviest thing in the phase.
+
+### Portrait floors (1080×1920 / 9:16) — canonical for LEARNINGS §1
+
+Vertical video is consumed on phones at arm's length. Text that looks fine
+at landscape 1080p is unreadable in 9:16:
+
+```
+Hero / impact text:  80px+  — confirmed readable in production
+Section title:       60px+
+Body / labels / eyebrows / mono data: 44px minimum — 36px was still too
+                            small after two rounds of user feedback
+Stat numbers:        80px+
+Stat labels:         36px+
+Lower-third names:   56px+ (subtitles 44px+)
+Caption / source:    32px+
+```
+
+**Rule:** if it wouldn't be readable on a phone screen held vertically at
+arm's length, it's too small. Portrait does NOT use the `TYPE_SCALE`
+defaults from `theme.ts` (landscape values) — override per component.
 
 **Warning:** First-instinct sizes are almost always too small. Entity names (countries, brands) need 48px+. If it looks "about right" in code, scale up 1.5x.
 
@@ -229,21 +326,22 @@ Crowded text phases read as slideshows.
 
 ### Font Families by Role
 Always use the theme font tokens — never raw font strings:
-- `FONTS.heading` (Georgia, serif) — hero text, emotional emphasis, section labels
-- `FONTS.body` (Inter, sans-serif) — supporting text, body copy, narration
-- `FONTS.mono` (monospace) — data values, dates, counters, technical labels
+- `FONTS.heading` — hero text, emotional emphasis, section labels
+- `FONTS.body` — supporting text, body copy, narration
+- `FONTS.mono` — data values, dates, counters, technical labels
+
+Which families those tokens carry is a theme/brand decision — see "BRAND
+OVERRIDE" above and always check the brand guide before setting fonts in
+`theme.ts` (LEARNINGS §6: Georgia and Inter were wrong for Swarajya; the
+brand guide specifies Helvetica body, and Archivo is the validated display
+grotesk with true 800/900 weights).
 
 Mixing heading and body fonts in one phase creates automatic hierarchy.
 Using body-only in both positions collapses that hierarchy.
 
-### Font Size Minimums (1920x1080)
-```
-Hero:    ≥72px   — full-screen statements, dominant stats
-Section: ≥56px   — section labels, phase headlines
-Body:    ≥36px   — supporting copy, context
-Labels:  ≥34px   — labels/eyebrows/mono floor (LEARNINGS §43)
-Caption: ≥28px   — absolute floor; never go below this for any readable element
-```
+### Font Size Minimums
+See "Text Sizing — THE Authority" above for the canonical floors (landscape
+and portrait) and the role-sizing rule. Never author below those floors.
 
 Create hierarchy through weight, color, and opacity — NOT by making
 supporting text smaller than the body minimum. If it looks "about

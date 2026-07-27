@@ -88,6 +88,7 @@ const SRC_FILES = [
   'src/IllustratedPlate.tsx',
   'src/StandpointEndcard.tsx',
   'src/BroadcastCard.tsx',
+  'src/scenesManifest.json',
 ];
 
 let copied = 0;

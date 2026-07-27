@@ -7,13 +7,13 @@ Hard-won principles from iterative production. Read this before writing any scen
 These are non-negotiable. Every scene must satisfy all of them regardless of visual approach, weight class, or creative direction. If a scene violates any invariant, it is wrong — fix it before anything else.
 
 1. **Palette background only.** Use `PALETTE.bg` for the scene background. For the `editorial` preset this is `#F5F3EE` (cream). Never use dark backgrounds (`#0a0a0a`, `#1a1a2e`, etc.) unless the project's palette preset is `dark-cinematic`.
-2. **Serif headlines, sans-serif body.** Headlines and key labels use `FONTS.heading` (Georgia). Body and secondary text use `FONTS.body` (Inter). No exceptions, no swapping.
+2. **Distinct heading vs body families.** Headlines and key labels use `FONTS.heading`; body and secondary text use `FONTS.body` — never collapse them into one family. Which families those tokens carry is a brand decision (Swarajya: Archivo display + Helvetica body — see typography.md → "BRAND OVERRIDE", §6). Never set fonts without checking the brand guide.
 3. **Information over illustration.** The primary visual vocabulary is typography, data visualization, and photo collage — not hand-drawn SVG objects. Animate the *information*, not a picture of the thing. When illustration is needed, use flat simplified shapes (2-3 colors, no gradients, no faux-detail). Complex multi-path SVG illustrations (buildings with windows, ships with rigging) look amateur when code-generated — avoid them.
 4. **Text inhabits the scene.** Text is stenciled, etched, grounded, or atmospheric. Never floating UI labels, never pill badges, never card shadows, never `boxShadow` treatments.
 5. **No UI patterns.** No dashboards, no progress bars as progress bars, no card grids, no web-layout spacing. If it could be a screenshot of a web app, it's wrong.
 6. **Tight composition around a focal point.** All elements form a cohesive visual group. No scattered elements in separate corners. If you can draw a bounding box around all content that covers less than 60% of the frame, the composition is grouped correctly.
 
-7. **Text contrast adapts to background.** On SeamlessCanvas phases, the background color is sampled from the image and can be light (cream, amber, sage). White text on a light background is invisible — a production failure. Use `PALETTE.text` (`#2C2C2C`) for headlines and `rgba(44,44,44,0.72)` for body text whenever the phase background brightness exceeds 128 (`brightness = (R×299 + G×587 + B×114) / 1000`). See "Text Contrast on SeamlessCanvas" in SKILL.md for the full rule.
+7. **Text contrast adapts to background.** On SeamlessCanvas / over-image phases, sampled backgrounds can be light (cream, amber, sage) — white text on them is invisible. Choose text color by the brightness rule and back it with a SOLID chip (not a soft scrim). Full rule: SKILL.md → "Text Contrast on SeamlessCanvas" (§59).
 
 Everything below this line is guidance — principles that improve quality but allow creative judgment in application.
 
@@ -31,83 +31,33 @@ Dark backgrounds are appropriate only for:
 
 When a brand palette specifies a mandatory background color, always use it. Never override with dark defaults.
 
-## 2. Typography: Serif for Editorial Authority
+## 2. Typography: Distinct Heading + Body Families
 
-**The Economist / Claude video effect** comes from serif fonts on headlines:
+Sans-serif-only typography looks generic — a distinct heading/body pairing
+creates visual hierarchy automatically (the Economist / Claude editorial
+effect). WHICH families is a brand decision: for Swarajya, Archivo display +
+Helvetica body (typography.md → "BRAND OVERRIDE", §6). Load display type via
+`@remotion/google-fonts` with true 800/900 weights — system-font faux-bold is
+an amateur tell.
 
-```
-Headlines & Key Labels:  Georgia, "Times New Roman", serif  — authority, editorial gravitas
-Body & Secondary Text:   Inter, system-ui, sans-serif       — clean, modern readability
-Data & Code:             "JetBrains Mono", monospace        — technical precision
-```
+## 3. Font Sizes: Bigger Than You Think, Hierarchy Through Weight Not Size
 
-When defining `FONTS` in theme.ts, consider the content type:
-- Documentary / essay / editorial → `heading: 'Georgia'`
-- Tech / product / startup → `heading: 'Inter'`
-- News / breaking → `heading: 'Georgia'` or condensed serif
+First-instinct sizes are almost always too small for 1080p video, and the
+reflex to shrink "secondary" text below the floor is the #1 legibility failure.
+**All canonical size floors (landscape and portrait) live in typography.md**
+(§43 floors, §52 role-sizing) — author to those, never restate them here.
 
-Sans-serif-only typography looks generic. The serif/sans pairing creates visual hierarchy automatically.
-
-## 3. Font Sizes: Bigger Than You Think
-
-First-instinct sizes are almost always too small for 1080p video. Common mistake progression:
-
-```
-First attempt:    14-22px labels  →  unreadable
-Second attempt:   24-30px labels  →  technically readable but weak
-Final (correct):  36-48px+ labels →  confident, editorial presence
-```
-
-**Minimum sizes for editorial video (1920x1080):**
-```
-Hero / Title text:        72-120px  — full-screen statements, big number slams
-Entity Names:             48-64px   — company names, country names — visual anchors
-Subheadings / Labels:     36-48px   — section headers, setup lines, context phrases
-Labels / eyebrows / mono: 34px+     — floor raised July 2026 (LEARNINGS §43)
-Body / Supporting text:   28-36px   — anything the viewer needs to read
-ABSOLUTE MINIMUM:         28px      — including source citations (raised from
-                                      24px, July 2026 — LEARNINGS §43)
-```
-
-**The 28px Floor — HARD RULE:**
-
-Any text that carries meaning the viewer should absorb MUST
-be 28px minimum. This includes:
-- Setup labels ("China's rare earth exports")
-- Context phrases ("Indian automakers — that's all they had")
-- Entity names ("MARUTI SUZUKI — E-VITARA")
-- Attribution lines ("— executives, on camera")
-- Subtext lines ("internal e-Vitara target — slashed")
-
-ALL of the above are meaningful content, not citations.
-
-Even **literal source citations** — lines that name the data
-source and nothing else ("Source: NITI Aayog 2024",
-"Data: IEA 2025") — sit AT the 28px floor, never below it
-(raised from 24px after July 2026 user review, LEARNINGS §43).
-Nothing in the frame renders under 28px.
-
-**Common violation pattern — "small because secondary":**
-Designers instinctively shrink supporting text to create
-hierarchy. In web design, 14px sub-labels work because
-the viewer's eyes are 60cm from the screen. In video at
-1080p, viewed on phones, TVs, and projectors, 14-22px
-text is invisible noise. Create hierarchy through WEIGHT
-and COLOR, not by shrinking below the floor:
+The one principle that belongs here: **create hierarchy through WEIGHT, COLOR,
+and OPACITY — never by dropping below the floor.** A 14-22px sub-label works on
+a web page (viewer 60cm away) but is invisible noise in video on phones and
+TVs. Every meaningful line — setup labels, entity names, attributions, even
+bare source citations ("Source: NITI Aayog 2024") — sits AT the floor, not
+below it.
 
 ```
 BAD:   "MARUTI SUZUKI" at 16px, letter-spacing 7
-GOOD:  "MARUTI SUZUKI" at 28px, color: textMuted, letter-spacing 4
-
-BAD:   "— executives, on camera" at 17px
-GOOD:  "— executives, on camera" at 28px, opacity: 0.6
-
-BAD:   "CHINA'S RARE EARTH EXPORTS" at 22px
-GOOD:  "CHINA'S RARE EARTH EXPORTS" at 30px, color: rgba(255,255,255,0.7)
+GOOD:  "MARUTI SUZUKI" at floor size, color: textMuted, letter-spacing 4
 ```
-
-The hierarchy comes from opacity, color, and weight — not
-from making text too small to read.
 
 ## 4. Visual Approach Hierarchy (Vox/Economist Style)
 
@@ -237,7 +187,7 @@ The most common anti-pattern from web design thinking: elements placed in separa
 
 **Cinematic composition:** The frame has a center of gravity. Elements orbit it. A factory with smoke stacks, surrounded by supply lines, with a label stenciled on the wall — that's a composed scene. A factory in the top-left, a chart in the bottom-right, and a label floating in the center — that's a web layout wearing a video costume.
 
-**Image phases especially (LEARNINGS §44):** a small label in one corner and an image in another, with dead space between, is a HARD FAIL in the visual still review. Either build a composed multi-level text block — eyebrow + headline-weight line + supporting detail, tied together with an animated accent — or let a luminous image carry the frame narration-led with minimal text. Never crush the image under a dark overlay to make weak text legible.
+**Image phases especially (§44):** a small label in one corner and an image in another, with dead space between, is a HARD FAIL in the visual still review — see composition-templates.md → Composition Doctrine #2 for the full rule (composed text block OR luminous narration-led full-bleed; never crush the image under a dark overlay).
 
 **How to self-check:**
 - Could you draw a circle around all your elements that covers less than 60% of the frame? Good — they're grouped.
@@ -271,20 +221,32 @@ Avoid code-generated illustration whenever possible (use typography, data viz, o
 
 ## 9. Map Accuracy
 
-**Never approximate country outlines.** Use official SVG path data:
+**Never approximate country outlines, and NEVER AI-generate a
+boundary-bearing map.** Use official vector data. Full doctrine (dataset,
+extract-simplify-render, verify-by-crop) lives in `maps.md` (§63) — read it
+before rendering any map where borders matter.
 
-- India: Must include J&K + Ladakh. Use `fillRule="evenodd"` for multi-subpath rendering.
-- Reference: `atharvvvg/map-india-svg` on GitHub (viewBox `0 0 1000 1136`)
-- Other countries: Find proper SVG outlines from reputable sources
+- India: Must show the FULL official claim as one unbroken landmass — J&K
+  incl. PoK and Gilgit-Baltistan, Ladakh, Aksai Chin; NO LoC as an
+  international border. Preferred source: an official GeoJSON
+  (datameet/maps `india-composite.geojson`); coded-SVG fallback
+  `atharvvvg/map-india-svg` (viewBox `0 0 1000 1136`, `fillRule="evenodd"`).
+- Other countries: proper SVG outlines from reputable sources, verified.
 
-For India specifically, using an inaccurate map is a content sensitivity issue, not just an aesthetic one.
+For India specifically, using an inaccurate map is a content sensitivity and
+legal issue, not just an aesthetic one — see maps.md.
 
 ## 10. Color Palette Discipline
 
 When a brand/project defines a palette:
 1. **Background**: Use the specified bg color. If none specified, default LIGHT not dark.
 2. **Primary contrast**: Text color should have 4.5:1+ contrast ratio against bg.
-3. **Accent colors**: Use for highlights, borders, fills — not as primary text color.
+3. **Accent colors**: Use for highlights, borders, fills — not as primary text
+   color. This matters MORE than it looks: a mid-tone accent (e.g. brand bronze
+   `#C4873B`) can look dark enough to trust as text yet fail contrast badly
+   (~2.75:1 on cream). For accent-colored TEXT, add a darkened `accentInk`
+   variant to the palette and use it — see typography.md → "Bronze on cream
+   fails" (§60). Keep the bright accent for graphics only.
 4. **Tinted fills**: Use palette colors at 10-20% opacity for area fills (node backgrounds, card backgrounds).
 
 ### Palette Presets
@@ -307,14 +269,210 @@ Write the chosen preset to `theme.ts` at project setup.
 - Personal / reflective / nuanced → **muted**
 - Serious / formal / minimal → **monochrome**
 
+**`accentInk` — the 7th key (§60):** where the palette's `accent` is a
+mid-tone (bronze, ochre, warm gold) that will be used for text on a light bg,
+add an `accentInk` key one step darker (e.g. editorial `accent #C4873B` →
+`accentInk #8A5E22`, ~5.11:1 on cream). Bright `accent` = graphics only
+(rules, dots, bars, arrows, badges); `accentInk` = accent-colored TEXT. See
+typography.md → "Bronze on cream fails."
+
 **Custom palettes:** If a brand provides specific colors,
-create a custom PALETTE following the same 6-key structure.
-The preset system is a starting point, not a cage.
+create a custom PALETTE following the same 6-key structure (plus `accentInk`
+where needed). The preset system is a starting point, not a cage.
 
 **Per-scene palette emphasis:** The ontology specifies
 which 2-3 palette keys dominate each scene. This prevents
 every scene using the same color mix. Vary emphasis across
 the video: primary-heavy → accent-heavy → secondary-heavy.
+
+## 11. Imagery Treatment (canonical — LEARNINGS §2, §3, §4, §17, §25, §27, §29, §30)
+
+How photographs and generated images are treated in-frame. Every rule below
+was learned from a user-flagged production failure.
+
+### 11.1 Backdrop image treatment — light touch, keep the color (§2)
+
+What failed: `grayscale(0.7)` + `brightness(0.8)` = "grey something in the
+background"; `blur(16px)` = unrecognizable; a full-screen dark overlay at
+0.45 opacity killed the image entirely.
+
+What works:
+- `blur(4px) contrast(1.1) brightness(0.95)` — gentle depth without
+  destroying the image
+- NO grayscale — keep the color; that's the whole point of a backdrop image
+- NO full-screen dark overlay — handle text readability locally, not globally
+
+### 11.2 Text readability over images (§3)
+
+Static frosted-glass panels (light `rgba(245,243,238,0.75)` or dark
+`rgba(0,0,0,0.4)`) read as lazy overlays pasted on top. What works: the
+**AnimatedTextBox** pattern — an SVG border draws itself on (~15 frames), a
+dark fill (`rgba(0,0,0,0.35)`) fades in behind, text reveals after the box is
+drawn. The background treatment becomes a deliberate design element, not a
+readability hack. Size the box to the text, never a fixed screen percentage.
+
+### 11.3 AnimatedTextBox text color (§4)
+
+The box's fill is dark and translucent, so text inside MUST be white or
+light (`#FFFFFF`, `rgba(255,255,255,0.85)`, cream). NEVER dark palette
+colors inside it — dark text on a dark transparent box over a dark image is
+invisible. For emphasis, vary brightness (full white hero, 0.7 white muted);
+warm accents are OK at full saturation.
+
+### 11.4 Visuals must ADD to audio — never text-karaoke (§25)
+
+Displaying the narrator's exact words as on-screen text ("75,000 TONNES /
+NUCLEAR-POWERED" while the narrator says exactly that) wastes the visual
+channel and bores the viewer. Good documentary visuals:
+
+1. **SHOW what the narrator TELLS** — the image depicts the subject while
+   the voice describes it
+2. **ADD information audio can't** — maps, faces, diagrams, facilities
+3. **Create emotional context** — dark ocean for stealth, reactor room for
+   engineering difficulty
+4. **Use text SPARINGLY** — key stats, names/dates, dramatic emphasis only
+
+Per-phase rules:
+- **Image phases:** the image IS the visual. Overlay text is a short label,
+  name, or date — max 2 lines — never a transcript of the narration.
+- **Text-only phases:** reserved for maximum dramatic moments where the
+  WORDS are the visual ("She gave the order." / "Dead."). Rare — 2-3 per
+  scene maximum.
+- **The mute test:** if you mute the audio, does the image alone tell you
+  something? If the screen just shows text that means nothing without audio,
+  it FAILS.
+- On a SHORT (~5s) narration-led beat, prefer NO text over a fleeting label
+  that restates the narration — the image and voice carry it (LEARNINGS §46f
+  corollary).
+- At ontology level, `visual_depiction` describes what the viewer SEES;
+  text overlays go in a minimal separate `text_elements` field.
+
+### 11.5 Portrait photos must show the full face (§27)
+
+Default `objectFit: cover` + `objectPosition: center` often crops real
+photos of people at the nose or neck — worse than no image. Before using any
+portrait photo, READ/VIEW the image, then set `objectPosition`:
+
+- Face in upper third → `objectPosition: '50% 20%'`
+- Face centered → `'50% 35%'` (slight top bias to show the full head)
+- Face in lower half → `'50% 50%'`
+- Full-body shot → `'50% 15%'` (keep head and torso)
+
+Test mentally: in the target crop, is the full face visible forehead to
+chin? Keep a lookup of verified values per image and reuse them.
+
+### 11.6 Low-resolution images — upscale before use (§29)
+
+Wikipedia/Wikimedia photos are often 400-800px wide and look pixelated in a
+1920×1080 frame. Minimums: full-bleed 1920×1080; half-frame panels 960×1080.
+Check every downloaded image (`ffprobe -v quiet -show_entries
+stream=width,height -of csv=p=0 image.jpg`); if under minimum, upscale with
+lanczos:
+
+```bash
+ffmpeg -y -i input.jpg -vf "scale=1920:-1:flags=lanczos" -q:v 2 output.jpg
+```
+
+If the required upscale exceeds 3x, skip the image and use a generated
+alternative — 3x+ upscaling produces visible artifacts.
+
+### 11.7 Aspect ratio must match the panel — never distort (§30)
+
+`objectFit: cover` on a mismatched ratio chops heads, halves ships, crops
+map borders. The image's native ratio must be compatible with its panel
+(full-bleed 16:9 ← 16:9 or 3:2; ~9:10 split panels ← 1:1, 4:5, 3:4). When
+ratios don't match: prefer `objectFit: contain` with a matching background
+color; or `cover` with a carefully set `objectPosition`; or last resort, pad:
+
+```bash
+# Pad a 4:3 image to 16:9 with black bars
+ffmpeg -y -i input.jpg -vf "pad=ih*16/9:ih:(ow-iw)/2:0:black" output.jpg
+```
+
+See also SKILL.md → "Image Aspect Ratios for Split Layouts" for generating
+at the right ratio in the first place.
+
+### 11.8 Real imagery swaps (§17)
+
+Replace AI-generated PNGs with processed real photos at the SAME filename —
+no TSX changes needed. Processing for editorial consistency (crop square,
+desaturate, film grain):
+
+```bash
+ffmpeg -i input.jpg \
+  -vf "crop=ih:ih:(iw-ih)/2:0,scale=1080:1080,eq=contrast=1.3:saturation=0.12,noise=alls=10:allf=t" \
+  output.png
+```
+
+Real images ALWAYS take priority over AI-generated when they match the
+subject (see pre-production.md — real-image mapping at ontology level, §24).
+
+### 11.9 Image specificity — depict the NAMED subject, never generic b-roll (§56)
+
+The strongest, most-repeated production note: **when the narration names a
+specific thing at a specific moment, the image must depict THAT thing.** Not a
+mood-adjacent stand-in, not generic stock-feel b-roll.
+
+- A named country → its flag, a recognizable landmark, its leadership setting,
+  or its territory on a map — not "a generic city skyline."
+- "X's oil / X's fleet / X's factories" → infrastructure that reads as
+  X's (X-flagged tanker, X's refinery, the plant with X's context) — not any
+  refinery photo.
+- A named person → the place, the hardware, the flag, or an anonymous figure
+  standing in for the role (see §57 — never an AI likeness of the real person).
+- A named event → imagery of THAT event, that place, that moment — not a
+  generic "conflict" or "meeting" image.
+
+Generic imagery under a specific claim is a DEFECT, flagged the same as a
+show-don't-tell failure in the visual review (producer.md Step 4). The user's
+verdict: *"too many generic images look like you're throwing images for the
+heck of it."* A wall of pretty-but-unspecific images reads as filler and
+erodes trust in the film.
+
+**Test per phase:** could this exact image sit under a DIFFERENT sentence
+about a different subject without anyone noticing? If yes, it is too generic —
+find or generate the specific depiction. This is set at ontology time
+(`visual_depiction` names the specific subject, not a mood — §23) and
+enforced at visual review.
+
+### 11.10 Never generate AI likenesses of real people (§57)
+
+Do NOT generate identifiable real public figures — heads of state, named
+officials, named individuals. It is an editorial and legal hazard (AI
+likenesses are inaccurate, uncanny, and unlicensed) and it looks amateur.
+
+Depict the person's ROLE instead:
+- The place (the office, the podium, the capital, the ministry building).
+- The hardware or the flag associated with them.
+- An **anonymous** figure standing in for the role — e.g. an official shot
+  from BEHIND at a lectern, a silhouette, hands signing a document, a figure
+  at a distance. The viewer reads "the leader / the official" without a face.
+
+When a real photo of the person exists and is licensed/usable, a real photo
+is fine (see §11.5 face-crop rules). The ban is on GENERATING a synthetic
+likeness. Also see `video-gen.md` (AI video is even less reliable for faces).
+
+## 11b. Restraint / sensibilities (folded from the retired restraint.md)
+
+These are sensibilities, not hard rules — creative judgment applies. They are
+the taste layer that sits over every other rule in this file.
+
+**The Only Real Rule.** Every element on screen must earn its place. If you can
+remove something and the scene still works, remove it. This is the master
+restraint principle — when in doubt, cut.
+
+**White space is a feature, not wasted pixels.**
+- Let elements breathe. If the frame feels full, it probably is.
+- The focal element needs clear space around it to draw the eye.
+- An empty frame with one powerful object beats a crowded frame with five
+  competing objects.
+- Negative space creates rhythm — the visual equivalent of a musical rest.
+  Use white space to pace the eye, not just to fill layout gaps.
+
+(The palette, typography, motion, pacing, and sound sensibilities that used to
+also live in restraint.md are canonical elsewhere: palette + type in §2, §3,
+§10 above; motion + stagger + ambient life in `motion-doctrine.md`; phase pacing
+in `SKILL.md` → "Phase Pacing"; sound in `sound-design.md`.)
 
 ## 12. Camera Drift — Vary It, Don't Uniform It
 
@@ -409,7 +567,7 @@ Before finalizing any scene, verify:
 - [ ] **Cinematic composition**: scene has a focal point and tight grouping
 - [ ] **Elements tightly composed** around a focal area — no scattered corner placement or web-layout spacing
 - [ ] Background is appropriate for content type (light for editorial, dark only if justified)
-- [ ] Headlines use serif font at 30px+ minimum
+- [ ] Headlines use `FONTS.heading` (brand display type), all text at/above the typography.md floors
 - [ ] Text inhabits the scene (stenciled, etched, grounded) — not floating UI labels
 - [ ] Key entities (countries, products, concepts) have strong screen presence
 - [ ] Country maps use official outlines

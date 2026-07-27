@@ -172,6 +172,14 @@ const wipeX = interpolate(frame, [0, 30], [0, 100], {
 
 ## Remox Transition Standards
 
+### Never Hard-Cut Between Phases (canonical for LEARNINGS §5-transitions)
+Hard cuts between phases — `<Series>` with no overlap — are jarring, with no
+visual continuity. Every phase boundary gets a transition (default budget
+18f, see SKILL.md → Transition Rules for the TSM math), and every phase
+except the last in a scene needs exit choreography over its final frames
+(see motion-doctrine.md Act 3) so the last thing the viewer sees before a
+transition is motion, never a freeze.
+
 ### Scene-Boundary Continuity
 The ontology specifies transition types between scenes (cut / crossfade / wipe).
 Use the specified type at scene boundaries — these were set during narrative
@@ -179,15 +187,26 @@ planning and affect emotional continuity. Within a scene, you have full
 discretion on transition choice.
 
 ### Duration by Tonal Shift
-Do not use uniform transition durations. Match duration to the nature
-of the boundary:
+**18f is the audit-safe DEFAULT — use it unless you take the documented
+exception.** The mechanical audit's TSM check assumes a uniform 18f transition
+budget across a scene (SKILL.md → "Standardize all transitions to 18 frames"),
+so a bare non-18f transition will BREAK the audit. The tonal-shift durations
+below are creative guidance for *when the boundary earns a deviation* — they are
+NOT free to use. Any value other than 18f REQUIRES the explicit TSX
+header-comment exception AND a matching adjustment to the TSM math (SKILL.md →
+Transition Rules). Default to 18f; deviate deliberately, and document it.
 
-| Boundary type | Duration | Notes |
-|---|---|---|
-| Same-tone (text→text, same bg color) | 12 frames | Clean handoff, minimal interruption |
-| Contrast shift (cream→navy, navy→cream) | 18 frames | Color change needs breathing room |
-| Medium shift (video→text, image→text) | 24 frames | World change; let the previous world exit |
-| Major tonal shift (calm→urgent, dark→bright) | 24–30 frames | The transition is part of the drama |
+| Boundary type | Duration | Audit status | Notes |
+|---|---|---|---|
+| Contrast shift (cream→navy, navy→cream) | **18 frames (DEFAULT)** | audit-safe | The standard budget — no exception needed |
+| Same-tone (text→text, same bg color) | 12 frames | needs documented exception + TSM adjust | Clean handoff, minimal interruption |
+| Medium shift (video→text, image→text) | 24 frames | needs documented exception + TSM adjust | World change; let the previous world exit |
+| Major tonal shift (calm→urgent, dark→bright) | 24–30 frames | needs documented exception + TSM adjust | The transition is part of the drama |
+
+The tonal-duration guidance still holds creatively — a same-tone handoff CAN
+feel snappier at 12f and a major tonal shift CAN earn 24–30f — but every
+non-18f value is a deliberate, documented exception, never a silent default.
+If you are not writing the header-comment exception, use 18f.
 
 ### Wipe Direction Alternation
 When using consecutive wipe transitions, alternate direction:
@@ -211,9 +230,19 @@ a world shift and prevents the image from popping in abruptly.
 
 ---
 
-## Motivated Transition Vocabulary (July 2026, LEARNINGS §50)
+## Motivated Transition Vocabulary (July 2026 — canonical for LEARNINGS §50)
 
-Default was 63 identical 18f fades — monotone. Pick per boundary, in the brief
+User-flagged: "transitions are rather abrupt." Two problems, two fixes —
+(a) scene boundaries: crossfade at concat, never fade-through-black (the
+RemoxScene wrapper's fade through BLACK makes every boundary a dark blink, a
+slideshow tell, brutal on bright films; wrapper background must be the film's
+base colour, and fade-through-black is reserved for intentional act breaks,
+max 1-2 per film); (b) phase boundaries: motivated transitions, not N
+identical fades. A transition should feel CAUSED by what the imagery is
+doing, not applied to it. Brief field:
+`transition_out: wipe-left | fade | zoom | flash | slide`.
+
+Pick per boundary, in the brief
 (`transition_out:` per phase), all within the standard 18f budget:
 
 | Type | Use when | Implementation |

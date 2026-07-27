@@ -561,7 +561,13 @@ export default registry;
         mkdirSync(dirname(registryPath), { recursive: true });
         writeFileSync(registryPath, registryContent);
 
-        printStage(n, 'registry', TICK, `auto-generated SceneRegistry.ts (${registeredScenes.length} scenes)`);
+        // Studio Review Loop: regenerate the per-scene compositions manifest
+        const manifestPath = join(remotionDir, 'src', 'scenesManifest.json');
+        writeFileSync(manifestPath, JSON.stringify({
+          scenes: project.scenes.map(s => ({ id: s.id, durationFrames: s.durationFrames, audio: s.audio })),
+        }, null, 2));
+
+        printStage(n, 'registry', TICK, `auto-generated SceneRegistry.ts + scenesManifest.json (${registeredScenes.length} scenes)`);
         result.stages.registry = { pass: true, scenes: registeredScenes.length };
       }
     }

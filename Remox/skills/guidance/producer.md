@@ -2,15 +2,38 @@
 
 The producer agent takes the pre-production artifacts (briefs, ontology, theme, project.json) and creates the actual scene code and assets. It then hands each scene to `pipeline.mjs` which handles validation, audit, and rendering.
 
-## Mandatory Reads
+## Mandatory Reads (producer/pipeline role)
 
-STOP: Read these files BEFORE writing ANY scene code. Actually read them — do not summarize from memory.
+STOP: Read the CORE files BEFORE writing ANY scene code. Actually read them — do
+not summarize from memory. LEARNINGS.md is an INDEX — the canonical rule text
+lives in the file each entry points to. The always-read set is kept LEAN;
+everything else is in "Read when relevant" below.
 
-1. `~/.claude/skills/Remox/LEARNINGS.md` — **READ FIRST.** Hard-won production rules. Phase count (§19), AV sync (§15), image treatment (§2-3), text readability over images (§3-4), visual variety (§8), text-karaoke prevention (§25), safe zones (§9), portrait photo cropping (§27), no right-aligned text (§26).
-2. The scene's creative brief: `briefs/<SceneId>_brief.yml`
-3. `~/.claude/skills/Remox/skills/guidance/editorial-design.md`
-4. `~/.claude/skills/Remox/skills/guidance/restraint.md`
-5. `~/.claude/skills/Remox/skills/guidance/composition-templates.md`
+**CORE (always, before any scene code):**
+1. `~/.claude/skills/Remox/LEARNINGS.md` — the slim rule index (§1-§67).
+2. `~/.claude/skills/Remox/skills/guidance/motion-doctrine.md` — three acts
+   per phase, easing palette, banned tropes.
+3. `~/.claude/skills/Remox/skills/guidance/pipeline-traps.md` — **read before
+   running the pipeline.** Source-tree resolution, stale audio/registry/
+   renders, audit regex quirks, disk hygiene.
+4. `~/.claude/skills/Remox/skills/guidance/composition-templates.md` — incl.
+   the Composition Doctrine (§44/§49/§53).
+5. `~/.claude/skills/Remox/skills/guidance/typography.md` — THE sizing
+   authority (§43 floors, §52 role sizing).
+6. `~/.claude/skills/Remox/skills/guidance/editorial-design.md` — Imagery
+   Treatment (§2-4, §25, §27, §29-30) AND the Restraint / sensibilities
+   subsection (§11b — "The Only Real Rule", white-space-as-rhythm).
+7. The scene's creative brief: `briefs/<SceneId>_brief.yml`.
+
+**Read when relevant (load only when the scene triggers it):**
+- `~/.claude/skills/Remox/skills/cinematic/illustrated-plate.md` — when the
+  scene uses plates or camera moves over imagery.
+- `~/.claude/skills/Remox/skills/guidance/transitions.md` — when authoring
+  transitions (18f default; non-18f needs the documented TSM exception).
+- `~/.claude/skills/Remox/skills/guidance/charts.md` — when the scene has
+  charts (incl. data-viz restraint §62, alive-from-f0 §61).
+- `~/.claude/skills/Remox/skills/guidance/maps.md` — when the scene has a
+  boundary-bearing map (§63, India non-negotiable).
 
 Read the relevant cookbook patterns from `~/.claude/skills/Remox/skills/cinematic/` as specified in the brief's `techniques` field.
 
@@ -79,7 +102,13 @@ The brief is the contract. Follow it exactly:
 - Use `useCurrentFrame()` and `useVideoConfig()`
 - Return `<AbsoluteFill>` as root with `<TransitionSeries>`
 
-### Step 4: Visual Phase Review (MANDATORY — before pipeline)
+### Step 4: Visual Phase Review (MANDATORY — before pipeline; canonical for LEARNINGS §34)
+
+A video that passes all mechanical audits but looks like a slideshow of text
+karaoke is worse than useless. The mechanical audit checks structure (phase
+count, TSM math, font sizes, template tags) but CANNOT check visual quality,
+text placement in the actual rendered frame, or show-don't-tell compliance.
+This review is the quality gate that catches what algorithms cannot.
 
 After writing TSX and before calling the pipeline, the producer MUST visually
 review every phase by rendering its last frame and inspecting it. This catches
@@ -121,6 +150,24 @@ the mechanical audit cannot detect.
      something? If the screen just shows text that means nothing without
      audio, it FAILS.
 
+   **Image Specificity & Likeness (hard fail — LEARNINGS §56, §57):**
+   - **Specificity (§56):** does the image depict the SPECIFIC subject the
+     narration names right now (this country's flag/landmark, X's flagged
+     infrastructure, this event)? Swap test: could this exact image sit under
+     a different sentence about a different subject unnoticed? If yes → FAIL,
+     it's generic filler. Fix with the specific depiction.
+   - **No real-person likeness (§57):** is any AI-generated identifiable real
+     public figure on screen? → FAIL. Replace with place/hardware/flag or an
+     anonymous role figure (official from behind at a lectern).
+
+   **Text Contrast on Images (hard fail — LEARNINGS §59, §60):**
+   - Text over an image/busy/bright bg sits on a SOLID opaque chip (deep-navy
+     ~0.86-0.90 + white, or solid cream + ink) — NOT a feathered
+     gradient-to-transparent scrim. Read the still and confirm every character
+     is legible over the busiest/brightest patch it overlaps.
+   - No bronze TEXT in bright `PALETTE.accent` on cream (~2.75:1) — bronze text
+     uses `accentInk`.
+
    **Feedback Gate (hard fail — user-flagged, PL-15 July 2026; LEARNINGS §42-44):**
    Run this checklist explicitly for EVERY phase and fix failures BEFORE rendering:
    - **Label size floors (§43):** labels/eyebrows/mono ≥34px, stat sub-labels
@@ -160,26 +207,26 @@ the mechanical audit cannot detect.
      ...
    ```
 
-### Step 5: Sync to Skill Template (MANDATORY — per LEARNINGS §35)
+### Step 5: Verify the Source Tree (per pipeline-traps.md, §36)
 
-The render pipeline reads from `~/.claude/skills/Remox/remotion/`, NOT the
-project directory. Every file change MUST be copied before rendering.
+For scaffolded projects the pipeline renders directly from
+`<project>/remotion/` — no skill-template syncing. But VERIFY it: every
+render/validate log prints `Source tree: <path>` — confirm it points at the
+PROJECT tree, and keep `"projectDir": "/abs/path"` in project.json.
 
-```bash
-# Copy scene TSX
-cp <project>/remotion/src/scenes/Scene_XX.tsx ~/.claude/skills/Remox/remotion/src/scenes/
+Only legacy projects without their own `remotion/` still need the old
+skill-template sync ritual — see pipeline-traps.md § "Legacy projects only"
+(§35) for the copy + MD5-verify steps.
 
-# Copy theme
-cp <project>/remotion/src/theme.ts ~/.claude/skills/Remox/remotion/src/
+### Step 5b: Studio Review Gate (default when the user is present)
 
-# Sync images
-rsync -av <project>/remotion/public/images/ ~/.claude/skills/Remox/remotion/public/images/
-
-# VERIFY — hashes MUST match or render uses wrong code
-md5 <project>/remotion/src/scenes/Scene_XX.tsx ~/.claude/skills/Remox/remotion/src/scenes/Scene_XX.tsx
-```
-
-**If MD5s don't match, DO NOT proceed to pipeline.** Fix the sync first.
+Run the pipeline WITHOUT `--auto-approve`: it saves files, passes audit, and
+PAUSES at the preview gate. The user then reviews the scene in Studio (each
+scene is its own sidebar composition via scenesManifest.json). Iterate:
+edit TSX → hot reload → user re-scrubs. No renders during iteration. On the
+user's approval: `pipeline.mjs --scene SceneXX --from validate` to render.
+Claude's own gate checks still run on stills (Step 4). Use `--auto-approve`
+only for explicitly autonomous runs.
 
 ### Step 6: Call Pipeline
 
@@ -263,7 +310,7 @@ Phase start must align with narration start (±15 frames).
 ### H10: Creative Brief Required
 `briefs/<SceneId>_brief.yml` must exist. Audit checks for it.
 
-## Parallelization Strategy
+## Parallelization Strategy (canonical for LEARNINGS §45)
 
 **Default: SEQUENTIAL — always.** One scene at a time, preview gate pauses for
 review, regardless of scene count. The old ">5 scenes = parallel" rule is

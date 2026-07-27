@@ -228,6 +228,13 @@ img { max-width: 100%; display: block; }
 .calc::before { content: ""; position: absolute; top: 0; left: 32px; right: 32px; height: 4px; background: linear-gradient(90deg, var(--red), var(--amber)); border-radius: 0 0 4px 4px; }
 .calc h3 { font-family: var(--sans); font-weight: 800; font-size: 1.02rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--charcoal); margin-bottom: 4px; }
 .calc .sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 24px; }
+.plan-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+.plan-opt { font-family: var(--sans); text-align: left; cursor: pointer; border: 1.5px solid var(--line); background: var(--cream); border-radius: 12px; padding: 12px 14px; font-weight: 700; font-size: 0.94rem; color: var(--ink); line-height: 1.2; transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease; }
+.plan-opt span { display: block; font-weight: 500; font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+.plan-opt:hover { border-color: var(--red); }
+.plan-opt.active { border-color: var(--red); background: #fff; box-shadow: inset 0 0 0 1px var(--red); }
+.plan-opt.active span { color: var(--red); }
+
 .seat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .seat-row label { font-weight: 600; font-size: 0.96rem; }
 .seat-input { display: flex; align-items: center; gap: 6px; }

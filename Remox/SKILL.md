@@ -1,5 +1,7 @@
 ---
 name: Remox
+version: 1.0.0
+updated: 2026-07-09
 description: Cinematic motion graphics video production. Opus writes bespoke Remotion React code per scene guided by a cookbook of 28+ cinematic patterns. USE WHEN user wants cinematic video, motion graphics, animated explainer, visual essay, OR any 'make me a cinematic video about X' request.
 ---
 
@@ -34,8 +36,8 @@ pipeline.mjs runs per-scene:
   [12] Log           production_log.json
 
 → Finishing pass   scripts/finish.sh per scene (unified grade: S-curve,
-                   vignette, grain — see LEARNINGS §39)
-→ Concat           concat the GRADED scene files
+                   vignette, grain — see "Finishing Pass & Concat" below)
+→ Concat           crossfade-concat the GRADED scene files (concat_xfade.py)
 ```
 
 ### Parallelization
@@ -97,6 +99,9 @@ Exit codes: `0` = all pass, `1` = gate failure, `2` = usage error, `3` = preview
 
 ## Whisper Timestamps (Mandatory)
 
+> Provider note: this can run against OpenAI directly OR via OpenRouter (pin an
+> OpenAI-compatible model for word timestamps) — see `skills/guidance/providers.md`.
+
 After audio files exist, run the Whisper timestamp script:
 
 ```bash
@@ -156,25 +161,65 @@ vibes"). Dark/night-thriller moods only when the user explicitly asks. The
 PL-15 film was fully re-skinned from dark to cream at user request; keep red
 alarm beats for menace, carried on cream by red typography.
 
-## Mandatory Reads
+## Mandatory Reads (role-scoped)
 
-STOP: Before writing ANY scene code, read these files in order.
-Do not skip. Do not summarize from memory. Actually read them.
+**LEARNINGS.md is an index — the canonical rule text lives in the file each
+entry points to.** Read the index to know which rules exist and where they
+live; read the pointed-to files for the operative detail. Do not summarize
+from memory — actually read them.
 
-1. `~/.claude/skills/Remox/LEARNINGS.md` — **READ FIRST.** Hard-won production rules that override theoretical guidance. Contains phase count formula (§19), AV sync rules (§15), image treatment failures (§2-3), phase necessity (§19), India map requirements (§22), render-tree resolution (§36), and frozen durations (§38).
-2. `~/.claude/skills/Remox/skills/guidance/motion-doctrine.md` — **the anti-amateur doctrine.** Three acts per phase (entrance/ambient/exit), easing palette, motion blur, banned tropes, tonal-ramp backgrounds, payoff hierarchy law.
-3. `~/.claude/skills/Remox/skills/guidance/ontology.md`
-4. `~/.claude/skills/Remox/skills/guidance/restraint.md`
-5. `~/.claude/skills/Remox/skills/guidance/composition-templates.md`
-6. `~/.claude/skills/Remox/skills/guidance/creative-direction.md`
-7. `~/.claude/skills/Remox/skills/guidance/editorial-design.md`
-8. `~/.claude/skills/Remox/skills/guidance/sound-design.md`
-9. `~/.claude/skills/Remox/skills/guidance/illustration-style.md`
-10. `~/.claude/skills/Remox/skills/guidance/typography-animation.md`
+The always-read set is kept LEAN — a small CORE loaded every session, with
+everything else moved to a labelled "Read when relevant" list so context isn't
+loaded until it applies.
 
-These define production learnings, ontology structure, spatial layouts,
-aesthetic sensibilities, creative process, visual standards, sound
-design, and text animation patterns.
+**CORE — everyone reads these, every session, before any Remox work:**
+1. `~/.claude/skills/Remox/LEARNINGS.md` — the slim rule index (§1-§67) +
+   incident log. Skim it fully; follow pointers for anything you'll touch.
+   (Always read.)
+2. `~/.claude/skills/Remox/skills/guidance/motion-doctrine.md` — **the
+   anti-amateur doctrine.** Three acts per phase (entrance/ambient/exit),
+   easing palette, banned tropes, tonal-ramp backgrounds, payoff hierarchy.
+3. `~/.claude/skills/Remox/skills/guidance/pipeline-traps.md` — source-tree
+   resolution, stale audio/registry/renders, audit regex quirks, disk hygiene.
+4. `~/.claude/skills/Remox/skills/guidance/composition-templates.md` — incl.
+   the Composition Doctrine (§44/§49/§53).
+5. `~/.claude/skills/Remox/skills/guidance/typography.md` — THE sizing
+   authority (§1, §43, §52).
+6. `~/.claude/skills/Remox/skills/guidance/editorial-design.md` — Imagery
+   Treatment (§2-4, §25, §27, §29-30) AND the Restraint / sensibilities
+   subsection (§11b — "The Only Real Rule", white-space-as-rhythm).
+
+**Role add-ons to the CORE (still short):**
+- **Pre-production / creative** (ontology, briefs, creative direction) also
+  ALWAYS read: `ontology.md`, `creative-direction.md`.
+- **Producer / pipeline** (scene code, assets, rendering): start with
+  `~/.claude/skills/Remox/skills/guidance/producer.md` for the operative
+  per-scene workflow incl. the mandatory visual still review (§34). Everything
+  in producer.md's own CORE overlaps this list; its "Read when relevant" list
+  matches the one below.
+
+**Read when relevant (load only when the trigger applies):**
+- `charts.md` — when the video has charts / data-viz (incl. data-viz restraint
+  §62, alive-from-f0 §61).
+- `maps.md` — when the video has an official-boundary map (§63; India
+  non-negotiable).
+- `illustrated-plate.md` — when using AI plates + cinematic camera (plates,
+  camera grammar, Proportion Policy, world-pinned labels).
+- `transitions.md` — when authoring transitions (18f default, motivated
+  vocabulary, tonal-shift exceptions).
+- `sound-design.md` — during the sound pass.
+- `creative-direction.md` — pre-production / briefs (also in the pre-production
+  ALWAYS add-on above).
+- `ontology.md` — pre-production (also in the pre-production ALWAYS add-on).
+- `illustration-style.md` — when the video uses hand illustration.
+- `typography-animation.md` — when the video uses heavy kinetic type.
+- `spring-physics.md` — when tuning spring configs.
+- `sequencing.md` — when structuring multi-phase sequences.
+- `safe-zones.md` — when placing text near frame edges (portrait especially).
+- `3d.md` — when a scene uses 3D/perspective transforms.
+- `video-gen.md` — when generating AI video clips.
+- `voiceover.md` — when generating or padding TTS voiceover.
+- `pre-production.md` — when running the pre-production setup step.
 
 ## Workflows
 
@@ -336,7 +381,7 @@ When calling ImageGen:
 subject should be centered in the frame — no need for "offset to
 left/right" prompting tricks that were unreliable anyway.
 
-## Phase Pacing
+## Phase Pacing (canonical for LEARNINGS §19)
 
 - **Target average phase duration: 5-7 seconds (150-210 frames at 30fps)**
 - Maximum phase duration: 8 seconds (240 frames) — acceptable for slow analytical narration
@@ -349,6 +394,13 @@ left/right" prompting tricks that were unreliable anyway.
 - **NEVER create phases under 150 frames.** If whisper timestamps produce a sub-150f boundary, merge with the adjacent phase.
 
 Applies to both landscape and portrait.
+
+**Image montages inside a phase** (a beat that steps through several images)
+have their OWN pacing floor — do not slideshow them: each image holds ~3s
+(≥90f), floor 2.5s; joins are SLOW 30-40f eased directional slides with the
+outgoing image held fullscreen underneath; FEWER images beats faster cuts; and
+NEVER white cut-flashes between images. Full rule: motion-doctrine.md →
+"Montage & multi-image beats" (§58).
 
 ## Audio-Sync Phase Timing
 
@@ -385,6 +437,47 @@ node audiosync.mjs /path/to/project.json --scene SceneXX --fix  # rewrite durati
 - Save the Whisper timestamps JSON alongside the audio for reference
 - Phase start/end times are approximate — the goal is that each visual phase matches the corresponding narration, not frame-perfect lip sync
 - For phases covering multiple sentences, the phase duration = `last_sentence_end - first_sentence_start` (including inter-sentence gaps)
+- **The phase TEXT content must also match what is being narrated at that
+  time (§15)** — boundary alignment alone is not enough. A phase that starts
+  at the right frame but displays the wrong sentence is still an AV sync
+  failure.
+- **No callback/recall phases (§16):** short post-audio phases (30-50f) that
+  flash an image or text after narration ends read as a flicker with no
+  audio context. Let the last content phase hold to the end of the scene.
+
+### Frozen durations — never change TransitionSeries timing when re-skinning (canonical for §38)
+
+Visual upgrades re-skin the INTERIOR of phases. Phase count, order, and every
+`durationInFrames` (sequences AND transitions) are Whisper-derived and
+frozen. Changing one (262 → 248 in production) breaks the TSM audit and
+drifts phase timing off the narration. If exit choreography needs timing,
+derive it from the existing `DUR` constant (`exitStart = DUR - 32`), never by
+changing `DUR`. Sole sanctioned exception: when the AUDIO itself changed
+(e.g. retro-padding tails per §42) — then update project.json, whisper JSONs,
+and re-run `audiosync.mjs --fix`.
+
+### Text arrival & minimum hold (canonical for §51)
+
+Text that is already on screen when the viewer's eye lands is wallpaper — no
+entrance, no attention, no read (user-flagged: an early stat chip "just never
+registers at all").
+
+1. **The image establishes ALONE first** — minimum ~1s (30f) of pure imagery
+   at every scene open and every new-world phase before any text enters.
+2. **Text lands ON its whisper beat** — the frame the narrator says the
+   number or name is the frame the text's kinetic entrance fires. The motion
+   onset at the spoken moment is what captures the eye. Entering early
+   pre-empts the beat; entering late orphans it.
+3. **If on-beat entry leaves the text <2s of hold**, skip its exit fade and
+   let the phase cross-fade take it out.
+4. Applies doubly to Phase 1 of Scene 1: the film's first seconds carry the
+   scene entrance AND the viewer's arrival; nothing textual should compete.
+5. **MINIMUM HOLD: 3 seconds (90f) on screen for any text element** (user
+   rule, July 2026). If landing exactly on the whisper beat would leave less
+   than 90f before the phase ends, enter EARLIER:
+   `enterAt = min(beat, phaseDur − 90)`. The minimum hold outranks perfect
+   beat alignment — text that arrives on beat but vanishes in 2s registers
+   no better than wallpaper. (Persistent UI like the corner bug is exempt.)
 
 ---
 
@@ -443,53 +536,41 @@ const bodyColor = darkText ? 'rgba(44,44,44,0.72)' : 'rgba(255,255,255,0.72)';
 
 Never hardcode white text on a SeamlessCanvas phase without checking the sampled background color first.
 
+### Over images / busy / bright backgrounds: SOLID chips, not soft scrims (canonical for §59)
+
+The brightness rule above chooses the TEXT color. Over a photographic, busy,
+or bright background, color alone is not enough — the text needs a **solid
+opaque backing chip**, not a feathered scrim.
+
+- **Feathered / gradient-to-transparent scrims FAIL.** A gradient that fades
+  to transparent lets the busy background bleed through exactly where the text
+  sits, and legibility collapses in the bright patches. Do not use
+  gradient-to-transparent overlays as a legibility device.
+- **Use a SOLID chip sized to the text**, chosen by the background-brightness
+  rule:
+  - Over a dark/mid image → deep-navy chip `rgba(11,22,34,0.86)`–`0.90` with
+    WHITE text.
+  - Over a bright/light image → a SOLID cream chip (`#F5F3EE`, opaque) with
+    INK text (`PALETTE.text`), and bronze text only in the darker
+    `accentInk` (see typography.md → "Bronze on cream fails" — the bright
+    brand bronze is unreadable as text on cream).
+- The AnimatedTextBox pattern (editorial-design.md §11.2) satisfies this — its
+  fill is a solid translucent panel that draws on, not a soft gradient.
+- **Verify on the actual rendered still, not in theory.** Read the phase's
+  keypoint still and confirm every character is legible against the busiest
+  and brightest patch it overlaps (producer.md Step 4).
+
 ---
 
-## Typography Specifications
+## Typography
 
-These are **minimum** sizes — components may go larger for emphasis or dramatic effect.
-All values are in pixels and apply to the rendered canvas dimensions.
-
-### Landscape (1920×1080 / 16:9)
-
-The active canvas is 1920×1080. Text must be legible on a 16:9 display at typical viewing distance.
-
-| Role | TYPE_SCALE key | Minimum px |
-|---|---|---|
-| Hero headline | `heroHeadline` | 72px |
-| Section title / split headline | `sectionTitle` | 56px |
-| Body / detail text | `body` | 28px |
-| Subheading | `subheading` | 28px |
-| Stat numbers | `statNumber` | 64px (default 96px) |
-| Stat labels | `statLabel` | 36px |
-| Lower third name | — | 56px |
-| Lower third subtitle | — | 32px |
-| Labels / eyebrows | `label` | 34px |
-| Caption / source credit | `caption` | 28px |
-
-Label-class minimums (stat labels, lower-third names, labels/eyebrows, captions) were raised in July 2026 after user review — 18-20px labels are near-illegible at real viewing sizes (LEARNINGS §43). If `TYPE_SCALE` in a project's `theme.ts` still carries the old 18-20px values, override per component.
-
-### Portrait (1080×1920 / 9:16)
-
-Portrait video is consumed on mobile phones. The frame is narrower, which means lines break earlier and text spans less screen width. Text must be larger to remain legible at arm's length on a small screen.
-
-These minimums come from live production experience documented in `LEARNINGS.md §1`.
-
-| Role | Minimum px | Notes |
-|---|---|---|
-| Hero / impact text | 80px | From production: 80px+ confirmed readable |
-| Section title | 60px | From production: subheadings at 60px+ |
-| Body / detail text | 44px | From production: 36px was too small after two feedback rounds |
-| Stat numbers | 80px | Proportional to hero scale |
-| Stat labels | 36px | Must pair legibly with large stat number |
-| Lower third name | 56px | |
-| Lower third subtitle | 44px | |
-| Labels / eyebrows / mono / data | 44px | From production: 44px minimum confirmed |
-| Caption / source credit | 32px | |
-
-**Rule:** If it wouldn't be readable on a phone screen held vertically at arm's length, it is too small.
-
-Portrait does NOT use the `TYPE_SCALE` defaults from `theme.ts` — those are landscape values. When producing a portrait video, override sizes explicitly per component.
+**`skills/guidance/typography.md` is THE sizing authority** — do not restate its
+tables here. It carries the canonical landscape floors (§43), the portrait
+floors (§1), and the role-sizing rule (§52: minimums are for supporting
+classes; the phase's payoff element is sized by its role, not the floor). Read
+it before setting any text size. Quick orientation: landscape body/label floor
+≥28-34px, hero 72-120px; portrait body/label floor ≥44px, hero 80px+; portrait
+overrides the landscape `TYPE_SCALE` defaults from `theme.ts` per component.
 
 ## Logo Burn-In
 
@@ -517,6 +598,52 @@ import { Img, staticFile } from 'remotion';
 - Size: 229px wide, auto height (iterated up from 160px → 208px → 229px across sessions)
 - Opacity: 85%
 
+**Endcard scenes skip the corner logo (§7):** when a scene is a dedicated
+endcard (large centered logo + tagline), the small corner logo clashes with
+the centered hero logo. In `RemoxScene.tsx`, wrap the corner `<Img>` (and the
+corner bug) with a scene-ID check, e.g.
+`{sceneId !== 'SceneEndcard' && (<Img ... />)}` — substitute the actual last
+scene ID.
+
+## Corner Bug — Alternating Show/Channel Brand (canonical for LEARNINGS §54)
+
+User spec, July 2026: the static #SWARAJYA badge in the top-right is replaced
+by an alternating broadcast bug (standard channel-DOG practice): a red
+**STANDPOINT** chip and the **by #SWARAJYA** badge swap every **10 seconds**.
+
+Rules (component lives in `RemoxScene.tsx` — `CornerBug`, ships with scaffold):
+- **Quiet swap**: 12f slide-fade. The bug swaps ~56×/9-min video; any louder
+  and it pulls eyes off content. Persistent UI is exempt from §51 hold rules.
+- **10s cadence** — 2s would strobe; longer under-serves the show brand.
+- **One brand object, two states**: the STANDPOINT chip uses the badge's red
+  so the corner reads as a single element changing state, not two logos.
+- **3D lighting (user: "looks flat" without it)**: beveled vertical gradient
+  (lit top-edge → brand red → deep base), inner top highlight + bottom shade,
+  navy-tinted drop shadow, tight 1px emboss on the type, and a quiet diagonal
+  gloss sweep once per cycle. The badge state gets a matching drop-shadow so
+  both faces carry equal depth.
+- Endcard/intro scenes still skip the bug (RemoxScene skip-list).
+
+## Show-Brand Opener — suppress the bug for its full duration (canonical for §64)
+
+A show-brand opener can be layered OVER the cold open (it doesn't need its own
+dead-air scene): the show name enters as the hero title, the episode title
+lands on a key beat, then both DOCK (shrink/settle to a corner or strap) as
+the cold open continues underneath. This is standard broadcast grammar.
+
+- **Suppress the corner bug/DOG for the FULL duration of the opener.** Running
+  the opener AND the corner bug at once is a double-brand — two show marks on
+  screen fighting each other. The bug returns AFTER the opener docks/clears.
+  Add the opener's scene/frame range to the RemoxScene bug skip-list, same
+  mechanism as the endcard/intro skip.
+- **Openers bookend the endcard.** The opener and the Standpoint end card are
+  a matched pair — same brand voice, same authority. If you build/modify one,
+  keep it consistent with the other.
+- **Brand furniture must read AUTHORITATIVE** — bugs, straps, openers,
+  endcards are studio-grade (glass, light, precise type), never celebratory or
+  toy-like (§55). An opener that looks like a lower-third template undercuts
+  the whole film.
+
 ## Subtitle System
 
 Subtitles are a SEPARATE layer rendered beneath (or above) scenes — they are not part of kinetic typography inside a scene.
@@ -526,16 +653,50 @@ Subtitles are a SEPARATE layer rendered beneath (or above) scenes — they are n
 - Occupies the bottom ~15-20% of the frame (which is exactly why text in scenes must avoid that area)
 - Implemented as a standalone component wrapping the scene output, not baked into individual `.tsx` files
 
-### Post-Production Subtitle Burn-In
+### Post-Production Subtitle Burn-In (canonical for LEARNINGS §12)
 
-For burning subtitles into a rendered video after the fact, use the subtitle pipeline documented in `LEARNINGS.md` (section 12) and the reusable generator script at `skills/utilities/gen_subs.py`.
+Pipeline order — render first, then subtitle:
+1. **Render video** from Remotion (full render, not preview)
+2. **Transcribe the SOURCE voiceover** with Whisper — not the rendered video.
+   If the video was sped up, transcribe AFTER speed-up so timestamps align.
+   ```bash
+   source ~/.claude/.env   # loads OPENAI_API_KEY
+   curl https://api.openai.com/v1/audio/transcriptions \
+     -H "Authorization: Bearer $OPENAI_API_KEY" \
+     -F file=@voiceover.mp3 -F model=whisper-1 \
+     -F response_format=verbose_json -F timestamp_granularities[]=word \
+     > whisper.json
+   ```
+   `verbose_json` + word granularity are required — sentence-level
+   timestamps are not sufficient for burn-in.
+3. **Generate the ASS file:**
+   `python3 ~/.claude/skills/Remox/skills/utilities/gen_subs.py whisper.json subs.ass`
+4. **Burn:**
+   `ffmpeg -y -i rendered.mp4 -vf "ass=subs.ass" -c:v libx264 -preset medium -crf 18 -c:a copy output.mp4`
 
-Quick reference:
-1. Transcribe voiceover with Whisper (`verbose_json` + `timestamp_granularities[]=word`)
-2. Run `python3 ~/.claude/skills/Remox/skills/utilities/gen_subs.py whisper.json subs.ass`
-3. Burn: `ffmpeg -y -i rendered.mp4 -vf "ass=subs.ass" -c:v libx264 -preset medium -crf 18 -c:a copy output.mp4`
+ASS style rules:
+- **BorderStyle=3** (opaque box) with **Outline ≥ 12** (15 for comfortable
+  padding). CRITICAL: `Outline=0` makes the black box invisible.
+- **Full white text** (`PrimaryColour=&H00FFFFFF`, same Secondary). No
+  karaoke color highlighting unless the user explicitly requests it.
+- **Vertical (9:16):** Helvetica Bold 58px, `MarginV=420` — Instagram's
+  bottom UI covers ~400-440px of a 1920px frame; MarginV=180 hides
+  subtitles behind it. (Older settings — 64px, MarginV=320, gold word
+  highlight — are archived as §13, superseded.)
+- **Line grouping:** max 7 words per line, break on pauses > 0.4s.
 
-Critical: Use `BorderStyle=3` with `Outline=15` in ASS styles. `Outline=0` makes the background box invisible.
+Audio splitting (per-scene files from one long voiceover): detect paragraph
+boundaries with
+`ffmpeg -i voiceover.mp3 -af silencedetect=noise=-30dB:d=0.5 -f null -` and
+split at silence gaps > 1s.
+
+## Thumbnail Generation (LEARNINGS §14)
+
+- Use the **ImageGen skill** (Nano Banana Pro) for Instagram thumbnails, not
+  HTML screenshots. 9:16, 2K size.
+- Reuse the video's first backdrop image with duotone treatment for visual
+  consistency. Include headline, subtitle, #SWARAJYA badge, play indicator.
+- Keep the bottom 15% clear (Instagram UI overlaps there).
 
 ## Video Background Treatment
 
@@ -567,13 +728,76 @@ yt-dlp -o "public/video/clip_name.mp4" "https://youtube.com/..."
 - Real clips are particularly effective for scenes about specific companies or products (factory footage, launch events, vehicle reveals)
 
 
-## Standpoint End Card (house brand close)
+## Finishing Pass & Concat (canonical for LEARNINGS §39; scene joins per §50)
 
-Every Standpoint by Swarajya video ends with the house end card: a bright
-7-second two-beat closer — credits (Script by / Creative Direction by /
-"Images are for illustration purposes only.") then the STANDPOINT + Swarajya
-wordmark sign-off. Colourful ribbons/confetti on a warm white field; fades in
-from white and out to white; carries a silent AAC track.
+Rendered scenes get ONE shared grade so photo scenes and vector scenes read
+as a single film: gentle S-curve with lifted blacks, +5% saturation, subtle
+vignette, temporal grain.
+
+```bash
+~/.claude/skills/Remox/scripts/finish.sh output/scenes/SceneXX.mp4 output/graded/SceneXX.mp4
+```
+
+Run per scene after RENDER, then concat the GRADED files. Calibration note:
+the first version (vignette PI/5, noise 5) grayed the cream scenes — current
+settings (vignette PI/7, noise 4, saturation 1.05) preserve warmth. If cream
+scenes look dirty-gray after grading, the vignette is too strong.
+
+Concat with soft crossfades, never butt joints (transitions.md, §50):
+
+```bash
+python3 ~/.claude/skills/Remox/scripts/concat_xfade.py out.mp4 <graded scenes...>
+```
+
+## Text-Only Productions (LEARNINGS §11)
+
+When the user requests "text only" visuals, skip ALL ImageGen and backdrop
+generation. Pure kinetic typography on cream backgrounds with color wash
+phases — faster and often more visually effective; the typography IS the
+visual, and there is nothing to generate, approve, or re-generate.
+
+
+## Studio Review Loop (user workflow, July 2026)
+
+The production gate the user chose: **audit pass → files saved → the user
+reviews each scene in Remotion Studio → the user chooses to render.** No
+renders for review iterations.
+
+Per-scene flow:
+1. Write/edit the scene TSX. Claude's deterministic checks run on stills
+   (audit + feedback gate).
+2. Run `pipeline.mjs --scene SceneXX` WITHOUT `--auto-approve` — it stops at
+   the PREVIEW gate (exit 3) with the TSX saved and audit passed.
+3. The user reviews in Studio: every scene is its OWN composition in the
+   sidebar (per-scene compositions are generated from `src/scenesManifest.json`,
+   which the pipeline's REGISTRY stage regenerates from project.json). Scrub,
+   play with audio, judge beats and holds live.
+4. Feedback → Claude edits TSX → Studio hot-reloads (~2s) → user re-scrubs.
+   Re-run audit after edits. Still no renders.
+5. User approves → `pipeline.mjs --scene SceneXX --from validate` renders.
+
+Start Studio: `cd remotion && npm run studio` (background,
+http://localhost:3000). Keep it running through the whole production.
+`--auto-approve` remains for explicitly autonomous runs only.
+
+Notes: the props panel is NOT part of the workflow (user preference — Studio
+is a viewer; edits go through Claude). Studio preview is not render ground
+truth for edge cases — the §36 verify-from-output rule still applies after
+rendering. Heavy scenes: set preview scale to 50%.
+
+## Standpoint End Card (house brand close — canonical for LEARNINGS §55)
+
+Every Standpoint by Swarajya video ends with the house end card: a 7-second
+BROADCAST NEWS closer (v2, July 2026 — the earlier confetti sting was retired
+as "a little amateur"). Deep navy studio field with sweeping diagonal light
+bands; Beat 1: credit STRAPS (red kicker block + frosted-glass name bar)
+slide in — Script / Creative Direction / the italics disclaimer; Beat 2:
+STANDPOINT slams in white 900, red rule sweep, "by [Swarajya wordmark on red
+chip]", specular shine pass, fade to BLACK (sign-off, not white). Silent AAC
+track for concat.
+
+**The lesson (§55):** brand furniture — bugs, straps, end cards — must read
+AUTHORITATIVE: studio light and glass, not celebration graphics.
 
 **Default (credits unchanged):** concat the pre-rendered asset directly —
 no render needed:
@@ -597,11 +821,11 @@ on a brand-red chip).
 
 ## Cookbook
 
-32+ skill files in `skills/`:
-- **guidance/** (16): motion-doctrine, ontology, composition-templates, aesthetic-guide (restraint.md), creative-direction, editorial-design, sound-design, spring-physics, sequencing, transitions, typography, charts, 3d, safe-zones, video-gen, producer
-- **cinematic/** (18): particle-systems, camera-shake, tunnel-flythrough, font-morphing, arc-wipe, card-flip-3d, ripple-expand, split-screen, dither-dissolve, posterize-stutter, speed-remap, svg-path-draw, clip-path-reveal, depth-blur, parallax-layers, blend-layers, conic-sweep, **illustrated-plate** (new — AI plate + cinematic camera)
-- **utilities/** (4): spring-presets, seeded-random, measure-spring-chain, delay-render
-- **examples/** (10): Working .tsx scene components demonstrating patterns
+Skill files in `skills/`:
+- **guidance/** (22): motion-doctrine, ontology, composition-templates, creative-direction, editorial-design, illustration-style, sound-design, spring-physics, sequencing, transitions, typography, typography-animation, charts, maps, 3d, safe-zones, video-gen, voiceover, providers, pre-production, pipeline-traps, producer
+- **cinematic/** (23): particle-systems, camera-shake, tunnel-flythrough, font-morphing, arc-wipe, card-flip-3d, ripple-expand, split-screen, dither-dissolve, posterize-stutter, speed-remap, svg-path-draw, clip-path-reveal, depth-blur, parallax-layers, blend-layers, conic-sweep, animated-counters, annotated-overlay, duotone-photo, generated-backdrop, kinetic-typography, **illustrated-plate** (AI plate + cinematic camera)
+- **utilities/** (4 + gen_subs.py): spring-presets, seeded-random, measure-spring-chain, delay-render
+- **examples/** (12): working .tsx scene components demonstrating patterns
 
 ## Theme System
 

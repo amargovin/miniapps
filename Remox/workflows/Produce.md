@@ -13,7 +13,14 @@ Production splits into two sequential agents:
 1. **Pre-Production Agent** — project setup + creative planning (runs once)
 2. **Producer Agent** — scene code + assets + pipeline (runs per scene)
 
-Both agents MUST read `LEARNINGS.md` before any work.
+Both agents MUST read the slim `LEARNINGS.md` rule index +
+`motion-doctrine.md` before any work, then their ROLE-SCOPED mandatory-read
+list: pre-production/creative agents read the list in
+`skills/guidance/pre-production.md`; producer/pipeline agents read the list
+in `skills/guidance/producer.md` (which includes
+`skills/guidance/pipeline-traps.md` — mandatory before invoking
+pipeline/render tools). LEARNINGS.md is an index — the canonical rule text
+lives in the file each entry points to.
 
 ## Phase 1: Pre-Production
 

@@ -17,6 +17,44 @@ const SAFE = {
 };
 ```
 
+## Reserved Zones & CSS Traps (canonical for LEARNINGS §9)
+
+Every frame — landscape AND portrait — reserves two zones:
+
+```
++---------------------------------------+
+|  [TOP-LEFT: safe]          [LOGO]     |  <- top-right reserved for logo
+|                                       |
+|         [CENTER: hero text]           |
+|                                       |
++---------------------------------------+
+|        [SUBTITLE STRIP — OFF]         |  <- bottom 20% reserved for subtitles
++---------------------------------------+
+```
+
+- NEVER place text in the bottom 20% (subtitles burn in there in post)
+- NEVER place text in the top-right (logo zone, ~300px × 200px)
+- Preferred: center-middle (hero), top-left (secondary)
+
+### CSS implementation traps (learned in portrait production, apply everywhere):
+
+- **`alignItems: 'flex-end'`** pushes content to the BOTTOM of the frame —
+  directly into the subtitle zone. NEVER use `flex-end` for text positioning.
+- **`alignItems: 'flex-start'`** pushes content top-left — safe, but verify
+  it doesn't overlap the logo zone.
+- **Full-width dark bars** anchored to `flex-end` = a "lower-third" bar
+  sitting ON the subtitle strip. WRONG even though it looks like a common TV
+  lower-third — subtitles burn into that exact space in post-production.
+- **The "lower-third" template is a misnomer.** Never implement it as a
+  bottom-anchored bar. Position text center-left instead:
+  `justifyContent: 'center', alignItems: 'flex-start',
+  padding: '80px 192px 220px'` — the 220px bottom padding keeps text above
+  the subtitle zone.
+- **NEVER use `justifyContent: 'flex-start'` for text containers** — it
+  pushes text to the very top, reading as a banner. Use
+  `justifyContent: 'center'` to vertically center text between the logo
+  (top) and subtitles (bottom).
+
 ## Safe Zone Wrapper Component
 
 ```tsx
@@ -82,7 +120,9 @@ const TEXT = {
   <p>Subtitle</p>
 </AbsoluteFill>
 
-// Bottom-anchored lower third
+// Bottom-anchored lower third — ONLY for productions WITHOUT burned-in
+// subtitles; otherwise this lands in the subtitle zone (see Reserved Zones
+// above — use the center-left placement instead)
 <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "flex-start", padding: SAFE.action }}>
   <LowerThird />
 </AbsoluteFill>

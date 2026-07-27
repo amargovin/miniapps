@@ -2,19 +2,38 @@
 
 The pre-production agent handles everything from raw user input to a complete set of creative briefs. Its output is the contract that the producer agent executes.
 
-## Mandatory Reads
+## Mandatory Reads (pre-production/creative role)
 
-STOP: Read these files BEFORE any work. Actually read them — do not summarize from memory.
+STOP: Read these files BEFORE any work. Actually read them — do not summarize
+from memory. LEARNINGS.md is an INDEX — the canonical rule text lives in the
+file each entry points to.
 
-1. `~/.claude/skills/Remox/LEARNINGS.md` — **READ FIRST.** Hard-won production rules that override theoretical guidance. Contains phase count formula (§19), AV sync rules (§15), image treatment failures (§2-3), India map requirements (§22), visual-must-add-to-audio (§25).
-2. `~/.claude/skills/Remox/skills/guidance/ontology.md`
-3. `~/.claude/skills/Remox/skills/guidance/restraint.md`
-4. `~/.claude/skills/Remox/skills/guidance/composition-templates.md`
-5. `~/.claude/skills/Remox/skills/guidance/creative-direction.md`
-6. `~/.claude/skills/Remox/skills/guidance/editorial-design.md`
-7. `~/.claude/skills/Remox/skills/guidance/sound-design.md`
-8. `~/.claude/skills/Remox/skills/guidance/illustration-style.md`
-9. `~/.claude/skills/Remox/skills/guidance/typography-animation.md`
+The always-read set is kept LEAN; everything else is in "Read when relevant".
+
+**CORE (always, before any pre-production work):**
+1. `~/.claude/skills/Remox/LEARNINGS.md` — the slim rule index (§1-§67).
+2. `~/.claude/skills/Remox/skills/guidance/motion-doctrine.md`.
+3. `~/.claude/skills/Remox/skills/guidance/composition-templates.md` — incl.
+   the Composition Doctrine (§44/§49/§53).
+4. `~/.claude/skills/Remox/skills/guidance/typography.md` — THE sizing
+   authority (§1, §43, §52).
+5. `~/.claude/skills/Remox/skills/guidance/editorial-design.md` — Imagery
+   Treatment (§2-4, §25, §27, §29-30) AND the Restraint / sensibilities
+   subsection (§11b — "The Only Real Rule", white-space-as-rhythm).
+
+**Pre-production role add-ons (also always, for this role):**
+6. `~/.claude/skills/Remox/skills/guidance/ontology.md`.
+7. `~/.claude/skills/Remox/skills/guidance/creative-direction.md`.
+
+**Read when relevant (load only when the trigger applies):**
+- `~/.claude/skills/Remox/skills/cinematic/illustrated-plate.md` — when using AI
+  plates + camera (plate budget / Proportion Policy, camera grammars,
+  world-pinned labels).
+- `~/.claude/skills/Remox/skills/guidance/sound-design.md` — during the sound pass.
+- `~/.claude/skills/Remox/skills/guidance/illustration-style.md` — when the video
+  uses hand illustration.
+- `~/.claude/skills/Remox/skills/guidance/typography-animation.md` — when the
+  video uses heavy kinetic type.
 
 ## When to Invoke
 
@@ -50,11 +69,33 @@ Copies remotion boilerplate, runs npm install. Idempotent.
 
 1. Create `audio/` directory
 2. Copy/link per-scene audio files
-3. Pad with trailing silence (LEARNINGS §42 — MANDATORY, do this BEFORE measuring durations or running Whisper):
+3. Pad with trailing silence (canonical for LEARNINGS §42 — MANDATORY, do this BEFORE measuring durations or running Whisper):
    ```bash
    ffmpeg -y -i audio/scene_XX.mp3 -af "apad=pad_dur=1.1" audio/scene_XX_padded.mp3 && mv audio/scene_XX_padded.mp3 audio/scene_XX.mp3
    ```
-   Tail-only — NEVER prepend silence (it shifts every Whisper word timestamp). Skip only if the audio was already padded at generation time (voiceover.md does this).
+   Why: ElevenLabs TTS ends almost exactly on the final word — scenes
+   rendered to that duration cut off abruptly ("the very last few
+   microseconds of the words are cut") and concatenated scenes feel
+   breathless. Why 1.1s and not 0.9s: the H5 audit rule requires ≥30 frames
+   AFTER the last word's END; TTS speech usually ends a hair before the file
+   does, so 0.9s of pad yielded exactly 27f in production and failed H5.
+   1.1s clears the floor with margin. The LAST phase absorbs the padding
+   (audiosync's dur[last] formula handles it automatically).
+
+   Tail-only — NEVER prepend silence (it shifts every Whisper word
+   timestamp). Skip only if the audio was already padded at generation time
+   (voiceover.md does this).
+
+   If audio was already produced unpadded and scenes are BUILT: pad at a
+   clean boundary, add +27f (at 30fps) to every scene in project.json,
+   update audioDurationMs in the whisper JSONs, and re-run
+   `audiosync.mjs --fix` per built scene — a sanctioned exception to §38
+   because the audio itself changed.
+
+   Between phases: true silent gaps are impossible without desyncing
+   narration (phase starts pin to Whisper word starts) — breathing comes
+   from exit choreography playing through the narrator's pauses (see
+   motion-doctrine.md Act 3).
 4. Calculate durations (on the PADDED files):
    ```bash
    ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 audio/scene_XX.mp3
@@ -104,7 +145,29 @@ runtime as camera-walk phases (hard cap 40%), organised as 3–5 plate WORLDS pe
 ~10 min. Assign worlds at ontology time; a photo gets a camera walk only with
 ≥2 focal zones + spatial narration.
 
-**Concrete visual direction (LEARNINGS §23):** Each phase in ontology MUST specify `narration_text`, `visual_depiction`, `image_source`, `image_style`, `template`.
+**Concrete visual direction (canonical for LEARNINGS §23):** Vague phase
+descriptions ("defocused ocean backdrop, kinetic word slam") give creative
+INTENT but not concrete DIRECTION — the producer then improvises wildly.
+Each phase in the ontology MUST specify, at `target_phases` granularity:
+- `narration_text` — the EXACT words the narrator says during this phase
+- `whisper_start_ms` / `whisper_end_ms` — from whisper timestamps
+- `visual_depiction` — concrete, unambiguous description of what the viewer
+  SEES (not creative intent, not on-screen text)
+- `image_source` — a real image file (checked for existence) or
+  "generate: [prompt]"
+- `image_style` — a named style from the project's style set; the image
+  style per phase is a CREATIVE DIRECTION decision locked in the ontology,
+  not a producer decision
+- `template`
+The producer should NOT need to "figure out" what to show.
+
+**Real images mapped at ontology level (canonical for LEARNINGS §24):** Real
+images ALWAYS take priority over AI-generated when they match the subject.
+The ontology writer must read `image_manifest.md` (when the project has real
+imagery), list matching real images per scene, assign them to specific
+phases, and mark phases "generate" only when no real image matches. Track
+recurring entities and note reference-image chains in the briefs (§48,
+illustrated-plate.md).
 
 Write `ontology.yml` to the project directory.
 
@@ -137,7 +200,8 @@ export const MOTION = { springSnappy, springBouncy, springHeavy, springOverdampe
 **Read these in order:**
 1. `ontology.md`
 2. Chosen style file
-3. `restraint.md`
+3. `editorial-design.md` → §11b "Restraint / sensibilities" (folded from the
+   retired restraint.md)
 4. `composition-templates.md`
 5. `creative-direction.md`
 

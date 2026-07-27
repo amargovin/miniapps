@@ -1,0 +1,9 @@
+{
+  "name": "xmcpbridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hosted MCP bridge for the X API — OAuth 2.0 user-context proxy to api.x.com/mcp",
+  "scripts": {
+    "start": "bun server.ts"
+  }
+}

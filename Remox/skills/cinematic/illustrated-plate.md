@@ -9,6 +9,32 @@ remain Remotion kinetic typography layered above.
 
 ---
 
+## Why plates — bespoke vector diagrams are an amateur tell (canonical for §41)
+
+Bespoke thin-vector diagrams (hand-coded SVG with 1–2px strokes, small
+shapes, minimal fills on a plain background) are a confirmed amateur tell —
+user-validated in the PL-15 v3 session. They read as "clip art" regardless of
+how carefully the geometry is drawn; the thin-line look that feels "clean" in
+a browser is invisible and cheap on video.
+
+The validated replacement is this pattern: a 4K textless illustration
+(ImageGen / Nano Banana Pro) with a cinematic camera synced to narration.
+The plate provides environmental depth and atmosphere; the camera creates
+progressive revelation; kinetic text floats cleanly above.
+
+**Where vector is still appropriate:**
+- Data charts — where axis alignment and animated counters require code
+  (follow `charts.md` Chart Craft Requirements)
+- Kinetic typography decorations — rule draws, underlines, accent brackets
+
+When vector IS used, the `motion-utils.ts` v3 tokens (`strokeGlow()`,
+`barFill()`, `gridline()`) are mandatory — they enforce the minimum stroke
+weights and glow treatment that make vector legible on video. Never hand-roll
+thin flat SVG for primary elements. See `motion-doctrine.md` § "Modern vector
+language".
+
+---
+
 ## When to use
 
 **USE for:**
@@ -41,6 +67,13 @@ remain Remotion kinetic typography layered above.
      numbers, no UI elements"** — this is the textless mandate; any label
      that bleeds into the plate will appear under the Remotion overlays
      and double-read
+   - **India maps (NON-NEGOTIABLE, §22):** any map of India MUST show
+     complete territory including Jammu & Kashmir and Ladakh as integral
+     parts of India; the Line of Control must NOT be shown as an
+     international boundary. The generation prompt must always include:
+     "Complete map of India including Jammu Kashmir and Ladakh as integral
+     parts of India." (Applies to ALL generated imagery, not just plates —
+     for coded SVG maps see editorial-design.md § "Map Accuracy".)
 
 3. **Save the plate** to `public/images/plates/plate_<sceneId>_<name>.png`.
 
@@ -57,6 +90,16 @@ remain Remotion kinetic typography layered above.
    had the missile flying TOWARD the friendly early-warning aircraft —
    present-and-beautiful but narratively backwards. Wrong vectors invert the
    story; regenerate until every nose, plume, and beam points the right way.
+
+6. **Recurring subjects need reference-image chaining (canonical for §48).**
+   When the same entity appears in multiple scenes (a character, a specific
+   aircraft, a location), generate its later appearances with ImageGen's
+   `--reference-image` pointing at the FIRST generated image of it.
+   Continuity of subjects is felt even when unnoticed; two different-looking
+   "same men" in bookend scenes break the callback. Track recurring entities
+   at ontology time and note the reference chain in the briefs (e.g. "reuse
+   s01_two_men.png as --reference-image"). Applies to ALL generated imagery,
+   not just plates.
 
 ---
 

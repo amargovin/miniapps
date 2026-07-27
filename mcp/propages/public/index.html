@@ -24,14 +24,13 @@
         <span class="pro">PRO</span>
       </a>
       <div class="nav-links">
+        <a href="#pricing">Pricing</a>
         <a href="#what">What's included</a>
         <a href="#how">How it works</a>
-        <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
       </div>
       <div class="nav-cta">
-        <a class="btn btn-ghost hide-sm" href="#pricing">See pricing</a>
-        <a class="btn btn-primary" id="navCta" href="mailto:pro@swarajyamag.com?subject=Swarajya%20PRO%20—%20request%20access&body=Organisation:%0ATeam%20size%20(seats):%0AHow%20you'd%20use%20it:%0AName%20%26%20role:">Request access</a>
+        <a class="btn btn-primary" href="#pricing">Buy now</a>
       </div>
     </div>
   </nav>
@@ -45,12 +44,11 @@
         <h1>Swarajya's <em>in-depth analysis</em> of India — now for your whole team.</h1>
         <p class="hero-lede">Every PRO user gets full access to Swarajya's content stack <strong>plus</strong> a Swarajya MCP that plugs right into your Claude, ChatGPT or Gemini.</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" id="heroCta" href="mailto:pro@swarajyamag.com?subject=Swarajya%20PRO%20—%20request%20access&body=Organisation:%0ATeam%20size%20(seats):%0AHow%20you'd%20use%20it:%0AName%20%26%20role:">Request access
+          <a class="btn btn-primary" href="#pricing">See plans &amp; buy
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
-          <a class="btn btn-ghost" href="#pricing">Calculate your price</a>
         </div>
-        <p class="hero-note"><strong>From ₹1,999 / seat / year</strong><span class="divit"></span>Minimum 10 seats<span class="divit"></span>Volume discounts up to 30%</p>
+        <p class="hero-note"><strong>From ₹1,999 / seat / year</strong><span class="divit"></span>Minimum 5 seats<span class="divit"></span>Volume discounts up to 30%</p>
       </div>
 
       <!-- Chat mock: makes the MCP tangible -->
@@ -70,6 +68,88 @@
       </div>
     </div>
   </header>
+
+  <!-- ===================== PRICING (second section) ===================== -->
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Pricing</span>
+        <h2>Simple per-seat pricing. Better as your team grows.</h2>
+        <p>One price covers the full Swarajya subscription and MCP access for every seat. Buy in volume and the per-seat price drops — and add the print magazine if you want it in hand.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="price-copy">
+          <span class="eyebrow">From</span>
+          <div class="lead-price">
+            <span class="amt">₹1,999</span>
+            <span class="per">/ seat / year</span>
+          </div>
+          <p class="gstline">Digital only, + 18% GST · minimum 5 seats · billed annually</p>
+
+          <table class="tier-table">
+            <thead>
+              <tr><th>Seats</th><th>Volume discount</th><th>Digital / seat</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>5 – 10</td><td class="disc">10% off</td><td>₹1,799</td></tr>
+              <tr><td>11 – 20</td><td class="disc">20% off</td><td>₹1,599</td></tr>
+              <tr><td>21+</td><td class="disc">30% off</td><td>₹1,399</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:0.86rem;color:var(--muted);margin-top:18px;">Every plan includes an <b>indiaBUILD contribution</b> — ₹5,000 (5–9 seats) or ₹10,000 (10+ seats) — added to your total to back India's builders.</p>
+          <p style="font-size:0.86rem;color:var(--muted);margin-top:10px;">Add <b>print delivery</b> for ₹400 / seat / year (GST-exempt). Larger team? <a href="mailto:pro@swarajyamag.com?subject=Swarajya%20PRO%20—%20larger%20team%20enquiry" style="color:var(--red);font-weight:600;">Talk to us.</a></p>
+        </div>
+
+        <!-- Calculator -->
+        <div class="calc" id="calc">
+          <h3>Build your plan</h3>
+          <p class="sub">Choose your plan, then the number of seats.</p>
+
+          <div class="plan-toggle" id="planToggle">
+            <button type="button" class="plan-opt active" id="planDigital">
+              Digital only
+              <span>Full stack + MCP</span>
+            </button>
+            <button type="button" class="plan-opt" id="planPrint">
+              Includes print
+              <span>+₹400/seat · no GST</span>
+            </button>
+          </div>
+
+          <div class="seat-row">
+            <label for="seatNum">Number of seats</label>
+            <div class="seat-input">
+              <button type="button" id="seatMinus" aria-label="Fewer seats">−</button>
+              <input type="number" id="seatNum" min="5" max="500" value="5" inputmode="numeric" />
+              <button type="button" id="seatPlus" aria-label="More seats">+</button>
+            </div>
+          </div>
+          <input type="range" id="seatRange" min="5" max="60" step="1" value="5" />
+          <div class="range-scale"><span>5</span><span>15</span><span>30</span><span>45</span><span>60+</span></div>
+
+          <div class="calc-lines">
+            <div class="calc-line muted"><span id="lineSeats">5 seats × ₹1,999</span><span id="lineList">₹9,995</span></div>
+            <div class="calc-line discount"><span id="lineDiscLbl">Volume discount (10%)</span><span id="lineDisc">−₹1,000</span></div>
+            <div class="calc-line" id="printRow" style="display:none"><span id="linePrintLbl">Print delivery (5 × ₹400)</span><span id="linePrint">+₹2,000</span></div>
+            <div class="calc-line"><span id="subLbl">Subtotal (ex-GST)</span><span id="lineSub">₹8,996</span></div>
+            <div class="calc-line" id="ibRow"><span id="lineIbLbl">indiaBUILD contribution</span><span id="lineIb">+₹5,000</span></div>
+            <div class="calc-line muted" id="gstRow"><span>GST (18%)</span><span id="lineGst">₹2,519</span></div>
+            <div class="calc-total">
+              <span class="lbl">Total per year</span>
+              <span class="val" id="lineTotal">₹16,515 <small>incl. GST</small></span>
+            </div>
+            <div class="calc-perseat" id="linePerSeat">≈ ₹1,799 / seat / year + GST</div>
+          </div>
+
+          <div class="calc-cta">
+            <a class="btn btn-primary" id="calcCta" href="https://join.swarajyamag.com/pro?seats=5&amount=13996&type=digital">Buy now — 5 seats →</a>
+          </div>
+          <p class="calc-enterprise" id="entNote"></p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ===================== WHAT'S INCLUDED ===================== -->
   <section class="section" id="what">
@@ -101,7 +181,7 @@
             <li>Every long-form investigation, essay and Spark</li>
             <li>The full premium archive — no paywalls for your people</li>
             <li>Central billing, one renewal, seats you can add or move</li>
-            <li>Depth over speed: analysis that stays useful months later</li>
+            <li>Optional print delivery of the magazine, per seat</li>
           </ul>
         </div>
       </div>
@@ -119,7 +199,7 @@
         <div class="step">
           <div class="num">1</div>
           <h4>Choose your seats</h4>
-          <p>Pick 10 or more seats and we set up your organisational account. Central billing, one renewal.</p>
+          <p>Pick 5 or more seats and we set up your organisational account. Central billing, one renewal.</p>
           <span class="step-arrow"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </div>
         <div class="step">
@@ -132,76 +212,6 @@
           <div class="num">3</div>
           <h4>Ask in plain language</h4>
           <p>Query the archive, pull briefings, track a topic — grounded, cited and access-controlled, every time.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== PRICING ===================== -->
-  <section class="section" id="pricing">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Pricing</span>
-        <h2>Simple per-seat pricing. Better as your team grows.</h2>
-        <p>One price covers both the Swarajya subscription and full MCP access for every seat. Buy in volume and the per-seat price drops.</p>
-      </div>
-
-      <div class="pricing-grid">
-        <div class="price-copy">
-          <span class="eyebrow">List price</span>
-          <div class="lead-price">
-            <span class="amt">₹1,999</span>
-            <span class="per">/ seat / year</span>
-          </div>
-          <p class="gstline">+ 18% GST · minimum purchase 10 seats · billed annually</p>
-
-          <table class="tier-table">
-            <thead>
-              <tr><th>Seats</th><th>Volume discount</th><th>Effective / seat</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>10</td><td class="disc">10% off</td><td>₹1,799</td></tr>
-              <tr><td>11 – 20</td><td class="disc">20% off</td><td>₹1,599</td></tr>
-              <tr><td>21+</td><td class="disc">30% off</td><td>₹1,399</td></tr>
-            </tbody>
-          </table>
-          <p style="font-size:0.86rem;color:var(--muted);margin-top:18px;">Prices shown before GST. Buying for a larger team? <a href="mailto:pro@swarajyamag.com?subject=Swarajya%20PRO%20—%20larger%20team%20enquiry" style="color:var(--red);font-weight:600;">Talk to us.</a></p>
-        </div>
-
-        <!-- Calculator -->
-        <div class="calc" id="calc">
-          <h3>Estimate your price</h3>
-          <p class="sub">Drag the slider or type the number of seats.</p>
-
-          <div class="seat-row">
-            <label for="seatNum">Number of seats</label>
-            <div class="seat-input">
-              <button type="button" id="seatMinus" aria-label="Fewer seats">−</button>
-              <input type="number" id="seatNum" min="10" max="500" value="10" inputmode="numeric" />
-              <button type="button" id="seatPlus" aria-label="More seats">+</button>
-            </div>
-          </div>
-          <input type="range" id="seatRange" min="10" max="60" step="1" value="10" />
-          <div class="range-scale"><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60+</span></div>
-
-          <div class="calc-tier-pill" id="tierPill">Applying <b>10% volume discount</b></div>
-
-          <div class="calc-lines">
-            <div class="calc-line muted"><span id="lineSeats">10 seats × ₹1,999</span><span id="lineList">₹19,990</span></div>
-            <div class="calc-line discount"><span id="lineDiscLbl">Volume discount (10%)</span><span id="lineDisc">−₹1,999</span></div>
-            <div class="calc-line"><span>Subtotal (ex-GST)</span><span id="lineSub">₹17,991</span></div>
-            <div class="calc-line muted"><span>GST (18%)</span><span id="lineGst">₹3,238</span></div>
-            <div class="calc-total">
-              <span class="lbl">Total per year</span>
-              <span class="val" id="lineTotal">₹21,229 <small>incl. GST</small></span>
-            </div>
-            <div class="calc-perseat" id="linePerSeat">≈ ₹1,799 / seat / year before GST</div>
-          </div>
-
-          <div class="calc-cta">
-            <a class="btn btn-primary" id="calcCta" href="mailto:pro@swarajyamag.com?subject=Swarajya%20PRO%20—%20request%20access">Request access for 10 seats →</a>
-          </div>
-          <p class="calc-enterprise" id="entNote"></p>
         </div>
       </div>
     </div>
@@ -220,6 +230,10 @@
           <div class="faq-a"><p>It's a content-intelligence connector for AI assistants. Once added, your team's Claude, ChatGPT or Gemini can search and read Swarajya's archive and answer questions grounded strictly in what Swarajya has published — with citations. It is not a chatbot bolted onto our site; it's an intelligence layer your existing tools call directly.</p></div>
         </div>
         <div class="faq-item">
+          <button class="faq-q">What's the difference between Digital only and Includes print? <span class="chev">+</span></button>
+          <div class="faq-a"><p>Both plans give every seat the full digital subscription and the Swarajya MCP. "Includes print" adds the physical magazine delivered to each seat for ₹400 / seat / year. Print orders are GST-exempt, so no GST is added to an Includes-print plan; Digital-only is subject to 18% GST.</p></div>
+        </div>
+        <div class="faq-item">
           <button class="faq-q">Is it accurate — or does it make things up? <span class="chev">+</span></button>
           <div class="faq-a"><p>Answers are grounded exclusively in published Swarajya content. The system is built so the model reasons only over retrieved Swarajya articles, never general knowledge, and every claim carries a citation (headline, date and URL) you can check.</p></div>
         </div>
@@ -228,20 +242,12 @@
           <div class="faq-a"><p>Story-level access control is enforced per seat, regardless of the tool being used. Premium stories can be cited, but their full content is never returned to seats that aren't entitled to them. Every PRO seat carries a full subscription, so your team gets full access.</p></div>
         </div>
         <div class="faq-item">
-          <button class="faq-q">Why is there a 10-seat minimum? <span class="chev">+</span></button>
-          <div class="faq-a"><p>PRO is an organisational product with central billing and volume pricing. Ten seats is the smallest team we set up under one account. Individuals can subscribe to Swarajya directly on swarajyamag.com.</p></div>
+          <button class="faq-q">Why is there a 5-seat minimum? <span class="chev">+</span></button>
+          <div class="faq-a"><p>PRO is an organisational product with central billing and volume pricing. Five seats is the smallest team we set up under one account. Individuals can subscribe to Swarajya directly on swarajyamag.com.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-q">Which tools does the connector work with? <span class="chev">+</span></button>
           <div class="faq-a"><p>Any client that supports the Model Context Protocol over Streamable HTTP — including Claude (Desktop, web and Code), ChatGPT, Gemini and others. Each member adds a single connector URL; there's nothing to install or build.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-q">Can we add or move seats later? <span class="chev">+</span></button>
-          <div class="faq-a"><p>Yes. Seats are managed centrally under your organisational account — add them as your team grows, or reassign them as people change roles. Billing stays on a single annual renewal.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-q">Do the prices include GST? <span class="chev">+</span></button>
-          <div class="faq-a"><p>List and per-seat prices are shown before GST. Indian GST of 18% is added at billing. The calculator above shows your GST-inclusive annual total.</p></div>
         </div>
       </div>
     </div>
@@ -256,14 +262,14 @@
             <img src="/assets/swarajya-red.png" alt="Swarajya" />
             <span class="pro">PRO</span>
           </a>
-          <p>An intellectual project that happens to use journalism as its instrument. PRO brings that depth — and a way to query it — to teams.</p>
+          <p>Igniting an Indian Renaissance. Published since 1956.</p>
         </div>
         <div class="footer-links">
           <div class="footer-col">
             <h5>Product</h5>
+            <a href="#pricing">Pricing</a>
             <a href="#what">What's included</a>
             <a href="#how">How it works</a>
-            <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
           </div>
           <div class="footer-col">

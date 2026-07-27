@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Swarajya PRO — Provisioning API</title>
+<style>
+  :root{--red:#ce5152;--ink:#1c1c1c;--muted:#6b6a66;--line:#e2ddd2;--cream:#f5f3ee;--navy:#1b3a5f;--code:#0f2438;}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff}
+  .wrap{max-width:860px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:1.9rem;margin:0 0 4px}
+  h2{font-size:1.25rem;margin:38px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+  h3{font-size:1rem;margin:22px 0 8px}
+  .sub{color:var(--muted);margin:0 0 8px}
+  code{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace;font-size:0.88em;background:#f2efe8;padding:2px 6px;border-radius:4px;color:#8a2b2c}
+  pre{background:var(--code);color:#e6edf3;padding:16px 18px;border-radius:10px;overflow-x:auto;font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace;font-size:0.85rem;line-height:1.5}
+  pre code{background:none;color:inherit;padding:0}
+  .pill{display:inline-block;font-weight:700;font-size:0.78rem;letter-spacing:.04em;padding:3px 10px;border-radius:5px;color:#fff;background:#2e8b57}
+  .method{background:#2e8b57}
+  table{border-collapse:collapse;width:100%;margin:8px 0;font-size:0.92rem}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:0.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  td code{white-space:nowrap}
+  .req{color:var(--red);font-weight:700}
+  .callout{border-left:4px solid var(--red);background:var(--cream);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+  .callout.warn{border-color:#c4873b;background:#fbf3e6}
+  .callout.info{border-color:var(--navy);background:#eef2f7}
+  .endpoint{display:flex;gap:10px;align-items:center;background:#f2efe8;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-family:"SFMono-Regular",ui-monospace,Menlo,monospace;font-size:0.9rem;flex-wrap:wrap}
+  .muted{color:var(--muted)}
+  hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+  .foot{color:var(--muted);font-size:0.82rem;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Swarajya PRO — Provisioning API</h1>
+  <p class="sub">Machine-to-machine endpoint to create a customer account and mint MCP access URL(s) right after a successful payment. One call in, ready-to-share connector URLs out.</p>
+
+  <div class="callout info">
+    <b>Before you integrate:</b> the endpoint must be live on <code>mcp.swarajyamag.com</code> and the bearer token (<code>PROVISION_API_KEY</code>) must be set on the server. The Swarajya team will share that token with you <b>separately and securely</b> — it is not in this document.
+  </div>
+
+  <h2>Authentication</h2>
+  <p>Send a bearer token in the <code>Authorization</code> header. This token is server-to-server only — <b>never expose it in a browser / frontend / mobile app.</b> Call this endpoint from your backend (e.g. inside your payment-success webhook handler).</p>
+<pre><code>Authorization: Bearer &lt;PROVISION_API_KEY&gt;</code></pre>
+
+  <h2>Endpoint</h2>
+  <div class="endpoint"><span class="pill method">POST</span> https://mcp.swarajyamag.com/provision/groups</div>
+  <p class="muted" style="margin-top:8px">Content-Type: <code>application/json</code></p>
+
+  <h2>Request body</h2>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>group</code></td><td>string</td><td class="req">yes*</td><td>Customer / organisation name (e.g. <code>"Varahe Analytics"</code>). Creates a new account. *Required unless <code>group_id</code> is given.</td></tr>
+      <tr><td><code>group_id</code></td><td>string</td><td class="muted">no</td><td>Provide an existing group's id to <b>add seats to it</b> (renewal / seat top-up) instead of creating a new account. Use one of <code>group</code> OR <code>group_id</code>.</td></tr>
+      <tr><td><code>seats</code></td><td>integer</td><td class="muted">no</td><td>How many connector URLs to mint (1–500). Default <code>1</code>. Each URL is one seat.</td></tr>
+      <tr><td><code>contact_email</code></td><td>string</td><td class="muted">no</td><td>Billing / admin contact for the account.</td></tr>
+      <tr><td><code>label</code></td><td>string</td><td class="muted">no</td><td>Names the seat(s) for your own tracking. With multiple seats it becomes <code>label #1</code>, <code>label #2</code>, …</td></tr>
+      <tr><td><code>monthly_request_quota</code></td><td>integer</td><td class="muted">no</td><td>Max MCP requests/calendar-month for the whole account (shared across its seats). Omit to use the server default (250). Send a higher number for PRO teams (e.g. <code>5000</code>).</td></tr>
+      <tr><td><code>rate_limit_per_minute</code></td><td>integer</td><td class="muted">no</td><td>Burst limit per minute (shared). Omit to use the server default (20).</td></tr>
+      <tr><td><code>expires_in_days</code></td><td>integer</td><td class="muted">no</td><td>Access expiry, e.g. <code>365</code> for an annual plan. Omit for no expiry.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Example request</h2>
+  <h3>cURL</h3>
+<pre><code>curl -X POST https://mcp.swarajyamag.com/provision/groups \
+  -H "Authorization: Bearer $PROVISION_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "group": "Varahe Analytics",
+        "contact_email": "ops@varahe.com",
+        "seats": 10,
+        "monthly_request_quota": 5000,
+        "expires_in_days": 365
+      }'</code></pre>
+
+  <h3>Node.js (fetch)</h3>
+<pre><code>const res = await fetch("https://mcp.swarajyamag.com/provision/groups", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${process.env.PROVISION_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    group: "Varahe Analytics",
+    contact_email: "ops@varahe.com",
+    seats: 10,
+    monthly_request_quota: 5000,
+    expires_in_days: 365,
+  }),
+});
+
+if (!res.ok) throw new Error(`provision failed: ${res.status}`);
+const data = await res.json();
+// data.access_urls -> email these to the customer
+// data.group_id    -> STORE against the customer (needed for renewals / add-seats)</code></pre>
+
+  <h2>Response <span class="pill" style="background:#2e8b57">200 OK</span></h2>
+<pre><code>{
+  "group_id": "a1b2c3d4e5f6...",
+  "group": "Varahe Analytics",
+  "created_group": true,
+  "seats": 10,
+  "access_url": "https://mcp.swarajyamag.com/s/swj_ab12....xz/mcp",
+  "access_urls": [
+    "https://mcp.swarajyamag.com/s/swj_ab12....xz/mcp",
+    "https://mcp.swarajyamag.com/s/swj_cd34....yw/mcp"
+    // ... one per seat
+  ],
+  "expires_at": "2027-07-04T00:00:00"
+}</code></pre>
+  <table>
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>group_id</code></td><td><b>Store this</b> against the customer. Pass it back as <code>group_id</code> to add seats or renew later.</td></tr>
+      <tr><td><code>access_urls[]</code></td><td>One connector URL per seat. These are the credentials — email them to the customer (see "What the customer does" below).</td></tr>
+      <tr><td><code>access_url</code></td><td>Convenience: the first URL in the list.</td></tr>
+      <tr><td><code>created_group</code></td><td><code>true</code> when a new account was created; <code>false</code> when seats were added to an existing <code>group_id</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Error responses</h2>
+  <table>
+    <thead><tr><th>Status</th><th>Body</th><th>Cause</th></tr></thead>
+    <tbody>
+      <tr><td><code>401</code></td><td><code>{"detail":"invalid or missing bearer token"}</code></td><td>Missing/wrong <code>Authorization</code> header.</td></tr>
+      <tr><td><code>404</code></td><td><code>{"detail":"group_id not found"}</code></td><td>A <code>group_id</code> was passed but doesn't exist.</td></tr>
+      <tr><td><code>422</code></td><td><code>{"detail":"provide `group` (name) or `group_id`"}</code></td><td>Neither <code>group</code> nor <code>group_id</code> supplied (or a field failed validation).</td></tr>
+      <tr><td><code>503</code></td><td><code>{"detail":"provisioning disabled: set PROVISION_API_KEY"}</code></td><td>The webhook isn't enabled on the server yet.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Suggested integration flow</h2>
+  <ol>
+    <li>Your <b>payment-success webhook</b> (Razorpay/Stripe/etc.) fires on a captured payment.</li>
+    <li>Your backend derives <code>seats</code> from the plan purchased and calls <code>POST /provision/groups</code>.</li>
+    <li>Store the returned <code>group_id</code> against the customer/order in your DB.</li>
+    <li>Email the <code>access_urls</code> to the customer with setup instructions.</li>
+    <li>For renewals or extra seats later, call again with <code>group_id</code> (not <code>group</code>).</li>
+  </ol>
+
+  <div class="callout warn">
+    <b>Idempotency — important.</b> Each call with <code>group</code> creates a <b>new</b> account. Payment webhooks are retried by the provider, so guard against double-provisioning on <b>your</b> side: dedupe on the payment/order id (e.g. only provision once per <code>order_id</code>), and store the resulting <code>group_id</code>. There is no server-side idempotency key today.
+  </div>
+
+  <h2>What the customer does with an access URL</h2>
+  <p>Each <code>access_url</code> is an MCP connector URL. The end user adds it as a custom connector in their AI client — Claude (Desktop / web / Code), ChatGPT, or Gemini — and their assistant can then search and cite Swarajya's archive. No install or API key on their side; the URL is the credential, so it should be treated as a secret.</p>
+
+  <hr>
+  <p class="foot">Swarajya PRO · Provisioning API · base URL <code>https://mcp.swarajyamag.com</code>. Questions: pro@swarajyamag.com. The <code>PROVISION_API_KEY</code> is shared separately — keep it server-side only.</p>
+
+</div>
+</body>
+</html>

@@ -589,6 +589,19 @@ text-on-solid-background, even if the colors differ. At least every
 third phase must introduce an image or video asset. Text-only phases
 serve pacing — they are not the default.
 
+### Editing for Momentum — cut the meta/roadmap scene (§67)
+
+Cutting a scene for pace is a valid editorial move, not a failure. The most
+cuttable scene is usually the **meta/roadmap scene** — one that talks ABOUT
+the video ("in this video we'll look at...", "there are three things to
+understand here") rather than delivering content. It stalls momentum; the film
+is almost always stronger without it, straight into the substance.
+
+When you cut a scene, **keep it on the shelf — do not delete it.** Move the
+TSX/brief/assets aside (e.g. a `_shelf/` folder, or comment it out of the
+scene manifest) so it can be restored in one step if the cut proves wrong.
+Renumber cautiously or keep IDs stable to avoid churn across the pipeline.
+
 ### Backdrop Treatment — Follow the Ontology
 The scene ontology specifies `phases_with_image`, `treatment`
 (duotone / defocused / masked), and `prompt_style`. Respect these.

@@ -64,6 +64,34 @@ For changing numbers, prefer ONE element that counts (interpolate the value,
 `fontVariantNumeric: 'tabular-nums'`, `EASING.inOut`, ~40f) over swapping two
 static labels.
 
+## Montage & multi-image beats — SLOW joins, held underlay (§58)
+
+Montage (a beat that steps through several images) is where amateur pacing
+shows most. The failure mode is a fast slideshow with hard cuts or white
+flashes — it reads as a strobe and gives viewers a headache. Rules:
+
+- **Hold floor per image: ~3s (≥90f @30fps).** Absolute floor 2.5s (75f), and
+  only when a frozen narration window forces it. This is the §51 90f text-hold
+  rule applied to images too — a montage image is an on-screen element.
+- **Joins are SLOW: 30-40f (1.0-1.3s)** eased directional slides
+  (`EASING.inOut` / `EASING.outSoft`). The incoming image slides IN over the
+  outgoing image, which is **held FULLSCREEN underneath** — never let the
+  outgoing image leave an edge gap or reveal the background between images.
+- **Vary the slide direction** across the montage (left, right, up) so it
+  doesn't read as a one-directional scroll (cf. transitions.md wipe
+  alternation).
+- **FEWER images beats faster cuts.** If the beat feels rushed, DROP images —
+  do not speed up the joins to fit more in. Roughly one image per
+  sentence-clause is the density target.
+- **NEVER white cut-flashes between images.** A white frame between images
+  reads as a strobe/headache. (The single sanctioned white flash is one impact
+  beat straddling a boundary, max 1-2 per scene — transitions.md; that is a
+  deliberate hit, not a montage joiner.)
+
+This is the same doctrine as the phase pacing floor (LEARNINGS §19) and the
+motivated-transition vocabulary (§50) — a montage inside one phase must obey
+the same "nothing rushed, nothing flashes" bar as phase-to-phase motion.
+
 ## Motion blur on fast moves
 
 Any translate faster than ~15px/frame strobes at 30fps. Apply
@@ -97,6 +125,28 @@ gets:
 3. Film grain (FILM_GRAIN_SVG) at 3–4% opacity
 4. Shadows tinted with the background hue (`RAMP.shadowOnCream` /
    `RAMP.shadowOnDark`) — never pure black.
+
+## Never open on an empty frame (§61)
+
+A scene — or a data beat — must NEVER begin on a blank frame. Something
+intentional is alive on screen from ~f10. A faint texture (a background at
+<~0.2 opacity, a barely-there ramp) reads as *blank* to the viewer, not as
+"atmosphere" — the frame looks broken or unloaded for the first second.
+
+- Have the establishing image, the ground plane, a rule, or the first
+  compositional element present and visibly settling by ~f10. The §51 rule
+  (image establishes ~1s before text) means the IMAGE is that live element —
+  it must actually read as present, not a ghost.
+- **Counters, rings, charts should be ALIVE from the start**, not slammed in
+  after empty seconds. Establish the ring TRACK / axis / gridlines early
+  (they can be present from f0), and have the counter count UP from 0 so it is
+  *arriving* at its value ON the whisper beat, rather than a blank frame that
+  suddenly gets a number. A data element that pops in after 2s of nothing
+  wastes the beat and reads as a jump. See charts.md → "Alive from f0."
+
+The dead-void rule below governs regions that stay empty within an otherwise
+populated frame; THIS rule governs the opening frames, where nothing empty is
+acceptable.
 
 ## Dead-void activation
 

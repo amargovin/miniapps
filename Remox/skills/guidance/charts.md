@@ -2,6 +2,44 @@
 
 > **Charts are a tool of last resort.** Before reaching for a chart, ask: can this data be shown as a physical quantity? A battery draining to 23%. Liquid filling vessels to different levels. Objects accumulating or disappearing. A gauge needle swinging to a position. A building being constructed floor by floor. See `creative-direction.md` Step 3 for metaphor guidance. Use charts only for 5+ data point trends, time series, or multi-variable comparisons that genuinely cannot be expressed as a physical metaphor. A single number is never a chart — it's an object at a level.
 
+## Data-viz restraint — cut what doesn't land (canonical for §62)
+
+Restated across a full film: **when a chart or gauge doesn't clearly
+communicate, cut it and go text-forward.** A fiddly data-viz that the viewer
+can't decode in ~2s is worse than a clean stat line — it looks busy and
+undesigned. Specifics learned in production:
+
+- **Remove data-viz that doesn't land.** Climbing gauges, stepped mini-bars,
+  and small multi-part meters routinely fail to read at video scale and pace.
+  If it isn't instantly legible, delete it — replace with a hero stat / thesis
+  line (typography.md → "Size by ROLE"), and **widen the text box** to fit the
+  text properly rather than shrinking the text to fit a leftover chart slot.
+- **When you DO chart, encode the ACTUAL variable meaningfully.** A disparity
+  is clearest when bar LENGTH maps to the quantity that differs — the eye
+  compares lengths instantly. Prefer **horizontal bars**, scaled UP, with
+  generous whitespace, so the comparison is the whole composition. Don't dress
+  a single number as a chart (see the last-resort note below — a single number
+  is an object at a level, never a chart).
+
+This is the same instinct as editorial-design.md Tier 1 (kinetic typography is
+the default) and the "charts are a tool of last resort" note below: reach for
+text first, chart only when the data genuinely needs it, and cut any chart
+that fights the viewer.
+
+## Alive from f0 — never a blank data frame (§61)
+
+A chart/counter/ring must NOT slam in after empty seconds. Establish the
+scaffolding (axis, gridlines, ring TRACK, baseline) from frame 0 so the frame
+reads as present, then animate the DATA into it:
+
+- Counters count UP from 0, *arriving* at the value on the whisper beat — not
+  a blank frame that suddenly shows a finished number.
+- The ring/donut track is drawn (faint) from f0; the fill sweeps in.
+- The axis and gridlines are present early; bars grow into the established
+  grid.
+
+See motion-doctrine.md → "Never open on an empty frame."
+
 ## Chart Craft Requirements (mandatory when a chart IS used)
 
 Two naked bars floating in empty space is not a chart — it's the #1
@@ -83,8 +121,12 @@ const PALETTE = {
 
 ## Animated Bar Chart — 4 Bars with Staggered Spring Entrance
 
+Uses `barFill()` for every bar — the mandated modern vector token (vertical
+gradient + inner highlight + glow). Never a flat `background: color` bar.
+
 ```tsx
 import { spring, interpolate, useCurrentFrame, useVideoConfig, AbsoluteFill } from "remotion";
+import { barFill } from "../motion-utils";
 
 const BAR_DATA = [
   { label: "China",  value: 78, color: "#e94560" },
@@ -117,14 +159,12 @@ const Bar: React.FC<{ data: typeof BAR_DATA[0]; index: number }> = ({ data, inde
         {displayValue}%
       </div>
 
-      {/* Bar */}
+      {/* Bar — barFill() gives the gradient + inner highlight + glow */}
       <div
         style={{
+          ...barFill(data.color),
           width: BAR_WIDTH,
           height: barHeight,
-          background: data.color,
-          borderRadius: "6px 6px 0 0",
-          boxShadow: `0 0 20px ${data.color}44`,
         }}
       />
 
@@ -204,27 +244,35 @@ export const Counter: React.FC<{ from: number; to: number; durationFrames?: numb
 
 ## Axis and Gridline Entrance
 
+Every gridline is `gridline()` — the ONLY sanctioned thin line on video (2px
+at 18% opacity). Never `height: 1` with a flat `background`. Multiply the
+token's baked-in opacity by the spring so the line still animates in.
+
 ```tsx
+import { gridline } from "../motion-utils";
+import { PALETTE } from "../theme";
+
 const GridLines: React.FC<{ count?: number }> = ({ count = 5 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+
+  const gl = gridline(PALETTE.primary); // { background, height: 2, opacity: 0.18 }
 
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       {Array.from({ length: count }).map((_, i) => {
         const f = Math.max(0, frame - i * 4);
-        const opacity = spring({ frame: f, fps, config: { damping: 20, stiffness: 100 } });
+        const enter = spring({ frame: f, fps, config: { damping: 20, stiffness: 100 } });
         const y = ((i + 1) / (count + 1)) * 100;
         return (
           <div
             key={i}
             style={{
+              ...gl,
               position: "absolute",
               top: `${y}%`,
               left: 0, right: 0,
-              height: 1,
-              background: "#333",
-              opacity,
+              opacity: gl.opacity * enter, // animate the token's 18% in
             }}
           />
         );

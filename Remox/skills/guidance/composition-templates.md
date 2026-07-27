@@ -27,14 +27,9 @@ and connective scenes use exactly one template.
 | focal-offset | Asymmetric emphasis, editorial feel | 4 | 3 | Dynamic, cinematic |
 | grid | Multi-item showcase, comparisons | 6 (2×3) | 4 (2×2) | Structured, dense |
 
-**Rich composition rule (LEARNINGS §44 — applies to every template):**
-"Label" never means a lone static caption floating in a corner. Any text zone
-over or beside an image must be a composed block — eyebrow + headline-weight
-line + supporting detail, tied together with an animated accent (rule draw,
-bracket, highlight wash) — OR the image must be luminous enough to carry the
-frame narration-led with minimal text. A small label in one corner and an
-image in another, with dead space between, is a HARD FAIL in the visual still
-review. Never crush images under dark overlays to make text fit.
+**Rich composition rule (§44) applies to every template** — "label" never
+means a lone static caption floating in a corner. See "Composition Doctrine"
+at the end of this file for the full, authoritative rules.
 
 ---
 
@@ -153,10 +148,10 @@ Classic documentary/news feel.
 - 10% breathing room between visual and text
 - Max 3 elements (1 visual + 2 text lines)
 - Text is large — 48px+ title, 30px+ subtitle; lower-third NAMES ≥56px
-  (LEARNINGS §43)
+  (typography.md floors, §43)
 - The text bar is a composed block with hierarchy and an animated accent
   (rule draw under the title, staggered entrance) — never two static lines
-  dropped on the frame (LEARNINGS §44)
+  dropped on the frame (Composition Doctrine, §44)
 
 **Works well with:** typography, spring-physics,
 arc-wipe, dither-dissolve
@@ -489,7 +484,7 @@ or breathes as negative space.
 - When the hero is an IMAGE, the supporting zone must be a composed text
   block (eyebrow + headline + support + animated accent, staggered entrance)
   or deliberate negative space — NEVER a lone small label stranded in the
-  opposite corner (LEARNINGS §44)
+  opposite corner (Composition Doctrine, §44)
 
 **Works well with:** spring-physics, clip-path-reveal,
 depth-blur, speed-remap, typography
@@ -609,21 +604,149 @@ concept may be too complex. Consider simplifying.
 
 ---
 
-## Integrated Full-Bleed Supersedes Focal-Offset (July 2026, LEARNINGS §49)
+## Composition Doctrine (July 2026 — canonical for §8, §26, §44, §46f, §49, §53)
 
-Focal-offset and split-compare are DEMOTED from default choices. Image-beside-
-text is the boring arrangement the user has rejected. Default instead to
-**integrated full-bleed**: generate imagery with designed negative space
-(subject off-centre, clear area prompted for the text side), camera move over
-the full 16:9, composed text block set INTO the negative space, world-pinned
-callouts (§47) for anything named in the image.
+This section reconciles the July 2026 user feedback into one authoritative
+doctrine for how image and text share a frame. It overrides the template
+defaults above wherever they conflict.
 
-Reach for split-compare ONLY when the narration is an explicit A-vs-B
-comparison — and then the divider must be alive: diagonal/curved mask, subject
-breaking across the boundary, or an animated divider that moves with the
-narration. Straight static vertical divider + flat text panel = review FAIL.
+### 1. Integrated full-bleed supersedes focal-offset (§49)
 
-## Extended Composition Vocabulary (July 2026)
+User verdict: "split compositions with image on one side and text on
+another — very boring." Focal-offset and split-compare are DEMOTED from
+default choices — an image column beside a text panel is an ARRANGEMENT, not
+a composition: the image is cropped into a column, the text floats on dead
+flat space, and nothing interacts.
+
+The default replacement — **integrated full-bleed**:
+1. **Generate the image WITH designed negative space** — prompt the subject
+   off-centre and demand clear sky / soft shadow / open ground on the side
+   where text will live ("subject in right third, vast clear sky
+   upper-left"). 16:9 native — no more cropping 1:1 panels out of it.
+2. Run a gentle camera move over the full-bleed image (cam keyframes).
+3. Set the composed text block INTO the negative space (scrim chip only if
+   contrast demands), and WORLD-PIN any label that names a thing in the
+   image (§47, illustrated-plate.md).
+The image becomes the environment for the words, not a neighbour.
+
+**When a split IS the story** (explicit A-vs-B comparison), make the split
+itself alive — at least one of:
+- **Diagonal or curved divider** (clip-path), never a straight vertical rule
+- **Subject breakout**: the subject crosses the divider (nose of the jet
+  overlaps the text side)
+- **Animated divider**: the boundary MOVES during the phase as narration
+  shifts attention (55/45 → 30/70), text reflowing in choreography
+- Panels acknowledge each other: colour echo, connector, shared horizon line
+
+A static straight-divider split with a flat text panel is a review FAIL
+unless the narration is an explicit two-thing comparison AND one of the
+techniques above is applied.
+
+### 2. Rich phase composition — no "lone label + image" phases (§44)
+
+User verdict: "too simplistic depiction — text is in one corner, image in
+another, we want rich depictions." A phase consisting of one small text label
+in one corner and an image in another — especially an image crushed by dark
+overlays — reads as dead air. Every image phase must be one of:
+
+1. **Composed text block**: eyebrow + headline-weight line + supporting
+   detail, tied together with an animated accent (rule draw, bracket,
+   highlight wash), left-aligned in the safe zone, with entrance/ambient/exit
+   choreography and a gentle Ken Burns on the image; OR
+2. **Narration-led full-bleed**: the image itself is rich and luminous enough
+   to carry the frame (light-touch treatment per editorial-design.md §11.1 —
+   never crushed), with text minimal or absent.
+
+Corner-text + corner-image flatness is a HARD FAIL in the producer's visual
+still review (§34).
+
+**Extension — text treatments too (user: "it can't be this simple"):** a
+plain static two-line label dropped on an image is equally a fail. Every text
+overlay moment needs deliberate typographic design — scale hierarchy between
+hero line and support line, staggered kinetic entrance, an animated accent
+(rule draw, underline, highlight wash, indicator dot), and ambient life
+(breathe/pulse) through the hold. Where the image offers a diegetic hook (a
+cockpit warning lamp, an instrument), tie the type's motion to it. If a
+phase's text would read the same as a lower-third caption, redesign it.
+
+**Sanctioned split exceptions (July 2026 sweep verdicts):**
+1. **Designed editorial spreads** — multi-item ledger/audit layouts (cream
+   ledger panels with rules, stamps, line items). A composed print grammar
+   and the film's variety breather, not a lazy split.
+2. **Live-diagram splits** — when the second panel is an ANIMATED diagram or
+   counter (photo | radar-fan draw + counting stat). Both halves alive = the
+   split earns itself.
+Everything else converts to integrated full-bleed.
+
+### 3. Broadcast text cards — the TV-news grammar for image+text (§53)
+
+User doctrine: "Unlike in television programs where a text card is almost
+70-80% of the screen width in two parts — a caption part maybe 20% of element
+height, and remaining 80% for text — think news programs. Otherwise the
+graphics just look like bad PPT."
+
+Small floating chips/labels on an image are PRINT graphics pasted on video.
+The grammar (component ships in scaffold: `src/BroadcastCard.tsx`):
+- **KICKER tab**: short accent band (~20% of card height), mono caps, brand
+  red/accent background — the category/context line
+- **MAIN bar**: the dominant text area (~80% of card height), 56-84px heading
+  type on a solid bar — the actual statement
+- **70-80% of screen width**, anchored lower-left ABOVE the subtitle floor
+- **ONE message per card per phase** (user correction, July 2026): a typical
+  phase is 5-7s and the card enters 2-3s in — there is no time for strap
+  swaps; a swapped text fragments the read and nothing registers. The
+  `items[]` swap API is RESERVED for rare ≥10s phases where every message
+  still gets ≥3s of hold. Default: single kicker + single main, held to the
+  phase end.
+
+Usage rules:
+- DEFAULT for image+text phases (full-bleed imagery + broadcast card).
+  Floating chips are demoted to minor in-image annotations only.
+- World-pinned callouts (§47) remain the tool for NAMING things in the
+  image; the broadcast card carries the SENTENCE-level message.
+- Card text follows the §52 role-sizing rule (typography.md): the main bar
+  is the phase's statement — size it like one.
+
+**Reference exemplar — person-introduction phases (user: "brilliant"):**
+full-bleed environmental portrait (subject in the right third, vast open sky
+as designed negative space), slow push toward the subject, BroadcastCard with
+the person's NAME as the main line landing exactly on the spoken-name beat
+(e.g. "THE FRAMEWORK / Sameer Joshi — ex-IAF Mirage pilot", 4s hold). When a
+script introduces a person, author the phase to this pattern.
+
+### 4. Rich images need hold time — merge worlds across short phases (§46f)
+
+A spectacular image on a ~≤180f phase "is cut short too quickly, doesn't get
+time for registering in audience mind." When a rich new image lands on a
+short whisper-pinned phase, carry it through the ADJACENT phase as a
+continuity world: the next phase renders its text/content over the same image
+with the camera move continuing (end state = next start state). Durations
+never change — only the background persists. Switch visuals on short phases
+only when both neighbours are already image-rich.
+
+Corollary: on a SHORT narration-led plate/photo beat, prefer NO text over a
+fleeting label that restates the narration — that is §25 text-karaoke with
+too little screen time to read anyway. Drop the label; let the phase breathe.
+
+### 5. Text placement — never right-aligned or top-right (§26)
+
+- **Text goes LEFT, image goes RIGHT** in offset/split layouts
+- `alignItems: 'flex-start'` (left-align) — NEVER `'flex-end'` (right-align,
+  which pushes text under the burned-in top-right logo)
+- `justifyContent: 'flex-start'` (top) or `'center'` — acceptable
+- The top-right quadrant (~right 300px × top 200px) is ALWAYS logo territory
+- Lower-third text is left-aligned at `left: 80-192px`, never right-aligned
+  or centered-right
+
+### 6. Visual variety across scenes (§8)
+
+- Never 3+ consecutive scenes with the same treatment
+- At least 20% of runtime low-text or no-text (narration-led)
+- Vary text layout: centered, left-aligned, top-left, split
+- Solid-bg phases sparingly for maximum dramatic contrast (1-2 per video)
+- Mix backdrop phases between pure text phases — no scene entirely text
+
+### Extended composition vocabulary
 
 Beyond integrated full-bleed, five sanctioned compositions — all generation +
 existing machinery, no new infrastructure:
@@ -641,10 +764,3 @@ existing machinery, no new infrastructure:
    Poster energy for thesis beats without going solid-bg.
 5. **Type-as-mask chapter card** — imagery visible through giant letterforms
    (clip-path/mask). Act breaks; doubles as thumbnail material.
-
-## Broadcast Card Is the Default Image+Text Treatment (July 2026, §53)
-
-For any phase where imagery carries a sentence-level message: full-bleed image
-+ `BroadcastCard` (kicker tab + main bar, 70-80% width, above subtitle floor,
-strap-style text swaps on whisper beats). Floating chips = minor annotations
-and world-pinned callouts only. See LEARNINGS §53 and src/BroadcastCard.tsx.
