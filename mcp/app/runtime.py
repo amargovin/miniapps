@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from app.clients.indiabuild import IndiaBuildClient
 from app.clients.llm import LLMClient
 from app.clients.quintype import QuintypeClient
 from app.config import Settings
@@ -17,6 +18,11 @@ from app.services.orchestrator import Orchestrator
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+@lru_cache
+def get_indiabuild() -> IndiaBuildClient:
+    return IndiaBuildClient(get_settings())
 
 
 @lru_cache

@@ -40,6 +40,14 @@ class Settings(BaseSettings):
     # e.g. https://mcp.swarajyamag.com  ->  <origin>/s/<token>/mcp
     public_base_url: str = "http://localhost:8000"
 
+    # --- IndiaBUILD federation (optional) ---
+    # Full Streamable-HTTP URL of the IndiaBUILD MCP connector, INCLUDING its
+    # secret path (e.g. https://mcp.indiabuild.wiki/mcp-<secret> — the path IS
+    # the credential, treat this value like a token). When set, this server
+    # re-exports IndiaBUILD's read-only tools on its own connector by acting as
+    # an MCP *client* of that URL (app/clients/indiabuild.py). Empty = off.
+    indiabuild_mcp_url: str = ""
+
     # MCP transport DNS-rebinding protection validates the Host header. That
     # guards localhost dev servers from browser attacks; it does not fit a
     # public, token-authenticated server behind a proxy (it rejects the proxy's

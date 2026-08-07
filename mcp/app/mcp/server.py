@@ -134,3 +134,14 @@ async def swarajya_collection(slug: str, limit: int = 12) -> dict:
         "summary": result["summary"],
         "sources": [s.model_dump() for s in result["sources"]],
     }
+
+
+# --- IndiaBUILD federation (read-only re-export) ----------------------------
+# When INDIABUILD_MCP_URL is set, the connector additionally serves the
+# IndiaBUILD map's read tools: this server acts as an MCP *client* of that URL
+# (app/clients/indiabuild.py), inheriting its suggest-only boundary by
+# construction. Unset (the default) = pure Swarajya surface, nothing registered.
+if get_settings().indiabuild_mcp_url:
+    from app.mcp.indiabuild_tools import register_indiabuild_tools
+
+    register_indiabuild_tools(mcp)
