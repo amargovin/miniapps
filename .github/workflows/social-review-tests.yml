@@ -1,0 +1,42 @@
+name: social-review tests
+
+on:
+  push:
+    paths: ["social-review/**", ".github/workflows/social-review-tests.yml"]
+  pull_request:
+    paths: ["social-review/**", ".github/workflows/social-review-tests.yml"]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: social-review
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: social_review_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # The §9 regression tests replay recorded payloads and skip until the fixtures are
+      # recorded from a real run (tests/fixtures/README.md). Everything else — the metric
+      # definitions, the IST window edges, the exclusive-`until` test, the cost guardrails,
+      # the two 409s and the page/link counts — runs here with no network access.
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/social_review_test
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: social-review/requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
