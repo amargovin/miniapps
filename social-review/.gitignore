@@ -1,0 +1,7 @@
+.env
+.api-token-local
+__pycache__/
+*.pyc
+.venv/
+work/
+*.pdf
