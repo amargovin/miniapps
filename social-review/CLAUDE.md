@@ -25,8 +25,8 @@ Claude Code on web against this repo (`amargovin/miniapps`, subfolder `social-re
   `/readyz`, docs disabled outside `ENV=dev`, no CORS; every `/v1` route is a 501 stub
 - `Dockerfile` (one image, two entrypoints), `railway.json`, `requirements.txt` (pinned
   2026-08-27)
-- `reference/` — the old manual process's renderer and metric scripts to port; see
-  `reference/README.md`, including a note on the missing `build_short.py`
+- `reference/` — the old manual process's renderer (`build_deck.py`), the four-slide
+  layout to port (`build_short.py`) and metric scripts; see `reference/README.md`
 
 ### Railway — already provisioned
 
@@ -69,8 +69,9 @@ Follow the build order in §12 of the brief exactly. Summary:
 2. X client: pagination, thread detection, retry policy (§4). Unit tests on recorded fixtures.
 3. Meta client: cursor pagination, **exclusive-`until`** test (§4 — a real bug lived here).
 4. Aggregation (§6, exact definitions) + `verify()` checks (§9).
-5. PDF renderer: four slides, ported visual system from `reference/build_deck.py`,
-   layout per §8, page-count and link-count verification.
+5. PDF renderer: port `reference/build_short.py` (four-slide layout) with
+   `reference/build_deck.py`'s visual system into one module, layout per §8, page-count
+   and link-count verification.
 6. Mailer behind a `Mailer` protocol (Resend implementation).
 7. Pipeline as one library function; CLI and API both call it. Advisory lock, background
    runs, Idempotency-Key, the two `409` cost guards — **write tests for those two**.
