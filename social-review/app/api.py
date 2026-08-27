@@ -80,8 +80,18 @@ def get_run_pdf(run_id: int) -> None:
     _not_implemented()
 
 
-@app.post("/v1/runs/{run_id}/email", dependencies=[Depends(require_token)])
-def resend_email(run_id: int) -> None:
+@app.post("/v1/runs/{run_id}/notify", dependencies=[Depends(require_token)])
+def renotify(run_id: int) -> None:
+    """Re-post an existing run's summary + deck link to the Chat room. No vendor calls.
+    (Was POST /runs/{id}/email in the brief — delivery is Google Chat now.)"""
+    _not_implemented()
+
+
+@app.get("/v1/decks/{week_ending}.pdf")
+def get_deck_signed(week_ending: str, sig: str = "") -> None:
+    """Signed PDF download for Chat links: sig = HMAC-SHA256(API_TOKEN, week_ending),
+    compared with hmac.compare_digest. No bearer header needed, so the link opens
+    straight from Chat. 404 on bad signature (do not confirm the week exists)."""
     _not_implemented()
 
 

@@ -32,10 +32,14 @@ class Settings(BaseSettings):
     ig_user_id: str = "17841400214702908"
     meta_api_version: str = "v21.0"
 
-    # Email (§4)
-    resend_api_key: str
-    mail_to: str = "amar@swarajyamag.com"
-    mail_from: str
+    # Delivery — Google Chat, not email (amendment to brief §4; see CLAUDE.md).
+    # Incoming webhook of the target Chat room. Webhooks cannot attach files, so the
+    # message carries the findings summary plus an HMAC-signed link to the PDF served
+    # by the api service.
+    google_chat_webhook: str
+    # Public base URL of the api service (https://...railway.app or custom domain),
+    # used to build the signed deck links. Set after Railway generates the domain.
+    public_base_url: str = ""
 
 
 def get_settings() -> Settings:

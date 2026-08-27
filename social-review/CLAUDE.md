@@ -2,12 +2,38 @@
 
 Scheduled Python service: once a week, pull every Swarajya post from X, Instagram and
 Facebook for the previous IST week, reconcile against the APIs' own aggregates, store in
-Postgres, render a four-slide PDF, email it.
+Postgres, render a four-slide PDF, post it to a Google Chat room.
 
 **`RAILWAY_BRIEF.md` in this folder is the full build specification and it is
-authoritative.** Numbers in it are measured regression targets, not examples. Read it
-before writing any code. This file is only the map: what exists, what's provisioned, and
-what to do next.
+authoritative — except where amended below.** Numbers in it are measured regression
+targets, not examples. Read it before writing any code. This file is only the map: what
+exists, what's provisioned, and what to do next.
+
+## Amendments to the brief (decided by Amar after the brief was written)
+
+**Delivery is a Google Chat room, not email.** Everywhere the brief says email
+(§4 "Email delivery", §8 "Email body", §9 alert email, §11 failure notice), read:
+
+- No Resend / SendGrid / SMTP, no `RESEND_API_KEY`, `MAIL_TO`, `MAIL_FROM`. Instead
+  `GOOGLE_CHAT_WEBHOOK` — an incoming webhook on the target room.
+- Incoming webhooks **cannot attach files**, so the weekly message is: the three-to-four
+  sentence findings summary from §8 as message text (Chat supports basic formatting),
+  the subject line from §4 as its first line ("Swarajya social review — week ending
+  Sunday 16 August 2026"), and a **signed link to the PDF**:
+  `GET /v1/decks/{week_ending}.pdf?sig=<hmac_sha256(API_TOKEN, week_ending) hex>` served
+  by the `api` service — no bearer header, so it opens straight from Chat. Compare with
+  `hmac.compare_digest`; 404 on bad signature. `PUBLIC_BASE_URL` env var supplies the
+  link base.
+- Keep the delivery behind the same protocol the brief calls `Mailer` — call it
+  `Notifier`, one `GoogleChatNotifier` implementation, so email can be added back later.
+- Verification failures (§9) and unhandled exceptions (§11) post to the same webhook
+  with the failing check / final traceback frame. Silence on a Monday morning must
+  still never be the failure mode.
+- `POST /v1/runs/{run_id}/email` in §2.1 is now `POST /v1/runs/{run_id}/notify`
+  (re-posts summary + link to the room; still costs nothing). The `send_email` field in
+  the `POST /v1/runs` body is now `notify` (same semantics, default true).
+- `MAIL_TO` is still set on the Railway services from before this amendment; it is
+  unused — ignore or delete it.
 
 ## Status: scaffold only — no pipeline code exists yet
 
@@ -46,10 +72,11 @@ Already set on both `api` and `weekly`: `DATABASE_URL` (reference to Postgres),
 
 ### Manual steps still needed (dashboard / Amar)
 
-1. **Secrets** — set on both `api` and `weekly`: `X_BEARER_TOKEN` (MUST be from the
-   developer app owned by @SwarajyaMag — see §10 "Owned Reads"; wrong app = 5x cost),
-   `META_ACCESS_TOKEN` (long-lived Page token, scopes in §4), `RESEND_API_KEY`,
-   `MAIL_FROM` (verified sender).
+1. **Secrets** — set on both `api` and `weekly`: ~~`X_BEARER_TOKEN`, `META_ACCESS_TOKEN`~~
+   (done 2026-08-27, copied from xmcpbridge / mcp-social-analytics — note the Meta token
+   expires ~60 days and must be rotated in both places), plus `GOOGLE_CHAT_WEBHOOK`
+   (create an incoming webhook in the target Chat room) and `PUBLIC_BASE_URL` (the api
+   service's domain, once generated).
 2. **Connect GitHub** — in the dashboard, point both `api` and `weekly` at
    `amargovin/miniapps`, **root directory `social-review`**. (CLI alternative while
    iterating: `railway up --service api` from this folder.)
@@ -72,11 +99,12 @@ Follow the build order in §12 of the brief exactly. Summary:
 5. PDF renderer: port `reference/build_short.py` (four-slide layout) with
    `reference/build_deck.py`'s visual system into one module, layout per §8, page-count
    and link-count verification.
-6. Mailer behind a `Mailer` protocol (Resend implementation).
+6. Notifier behind a protocol (`GoogleChatNotifier` — see amendments above) + the
+   signed deck-link route.
 7. Pipeline as one library function; CLI and API both call it. Advisory lock, background
    runs, Idempotency-Key, the two `409` cost guards — **write tests for those two**.
 8. Deploy, then one manual run for week-ending 2026-08-16 with `force:true,
-   send_email:false`, diff against the §9 regression table (215/4/43 posts,
+   notify:false`, diff against the §9 regression table (215/4/43 posts,
    21,217/1,927/641 engagement, etc. — must match exactly).
 9. Only then enable the cron schedule.
 

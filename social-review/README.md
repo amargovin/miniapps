@@ -2,7 +2,8 @@
 
 Weekly social performance review for Swarajya: pulls every post from X, Instagram and
 Facebook for the previous week (Monday–Sunday, Asia/Kolkata), reconciles counts, stores
-per-post rows and weekly rollups in Postgres, renders a four-slide PDF and emails it.
+per-post rows and weekly rollups in Postgres, renders a four-slide PDF and posts the
+findings summary + a signed deck link to a Google Chat room.
 Runs on Railway: managed Postgres + an always-on FastAPI operator service (`api`) + a
 cron-scheduled runner (`weekly`).
 
