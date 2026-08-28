@@ -364,3 +364,25 @@ def test_an_idempotency_key_maps_to_the_original_run_for_a_day(conn):
     assert store.idempotent_run_id(conn, "key-1") == out.run_id
     assert store.idempotent_run_id(conn, "key-2") is None
     assert store.idempotent_run_id(conn, "key-1", ttl_hours=0) is None
+
+
+def test_verification_outcomes_are_persisted_on_the_run(conn):
+    """§2.1: GET /v1/runs/{id} reports verification outcomes. Without persistence they
+    live only in the caller's stdout, which answers nothing a week later."""
+    out = run(conn, force=True, notify=False)
+    row = store.get_run(conn, out.run_id)
+    assert row["verification"] is not None
+    assert row["verification"]["ok"] is True
+    names = {c["check"] for c in row["verification"]["checks"]}
+    assert "no_fabricated_zeros" in names and "meta_reconciliation_all" in names
+    assert len(row["verification"]["checks"]) == len(out.verification)
+    assert row["report"] == {"slide_count": 4, "link_count": out.link_count}
+
+
+def test_a_failed_verification_is_persisted_too(conn):
+    out = run(conn, force=True, notify=False,
+              meta=meta_client(fb_drop_one_from_aggregate=True))
+    row = store.get_run(conn, out.run_id)
+    assert row["verification"]["ok"] is False
+    failed = [c for c in row["verification"]["checks"] if not c["ok"]]
+    assert any(c["check"] == "meta_reconciliation_facebook" for c in failed)

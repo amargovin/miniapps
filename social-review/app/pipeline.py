@@ -382,6 +382,11 @@ def _execute(outcome, req, settings, conn, logger, xc, mc, notifier, week_ending
         prior_week_ending=prior_week, duplicates=duplicates, unavailable=unavailable,
         notes=notes)
     outcome.verification = v.as_list()
+    # Persist the checks alongside the run. §2.1 requires GET /v1/runs/{id} to report
+    # verification outcomes, and `notes` is the only column that can carry them — without
+    # this they exist solely in the caller's stdout, which is no use a week later when
+    # someone asks whether that Monday's reconciliation actually passed.
+    notes.append({"note": "verification", "ok": v.ok, "checks": v.as_list()})
     outcome.notes = notes
     outcome.status = "ok" if not outcome.channels_failed else "partial"
     logger.info("phase.verify", ok=v.ok,
