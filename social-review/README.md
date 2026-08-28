@@ -148,9 +148,22 @@ through the Page.
 
 ### The schedule, and changing it
 
-`.github/workflows/social-review-weekly.yml`. It POSTs to `/v1/runs` and then polls the
-run to completion, so a failed pull surfaces in the Actions log as well as in the Chat
-room. Two repository secrets are required: `SOCIAL_REVIEW_URL` and `SOCIAL_REVIEW_TOKEN`.
+A Railway cron service — same repo, root directory `social-review` — with:
+
+```
+start command:  python -m app.cli trigger
+cron schedule:  30 23 * * 0
+```
+
+It POSTs to `/v1/runs` on the api service and exits; the pipeline runs there, in the
+long-lived container. It needs only `PUBLIC_BASE_URL` and `API_TOKEN`, not the vendor
+credentials, which is the point: the scheduler holds two variables instead of eleven, and
+there is exactly one place the pipeline ever runs.
+
+`cli trigger` rather than `curl` because the runtime image has no curl, and because a
+scheduler wants meaningful exit codes: **0** when a run started and when the cost guard
+refused one (both healthy), **75** when the api service is unreachable (retryable), **1**
+only when something is actually wrong.
 
 Cron is evaluated in **UTC** while the reporting week is **IST**, so the schedule is:
 
@@ -164,10 +177,10 @@ closes. The 5.5-hour margin between the window closing (18:30 UTC Sunday) and th
 deliberate, and it also absorbs GitHub's scheduling delay, which can be several minutes
 under load.
 
-To run a week by hand, use the workflow's **Run workflow** button — it takes
-`week_ending`, `force` and `notify` — or call the API directly as below. Any scheduler that
-can send an `Authorization` header works just as well; nothing about the endpoint is
-GitHub-specific.
+To run a week by hand: the API directly (below), `cli trigger --week-ending ... --force`,
+or the **Run workflow** button on `.github/workflows/social-review-manual-run.yml`, which
+takes `week_ending` / `force` / `notify` and polls the run to completion. Any scheduler that
+can send an `Authorization` header works — nothing about the endpoint is Railway-specific.
 
 ### Why `WEEK_TZ=Asia/Kolkata`
 

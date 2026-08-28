@@ -1,18 +1,16 @@
-name: social-review weekly run
+name: social-review manual run
 
-# Replaces the Railway `weekly` cron service (see social-review/CLAUDE.md amendments).
-# POST /v1/runs starts the same pipeline function in the background and returns 202, so
-# this only has to make one request and read the run id back.
+# MANUAL ONLY — there is deliberately no `schedule:` here. The weekly schedule lives on
+# Railway as a cron service running `python -m app.cli trigger` (see
+# social-review/CLAUDE.md amendments). Adding a schedule back would give the service two
+# schedulers: the second would be refused by the cost guard as a 409 rather than
+# double-billing, but it is noise nobody needs.
 #
-# 23:30 UTC Sunday == 05:00 IST Monday. That is a SUNDAY cron expression that fires on
-# Monday in local terms, and it looks wrong until you convert it — do not "simplify" it to
-# a Monday expression, which would run before the IST week has closed at 18:30 UTC Sunday.
-# The 5.5-hour margin is deliberate and also absorbs GitHub's scheduling delay, which can
-# be several minutes under load.
+# This exists for a run from a button with a form, and because it polls the run to
+# completion — so a failed pull surfaces in a log here rather than only as a Chat notice.
+# Needs two repository secrets: SOCIAL_REVIEW_URL and SOCIAL_REVIEW_TOKEN.
 
 on:
-  schedule:
-    - cron: "30 23 * * 0"
   workflow_dispatch:
     inputs:
       week_ending:

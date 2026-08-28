@@ -41,9 +41,18 @@ there are two (Postgres and `api`). Decided by Amar 2026-08-28, during the deplo
 - `POST /v1/runs` already starts the same `run_pipeline` function in the background,
   defaults to the last completed week and defaults `notify` to true, so the cron container
   was only ever a second way to invoke identical code.
-- The schedule now lives in `.github/workflows/social-review-weekly.yml` — same
-  `30 23 * * 0` expression, same UTC-vs-IST caveat, plus `workflow_dispatch` for a manual
-  run. It needs two repository secrets: `SOCIAL_REVIEW_URL` and `SOCIAL_REVIEW_TOKEN`.
+- The schedule is a **Railway cron service** whose start command is
+  `python -m app.cli trigger` on the schedule `30 23 * * 0` — same expression as before,
+  same UTC-vs-IST caveat. It needs only `PUBLIC_BASE_URL` and `API_TOKEN`, not the vendor
+  credentials, because it POSTs to the api service rather than running the pipeline itself.
+  `cli trigger` exists because the runtime image has no `curl`, and it gives a scheduler
+  the exit codes it wants: 0 when a run starts *and* when the cost guard correctly refuses
+  one, 75 when the target is unreachable (retryable), 1 only when something is wrong.
+- `.github/workflows/social-review-manual-run.yml` is **manual only** — no `schedule:`
+  block, deliberately, so there is exactly one scheduler. It is there for a run from a
+  button with a form, and because it polls the run to completion, so a failed pull shows up
+  in a log rather than only as a Chat notice. Needs `SOCIAL_REVIEW_URL` and
+  `SOCIAL_REVIEW_TOKEN` as repository secrets.
 - Dropping it removes a container, removes a whole class of "did that env var land on both
   services?" bug, and removes a real hazard found on first deploy: **Railway starts a
   service when the repo is connected, whether or not a cron is configured**, so wiring up
@@ -189,10 +198,11 @@ Done 2026-08-27/28: secrets on `api` (`X_BEARER_TOKEN`, `META_ACCESS_TOKEN`,
 Left to do:
 
 1. **Delete `MAIL_TO`** from `api` — a leftover from before the Chat amendment.
-2. **GitHub repository secrets** for the schedule: `SOCIAL_REVIEW_URL`
-   (`https://api-production-0bf0e.up.railway.app`) and `SOCIAL_REVIEW_TOKEN` (the
-   `API_TOKEN` value). Without both, `.github/workflows/social-review-weekly.yml` fails
-   fast with an explicit error rather than silently doing nothing.
+2. **The Railway cron service** that replaces `weekly`: same repo, root directory
+   `social-review`, start command `python -m app.cli trigger`, cron `30 23 * * 0`. It needs
+   `PUBLIC_BASE_URL` and `API_TOKEN` set on it — and nothing else. (Optional:
+   `SOCIAL_REVIEW_URL` / `SOCIAL_REVIEW_TOKEN` as GitHub repository secrets, if you also
+   want the manual-run workflow's button.)
 3. **X Developer Console** — a $10/cycle spending limit and auto-recharge (§10 Guardrails).
    Not yet confirmed done. Balance $94.64 on 2026-08-28. This is the only remaining
    guardrail against a runaway, now that the balance-alert path is known dead (decision 8).
@@ -203,7 +213,7 @@ Left to do:
 ## What is left
 
 **The pipeline is built, deployed and verified.** Step 9 — "enable the schedule" — is now
-"add the two GitHub secrets and let the workflow fire", since there is no cron to enable.
+"create the trigger cron service and let it fire".
 Nothing blocks it: step 8's gate passed and Owned Read pricing is confirmed.
 
 **Record the regression fixtures.** The 29 skipped tests in
