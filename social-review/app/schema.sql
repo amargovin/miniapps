@@ -81,3 +81,12 @@ CREATE TABLE IF NOT EXISTS raw_payloads (
   fetched_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   payload     JSONB NOT NULL
 );
+
+-- Beyond brief §5: `Idempotency-Key` on POST /v1/runs (§2.1) needs somewhere durable to
+-- live. Retrying a request that timed out client-side must not start a second, billed run,
+-- so the key->run mapping has to survive a process restart. Read with a 24-hour TTL.
+CREATE TABLE IF NOT EXISTS idempotency_keys (
+  key         TEXT PRIMARY KEY,
+  run_id      BIGINT REFERENCES runs(id) ON DELETE CASCADE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
