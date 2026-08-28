@@ -49,9 +49,14 @@ def test_a_pull_too_small_to_price_is_inconclusive_not_a_pass_or_a_fail():
 
 
 def test_an_unavailable_balance_endpoint_is_inconclusive_and_says_what_to_do():
+    """Measured against production 2026-08-28: GET /2/usage/credits 404s under app-only
+    auth, so this is the branch that actually fires. It has to hand over a usable manual
+    procedure, including the dedup trap that makes a same-day re-pull cost nothing."""
     v = assess(97, None, None)
     assert v.ok and not v.conclusive
-    assert "by hand before enabling the cron" in v.message
+    assert "before enabling the cron" in v.message
+    assert "$0.0970" in v.message and "$0.4850" in v.message   # both rates, to compare against
+    assert "fresh week" in v.message                            # the dedup trap
 
 
 def test_an_empty_pull_is_not_a_pass():

@@ -92,12 +92,24 @@ regression fixtures are recorded (see below).
    stored rows, but a deck saying "X unavailable" must not also show an X row. This matters
    more than it looks: the seeded rows include the 2026-08-16 week, so a substitution there
    would have been invisible.
-8. **X credit balance comes from `GET /2/usage/credits`.** The response shape
-   (`data.total_balance`) was confirmed against the live account through the `xmag`
-   connector; the path itself is inferred from that connector's naming and is **not yet
-   verified against the REST API directly**. A missing or 404 endpoint is tolerated: the
-   balance is reported as unknown and the smoke test says "inconclusive" rather than
-   failing an otherwise good run. Confirm it on first deploy.
+8. **The X credit balance is not readable from this service — confirmed on deploy.**
+   `GET /2/usage/credits` (the path implied by the `xmag` connector's naming) answers
+   **404 with the app-only bearer token**, measured against production 2026-08-28. The
+   same figure reads fine through the account's user-authenticated MCP connector, which
+   points at the endpoint needing OAuth 2.0 user context — X answers 404, not 403, for the
+   wrong auth context — and no REST path for it appears in the X docs. Consequences:
+   - the balance read stays best-effort and never fails a run; the first 404 is remembered
+     so a run makes one futile request rather than two;
+   - `x_balance_alert_usd` can therefore never fire. The low-balance alert is dead code
+     until a working path exists — **watch the Developer Console instead**;
+   - §10's balance-delta signal (the earliest warning that Owned Read pricing has stopped
+     applying) has no automatic source. `runs.x_cost_usd` still records the estimate, so
+     the check is: compare it against the Console's spend by hand, now and again.
+   - `cli smoke` therefore returns "inconclusive", not a pass, and prints the manual
+     procedure. **Verifying the rate once, by hand, is still required before step 9** —
+     the difference is $20/year against $105.
+   Fixing this properly means finding the real path or giving the service a user-context
+   token; neither is worth blocking the deploy on.
 9. **`python -m app.cli dump-fixture <run_id>`** writes a run's stored `raw_payloads` to
    disk as the §9 regression fixture. The measured numbers in §9 cannot be checked against
    hand-written payloads — that would test the fixture, not the pull — so the fixture is

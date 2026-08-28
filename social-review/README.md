@@ -180,8 +180,15 @@ Consequences worth knowing:
 
 - `GET /2/users/{id}/tweets` is $0.001 per post **only** when the token comes from the
   developer app @SwarajyaMag owns; otherwise it is $0.005, and nothing in any response
-  says which rate applied. `python -m app.cli smoke` measures it against the live credit
-  balance and fails loudly. Run it after deploying, before enabling the cron.
+  says which rate applied — $20/year against $105. `python -m app.cli smoke` checks it,
+  but **it cannot conclude on its own**: the credit balance endpoint answers 404 under the
+  app-only bearer token (see CLAUDE.md decision 8), so `smoke` reports "inconclusive" and
+  prints a manual procedure. Do that once before enabling the cron: note the balance in the
+  Developer Console, pull a week not already fetched today, check the drop against the two
+  figures `smoke` gives you. It must be a *fresh* week — reads are deduplicated within a
+  UTC day, so a same-day re-pull is free and the balance will not move at all.
+- The low-balance alert (`X_BALANCE_ALERT_USD`) depends on that same endpoint, so it never
+  fires. Watch the Console balance instead until a working path is found.
 - `GET /2/users/{id}/followers` is billed **per follower** — about $342 a run here, against
   $0.010 for the `user.fields=public_metrics` lookup. `app/x_client.py` refuses to build
   that path at all, and a test asserts it.
