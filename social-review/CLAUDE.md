@@ -45,19 +45,14 @@ there are two (Postgres and `api`). Decided by Amar 2026-08-28, during the deplo
   (`a006f8b1-eb35-4589-9200-a8e191e41bf2`), the Bun runtime, cron `30 23 * * 0`, restart
   policy NEVER. Source of record: `deploy/railway-function-trigger.ts`; Railway keeps its
   own copy base64-encoded in the start command, which is why the file is in the repo. It
-  hits `/v1/trigger` and nothing else, so it holds **one** variable: `TRIGGER_URL`, from
+  hits `/v1/trigger` and exits — four lines. One variable, `TRIGGER_URL`, from
   `python -m app.cli trigger-url`. That URL is signed over a fixed action string rather
-  than carrying the bearer token, which makes it strictly weaker than `API_TOKEN` — it
-  cannot read a deck, list runs, force a re-pull or choose a week. Regenerate it whenever
-  `API_TOKEN` is rotated; the function reports the resulting 404 to the room rather than
-  stopping silently. `GOOGLE_CHAT_WEBHOOK` on the function is optional and covers only the
-  api-is-unreachable case.
-  - 202 and 409 both exit 0. The cost guard and a run already in flight are correct
-    refusals by a healthy service; exiting non-zero is what had Railway reporting a crash
-    loop over nothing.
-  - Anything else, or an unreachable api service, exits 1 **and posts to the Chat room**.
-    The api service posts its own failure notices, but cannot report being down, and a
-    silent Monday is the failure mode §11 forbids.
+  than carrying the bearer token, which makes it strictly weaker than `API_TOKEN`: it
+  cannot read a deck, list runs, force a re-pull or choose a week. 202 and 409 both exit 0
+  — the cost guard refusing an already-stored week is a healthy service, and exiting
+  non-zero there is what had Railway reporting a crash loop over nothing. Anything else,
+  including the 404 after rotating `API_TOKEN` without regenerating the URL, fails the
+  deploy so it surfaces in Railway rather than as a missing Monday.
 - `python -m app.cli trigger` does the same job in Python and is kept as the fallback, for
   when the function is unavailable or for triggering from a shell.
 - `.github/workflows/social-review-manual-run.yml` is **manual only** — no `schedule:`
@@ -212,10 +207,10 @@ Left to do:
 1. **Delete `MAIL_TO`** from `api` — a leftover from before the Chat amendment.
 2. **Deploy the `function-bun` service.** Its cron (`30 23 * * 0`) and restart policy
    (NEVER) were set 2026-08-28, but the code and variables need replacing with the current
-   one-variable version: paste `deploy/railway-function-trigger.ts` into the service's
-   Source Code tab, set `TRIGGER_URL` from `python -m app.cli trigger-url`, and drop the
-   now-unused `TARGET_URL` and `API_TOKEN`. Then Deploy — the container still runs the
-   stock demo until someone does. (Optional:
+   current version: paste `deploy/railway-function-trigger.ts` into the service's Source
+   Code tab, set `TRIGGER_URL` from `python -m app.cli trigger-url`, and drop the
+   now-unused `TARGET_URL`, `API_TOKEN` and `GOOGLE_CHAT_WEBHOOK`. Then Deploy — the
+   container still runs the stock demo until someone does. (Optional:
    `SOCIAL_REVIEW_URL` / `SOCIAL_REVIEW_TOKEN` as GitHub repository secrets, if you also
    want the manual-run workflow's button.)
 3. **X Developer Console** — a $10/cycle spending limit and auto-recharge (§10 Guardrails).
