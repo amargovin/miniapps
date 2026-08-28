@@ -35,12 +35,76 @@ exists, what's provisioned, and what to do next.
 - `MAIL_TO` is still set on the Railway services from before this amendment; it is
   unused — ignore or delete it.
 
-## Status: pipeline complete, not yet deployed
+**There is no `weekly` cron service.** The brief's §2 called for three Railway services;
+there are two (Postgres and `api`). Decided by Amar 2026-08-28, during the deploy:
+
+- `POST /v1/runs` already starts the same `run_pipeline` function in the background,
+  defaults to the last completed week and defaults `notify` to true, so the cron container
+  was only ever a second way to invoke identical code.
+- The schedule is a **Railway Function** — service `function-bun`
+  (`a006f8b1-eb35-4589-9200-a8e191e41bf2`), the Bun runtime, cron `30 23 * * 0`, restart
+  policy NEVER. Source of record: `deploy/railway-function-trigger.ts`; Railway keeps its
+  own copy base64-encoded in the start command, which is why the file is in the repo. It
+  POSTs `/v1/runs` and nothing else, so it holds only `TARGET_URL`, `API_TOKEN` and
+  `GOOGLE_CHAT_WEBHOOK` — all three as Railway **references** to the `api` service
+  (`${{api.PUBLIC_BASE_URL}}` and so on), so no credential is duplicated and a rotation
+  propagates by itself.
+  - 202 and 409 both exit 0. The cost guard and a run already in flight are correct
+    refusals by a healthy service; exiting non-zero is what had Railway reporting a crash
+    loop over nothing.
+  - Anything else, or an unreachable api service, exits 1 **and posts to the Chat room**.
+    The api service posts its own failure notices, but cannot report being down, and a
+    silent Monday is the failure mode §11 forbids.
+- `python -m app.cli trigger` does the same job in Python and is kept as the fallback, for
+  when the function is unavailable or for triggering from a shell.
+- `.github/workflows/social-review-manual-run.yml` is **manual only** — no `schedule:`
+  block, deliberately, so there is exactly one scheduler. It is there for a run from a
+  button with a form, and because it polls the run to completion, so a failed pull shows up
+  in a log rather than only as a Chat notice. Needs `SOCIAL_REVIEW_URL` and
+  `SOCIAL_REVIEW_TOKEN` as repository secrets.
+- Dropping it removes a container, removes a whole class of "did that env var land on both
+  services?" bug, and removes a real hazard found on first deploy: **Railway starts a
+  service when the repo is connected, whether or not a cron is configured**, so wiring up
+  `weekly` fired an immediate live billed run for week ending 2026-08-23.
+- The CLI's `run` command stays — shell access and the fallback for when the API is down.
+  Everywhere §3, §11 or §12 says "the cron" or "the weekly service", read: the scheduled
+  `POST /v1/runs`.
+
+## Status: pipeline complete, deployed, step 8 verified
 
 Scaffolded 2026-08-27 from a local Claude Code session; build-order steps 2–7 written the
-same day from Claude Code on web (branch `claude/social-review-dev-8ep7e4`). **Steps 8 and
-9 remain, and both need the Railway dashboard.** 205 tests pass; 29 skip until the
-regression fixtures are recorded (see below).
+same day from Claude Code on web. Deployed and step-8 verified 2026-08-28. 212 tests pass;
+29 skip until the regression fixtures are recorded (see below).
+
+### Step 8 results (2026-08-28) — the gate is cleared
+
+Two runs, both `status='ok'`, which is only reachable when all six §9 checks pass:
+
+| run | week ending | channels | cost |
+|---|---|---|---|
+| 1 | 2026-08-23 | all three | $0.2330 |
+| 2 | 2026-08-16 | all three | $0.2250 |
+
+**The §9 regression table matched on everything still checkable.** Post counts 215/4/43 and
+ranked counts 163/4/43 were exact — so were the 52 thread continuations and the X and
+Facebook medians. Run 2's cost of $0.2250 is 215 × $0.001 + $0.010, confirming the X post
+count a second way, through the billing rather than the row count.
+
+What drifted, and why it had to: X engagement 21,217 → 21,063 (−0.73%), impressions
+1,156,638 → 1,159,254 (+0.23%), Instagram engagement 1,927 → 2,156 (+11.9%), followers
+−58 / +331 / −272. The brief's targets were measured on 2026-08-27 and the run was 11 days
+later. §5 says metrics keep accruing, and followers are a point-in-time reading that can
+never be re-taken for a past week. X engagement *falling* while impressions rose is
+attrition — withdrawn likes and bookmarks, deactivated accounts — on a week old enough that
+accrual has stopped. Derived metrics were checked against the stored components and are
+internally consistent. **The brief's "must match exactly" was only ever satisfiable on
+2026-08-27; it is not available any more, and nobody should chase it.**
+
+**Owned Read pricing is verified** (§10's central cost fact). The credit balance is not
+readable from the service (decision 8 below), so it was measured through the account's MCP
+connector either side of run 2: $94.85 → $94.64, a $0.21 draw against $0.225 expected at
+$0.001/post and $1.085 at $0.005/post. Not a close call. The 24-hour dedup also proved
+itself — `cli smoke` re-fetched 95 of run 1's posts eight minutes later for nothing.
 
 ### What exists and works
 
@@ -92,12 +156,24 @@ regression fixtures are recorded (see below).
    stored rows, but a deck saying "X unavailable" must not also show an X row. This matters
    more than it looks: the seeded rows include the 2026-08-16 week, so a substitution there
    would have been invisible.
-8. **X credit balance comes from `GET /2/usage/credits`.** The response shape
-   (`data.total_balance`) was confirmed against the live account through the `xmag`
-   connector; the path itself is inferred from that connector's naming and is **not yet
-   verified against the REST API directly**. A missing or 404 endpoint is tolerated: the
-   balance is reported as unknown and the smoke test says "inconclusive" rather than
-   failing an otherwise good run. Confirm it on first deploy.
+8. **The X credit balance is not readable from this service — confirmed on deploy.**
+   `GET /2/usage/credits` (the path implied by the `xmag` connector's naming) answers
+   **404 with the app-only bearer token**, measured against production 2026-08-28. The
+   same figure reads fine through the account's user-authenticated MCP connector, which
+   points at the endpoint needing OAuth 2.0 user context — X answers 404, not 403, for the
+   wrong auth context — and no REST path for it appears in the X docs. Consequences:
+   - the balance read stays best-effort and never fails a run; the first 404 is remembered
+     so a run makes one futile request rather than two;
+   - `x_balance_alert_usd` can therefore never fire. The low-balance alert is dead code
+     until a working path exists — **watch the Developer Console instead**;
+   - §10's balance-delta signal (the earliest warning that Owned Read pricing has stopped
+     applying) has no automatic source. `runs.x_cost_usd` still records the estimate, so
+     the check is: compare it against the Console's spend by hand, now and again.
+   - `cli smoke` therefore returns "inconclusive", not a pass, and prints the manual
+     procedure. **Verifying the rate once, by hand, is still required before step 9** —
+     the difference is $20/year against $105.
+   Fixing this properly means finding the real path or giving the service a user-context
+   token; neither is worth blocking the deploy on.
 9. **`python -m app.cli dump-fixture <run_id>`** writes a run's stored `raw_payloads` to
    disk as the §9 regression fixture. The measured numbers in §9 cannot be checked against
    hand-written payloads — that would test the fixture, not the pull — so the fixture is
@@ -112,69 +188,58 @@ Project **swarajya-social-review**, id `61e38253-cba0-4578-b173-37b8fe9a0dea`, w
 | Service | id | Notes |
 |---|---|---|
 | Postgres | `fa69c9a1-8f52-4ee3-bf42-d7381700e99c` | managed, always on |
-| api | `d25eb897-5caa-4113-9535-b1f361ac141c` | empty service, vars set |
-| weekly | `6220d13e-3b2f-402c-90d9-7697fba95040` | empty service, vars set |
+| api | `d25eb897-5caa-4113-9535-b1f361ac141c` | deployed, healthy; domain `api-production-0bf0e.up.railway.app` |
+| ~~weekly~~ | ~~`6220d13e-3b2f-402c-90d9-7697fba95040`~~ | **deleted 2026-08-28** — replaced by the GitHub Actions schedule (see amendments) |
 
-Already set on both `api` and `weekly`: `DATABASE_URL` (reference to Postgres),
-`API_TOKEN` (generated, 32 random bytes — local copy in the gitignored
-`.api-token-local`), `ENV`, `WEEK_TZ`, `X_USER_ID`, `X_MAX_POSTS_PER_RUN`,
-`X_BALANCE_ALERT_USD`, `FB_PAGE_ID`, `IG_USER_ID`, `META_API_VERSION`, `MAIL_TO`.
+Set on `api`: `DATABASE_URL` (reference to Postgres), `API_TOKEN` (generated, 32 random
+bytes — local copy in the gitignored `.api-token-local`), `ENV`, `WEEK_TZ`, `X_USER_ID`,
+`X_MAX_POSTS_PER_RUN`, `X_BALANCE_ALERT_USD`, `FB_PAGE_ID`, `IG_USER_ID`,
+`META_API_VERSION`, `X_BEARER_TOKEN`, `META_ACCESS_TOKEN`, `GOOGLE_CHAT_WEBHOOK`,
+`PUBLIC_BASE_URL`. `MAIL_TO` predates the Chat amendment and is unused — delete it.
 
-### Manual steps still needed (dashboard / Amar)
+### Manual steps — done, and what is left
 
-1. **Secrets** — set on both `api` and `weekly`: ~~`X_BEARER_TOKEN`, `META_ACCESS_TOKEN`~~
-   (done 2026-08-27, copied from xmcpbridge / mcp-social-analytics — note the Meta token
-   expires ~60 days and must be rotated in both places; README has the exchange commands),
-   plus `GOOGLE_CHAT_WEBHOOK` (create an incoming webhook in the target Chat room) and
-   `PUBLIC_BASE_URL` (the api service's domain, once generated).
-2. **Connect GitHub** — in the dashboard, point both `api` and `weekly` at
-   `amargovin/miniapps`, **root directory `social-review`**. (CLI alternative while
-   iterating: `railway up --service api` from this folder.)
-3. **weekly service settings** — custom start command `python -m app.cli run`, and cron
-   schedule `30 23 * * 0` (23:30 UTC Sunday == 05:00 IST Monday — see §3; do NOT
-   "simplify" it to a Monday cron). **Do not enable the cron until step 8's regression
-   check passes** (§12).
-4. **api service settings** — generate a public domain when first deployed.
-5. **X Developer Console** — set a $10/cycle spending limit and auto-recharge before the
-   first deploy that talks to X (§10 Guardrails). Balance was $95.25 on 2026-08-27.
+Done 2026-08-27/28: secrets on `api` (`X_BEARER_TOKEN`, `META_ACCESS_TOKEN`,
+`GOOGLE_CHAT_WEBHOOK`, `PUBLIC_BASE_URL`); repo connected with root directory
+`social-review`; public domain generated; step 8's run and diff (results above); the
+`weekly` service deleted.
 
-## What to build next — build-order steps 8 and 9 only
+Left to do:
 
-Everything before them is written and tested. Both remaining steps need the deploy, so
-they cannot be done from a code session alone.
+1. **Delete `MAIL_TO`** from `api` — a leftover from before the Chat amendment.
+2. **Deploy the `function-bun` service.** Its config was set 2026-08-28 — start command,
+   cron `30 23 * * 0`, restart policy NEVER, and the three reference variables — but the
+   container still runs the stock demo until someone hits Deploy. (Optional:
+   `SOCIAL_REVIEW_URL` / `SOCIAL_REVIEW_TOKEN` as GitHub repository secrets, if you also
+   want the manual-run workflow's button.)
+3. **X Developer Console** — a $10/cycle spending limit and auto-recharge (§10 Guardrails).
+   Not yet confirmed done. Balance $94.64 on 2026-08-28. This is the only remaining
+   guardrail against a runaway, now that the balance-alert path is known dead (decision 8).
+4. **Record the regression fixtures** so the 29 skipped tests start running — see below.
+5. **Rotate the Meta token** before ~2026-10-26 (~60 days from 2026-08-27). README has the
+   exchange commands.
 
-**Step 8 — deploy, then one manual run and the regression diff.**
+## What is left
 
-```bash
-# 1. after the services are connected and the secrets are set
-curl -s $BASE/readyz                              # must be 200, no missing_env
+**The pipeline is built, deployed and verified.** Step 9 — "enable the schedule" — is now
+"create the trigger cron service and let it fire".
+Nothing blocks it: step 8's gate passed and Owned Read pricing is confirmed.
 
-# 2. prove Owned Read pricing BEFORE anything larger (§10). ~$0.10, writes nothing.
-railway run --service api python -m app.cli smoke  # must print OK, not "inconclusive"
-
-# 3. the regression run
-curl -sX POST $BASE/v1/runs -H "Authorization: Bearer $API_TOKEN" \
-     -H 'Content-Type: application/json' \
-     -d '{"week_ending":"2026-08-16","force":true,"notify":false}'
-curl -s $BASE/v1/runs/<id> -H "Authorization: Bearer $API_TOKEN"
-```
-
-Diff the result against the §9 table — 215/4/43 posts, 21,217/1,927/641 engagement,
-1,156,638 impressions, 98.7/481.8/14.9 per post, 55/345/13 median, 1.83% engagement rate,
-262 posts and 23,785 engagement combined, 52 continuations, 36 duplicate stories over 72
-posts with 2,037 in the smaller copy. **It must match exactly.** Note the deck will show
-`n/c` in every change column, because the only prior row is the UTC-week 2026-08-09 seed —
-that is decision 6 above working, not a fault.
-
-Then freeze the payloads so the arithmetic is checked on every push from then on:
+**Record the regression fixtures.** The 29 skipped tests in
+`tests/test_regression_week.py` replay recorded payloads. Run 2's payloads are in
+`raw_payloads` for 180 days:
 
 ```bash
-railway run --service api python -m app.cli dump-fixture <id> \
-  --out tests/fixtures/week_2026-08-16
-# add the three follower counts to manifest.json — see tests/fixtures/README.md
+python -m app.cli dump-fixture 2 --out tests/fixtures/week_2026-08-16
+# then add the follower counts to manifest.json:
+#   "followers": {"x": 342714, "instagram": 60073, "facebook": 633599}
 ```
 
-**Step 9 — only then enable the cron schedule.**
+The container filesystem is ephemeral, so the files have to be copied out and committed.
+Note that the fixture will lock in the numbers **as measured on 2026-08-28**, not the
+brief's 2026-08-27 targets — so `EXPECTED` in that test needs updating to the recorded
+values for the metric rows. The structural rows (215/4/43 posts, 163/4/43 ranked, 52
+continuations) are properties of the window and stay as the brief has them.
 
 ## Things that will bite if forgotten
 

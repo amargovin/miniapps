@@ -24,6 +24,9 @@ from tenacity import Retrying, retry_if_exception_type, stop_after_delay, wait_e
 log = logging.getLogger(__name__)
 
 BASE = "https://api.x.com/2"
+# Not in the X docs; matches the naming of the account's MCP connector. 404s under
+# app-only auth — see fetch_credit_balance.
+BALANCE_PATH = "/usage/credits"
 POST_READ_USD = 0.001   # Owned Read rate; $0.005 if the app is not owned by the account
 USER_READ_USD = 0.010
 PAGE_SIZE = 100
@@ -120,6 +123,7 @@ class XClient:
         self._retry_max_wait_s = retry_max_wait_s
         self.user_reads = 0
         self.posts_returned = 0
+        self._balance_unavailable = False
 
     # ---- transport ----
 
@@ -178,14 +182,28 @@ class XClient:
         return int(payload["data"]["public_metrics"]["followers_count"])
 
     def fetch_credit_balance(self) -> float | None:
-        """GET /2/usage/credits -> data.total_balance (USD). Returns None if the account's
-        plan does not expose it, so a missing endpoint cannot fail an otherwise good run."""
+        """data.total_balance in USD, or None when it cannot be read.
+
+        Measured 2026-08-28 against production: this path returns **404 with an app-only
+        bearer token**. The same figure is readable through the account's user-authenticated
+        MCP connector, which is consistent with the endpoint requiring OAuth 2.0 user
+        context rather than app-only auth — X answers 404, not 403, for the wrong auth
+        context. No documented REST path for it exists in the X docs.
+
+        So this stays best-effort and a failure is never fatal: the balance-delta signal in
+        §10 (the earliest warning that Owned Read pricing has stopped applying) has to come
+        from the Developer Console or the MCP connector until a working path is found. The
+        first 404 is remembered so a run makes one futile request rather than two.
+        """
+        if self._balance_unavailable:
+            return None
         try:
-            payload = self._request("/usage/credits")
+            payload = self._request(BALANCE_PATH)
         except XCreditsDepleted:
             raise
         except XError as exc:
-            log.warning("credit balance unavailable: %s", exc)
+            log.warning("credit balance unavailable, not retrying this run: %s", exc)
+            self._balance_unavailable = True
             return None
         data = payload.get("data") or {}
         bal = data.get("total_balance")

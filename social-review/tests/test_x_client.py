@@ -272,3 +272,19 @@ def test_credit_balance_is_read_from_usage_credits():
 
 def test_a_missing_balance_endpoint_does_not_fail_the_run():
     assert client(lambda r: httpx.Response(404, text="not found")).fetch_credit_balance() is None
+
+
+def test_a_404_on_the_balance_endpoint_is_only_attempted_once_per_run():
+    """Measured against production: GET /2/usage/credits 404s under app-only auth. A run
+    reads the balance twice (before and after the pull), so without this it logs two futile
+    requests every week."""
+    calls = []
+
+    def handler(request):
+        calls.append(str(request.url))
+        return httpx.Response(404, text="")
+
+    c = client(handler)
+    assert c.fetch_credit_balance() is None
+    assert c.fetch_credit_balance() is None
+    assert len(calls) == 1

@@ -1,0 +1,114 @@
+name: social-review manual run
+
+# MANUAL ONLY — there is deliberately no `schedule:` here. The weekly schedule lives on
+# Railway as a cron service running `python -m app.cli trigger` (see
+# social-review/CLAUDE.md amendments). Adding a schedule back would give the service two
+# schedulers: the second would be refused by the cost guard as a 409 rather than
+# double-billing, but it is noise nobody needs.
+#
+# This exists for a run from a button with a form, and because it polls the run to
+# completion — so a failed pull surfaces in a log here rather than only as a Chat notice.
+# Needs two repository secrets: SOCIAL_REVIEW_URL and SOCIAL_REVIEW_TOKEN.
+
+on:
+  workflow_dispatch:
+    inputs:
+      week_ending:
+        description: "Week-ending Sunday (YYYY-MM-DD). Blank = last completed week."
+        required: false
+      force:
+        description: "Re-pull a week already stored. THIS IS BILLED AGAIN."
+        type: boolean
+        default: false
+      notify:
+        description: "Post the summary and deck link to the Google Chat room."
+        type: boolean
+        default: true
+
+concurrency:
+  # Only one run at a time. The pipeline also takes a Postgres advisory lock and answers
+  # 409, so this is belt-and-braces rather than the real guard.
+  group: social-review-weekly
+  cancel-in-progress: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start the run
+        env:
+          BASE: ${{ secrets.SOCIAL_REVIEW_URL }}
+          TOKEN: ${{ secrets.SOCIAL_REVIEW_TOKEN }}
+          WEEK: ${{ inputs.week_ending }}
+          FORCE: ${{ inputs.force }}
+          NOTIFY: ${{ inputs.notify }}
+        run: |
+          set -euo pipefail
+          test -n "$BASE"  || { echo "::error::SOCIAL_REVIEW_URL secret is not set"; exit 1; }
+          test -n "$TOKEN" || { echo "::error::SOCIAL_REVIEW_TOKEN secret is not set"; exit 1; }
+
+          body=$(jq -nc \
+            --arg week "${WEEK:-}" \
+            --argjson force "${FORCE:-false}" \
+            --argjson notify "${NOTIFY:-true}" \
+            '{force: $force, notify: $notify}
+             + (if $week == "" then {} else {week_ending: $week} end)')
+          echo "request: $body"
+
+          # An Idempotency-Key makes a retried request return the original run rather than
+          # starting a second, billed one. Scoped to the run date so a genuine next week
+          # is never mistaken for a replay.
+          key="gha-$(date -u +%Y-%m-%d)-${WEEK:-auto}"
+
+          code=$(curl -sS -o response.json -w '%{http_code}' -X POST "$BASE/v1/runs" \
+                   -H "Authorization: Bearer $TOKEN" \
+                   -H 'Content-Type: application/json' \
+                   -H "Idempotency-Key: $key" \
+                   --retry 3 --retry-connrefused --max-time 60 \
+                   -d "$body")
+          cat response.json; echo
+
+          case "$code" in
+            202)
+              echo "::notice::run started: $(jq -r '.run_id' response.json)"
+              ;;
+            409)
+              # The cost guard, or a run already in flight. Both are correct refusals, not
+              # failures — the service is healthy and nothing was double-billed.
+              echo "::warning::refused (409): $(jq -r '.error.message' response.json)"
+              ;;
+            *)
+              echo "::error::POST /v1/runs returned $code"
+              exit 1
+              ;;
+          esac
+
+      - name: Report the outcome
+        # A 202 means the run was accepted, not that it succeeded. Poll until it finishes so
+        # a failed pull surfaces here as well as in the Chat room.
+        env:
+          BASE: ${{ secrets.SOCIAL_REVIEW_URL }}
+          TOKEN: ${{ secrets.SOCIAL_REVIEW_TOKEN }}
+        run: |
+          set -euo pipefail
+          run_id=$(jq -r '.run_id // empty' response.json)
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "no run to poll"; exit 0
+          fi
+          for _ in $(seq 1 40); do          # up to ~20 minutes
+            sleep 30
+            curl -sS "$BASE/v1/runs/$run_id" -H "Authorization: Bearer $TOKEN" -o run.json
+            status=$(jq -r '.status' run.json)
+            echo "run $run_id: $status"
+            case "$status" in
+              ok)      jq -c '{status, channels_ok, x_cost_usd, verification: .verification.ok}' run.json
+                       exit 0 ;;
+              partial) echo "::warning::run $run_id finished partial — a channel failed or a check did not pass"
+                       jq -c '{channels_failed, verification}' run.json
+                       exit 0 ;;
+              failed)  echo "::error::run $run_id failed"
+                       jq -c '{notes}' run.json
+                       exit 1 ;;
+            esac
+          done
+          echo "::warning::run $run_id still running after 20 minutes; check $BASE/v1/runs/$run_id"

@@ -84,11 +84,21 @@ def get_run(conn: psycopg.Connection, run_id: int) -> dict | None:
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             """SELECT r.*, (SELECT count(*) FROM reports p WHERE p.run_id = r.id) > 0
-                            AS pdf_available
+                            AS pdf_available,
+                      (SELECT jsonb_build_object('slide_count', p.slide_count,
+                                                 'link_count', p.link_count)
+                         FROM reports p WHERE p.run_id = r.id
+                        ORDER BY p.rendered_at DESC LIMIT 1) AS report
                FROM runs r WHERE r.id = %s""",
             (run_id,),
         )
-        return cur.fetchone()
+        row = cur.fetchone()
+    if row:
+        # Lift the verification block out of `notes` so the run record has the shape §2.1
+        # describes, rather than making every caller dig through the notes array.
+        row["verification"] = next(
+            (n for n in (row.get("notes") or []) if n.get("note") == "verification"), None)
+    return row
 
 
 def list_runs(conn: psycopg.Connection, *, limit: int = 20,

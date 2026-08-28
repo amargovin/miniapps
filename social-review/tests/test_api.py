@@ -283,3 +283,65 @@ def test_docs_are_available_only_in_dev(client):
     from app.config import get_settings
     assert get_settings().env == "dev"
     assert client.get("/openapi.json").status_code == 200
+
+
+# ---------------- the scheduled trigger ----------------
+
+def test_the_trigger_command_starts_a_run_and_exits_zero(client, conn, monkeypatch):
+    """`cli trigger` is the start command for the scheduled service. It must knock on
+    /v1/runs with the bearer token and an Idempotency-Key, and report success."""
+    import httpx as _httpx
+
+    from app import cli
+
+    seen = {}
+
+    def fake_post(url, **kw):
+        seen["url"] = url
+        seen["headers"] = kw["headers"]
+        seen["json"] = kw["json"]
+        return _httpx.Response(202, json={"run_id": 7, "status": "queued",
+                                          "estimated_cost_usd": 0.32})
+
+    monkeypatch.setattr(cli, "get_settings", lambda: __import__(
+        "app.config", fromlist=["get_settings"]).get_settings())
+    monkeypatch.setattr("httpx.post", fake_post)
+    assert cli.main(["trigger"]) == 0
+    assert seen["url"].endswith("/v1/runs")
+    assert seen["headers"]["Authorization"] == f"Bearer {TEST_TOKEN}"
+    assert "Idempotency-Key" in seen["headers"]
+    assert seen["json"] == {"force": False, "notify": True}
+
+
+def test_the_trigger_treats_the_cost_guard_as_success(monkeypatch):
+    """409 is a correct refusal by a healthy service. A non-zero exit would have the
+    scheduler retrying and an operator paged over nothing."""
+    import httpx as _httpx
+
+    from app import cli
+
+    monkeypatch.setattr("httpx.post", lambda url, **kw: _httpx.Response(
+        409, json={"error": {"code": "week_already_stored", "message": "already stored",
+                             "run_id": 2}}))
+    assert cli.main(["trigger"]) == 0
+
+
+def test_the_trigger_reports_a_real_failure(monkeypatch):
+    import httpx as _httpx
+
+    from app import cli
+
+    monkeypatch.setattr("httpx.post", lambda url, **kw: _httpx.Response(500, text="boom"))
+    assert cli.main(["trigger"]) == 1
+
+
+def test_an_unreachable_target_is_retryable_not_a_hard_failure(monkeypatch):
+    import httpx as _httpx
+
+    from app import cli
+
+    def boom(url, **kw):
+        raise _httpx.ConnectError("no route")
+
+    monkeypatch.setattr("httpx.post", boom)
+    assert cli.main(["trigger"]) == 75          # EX_TEMPFAIL

@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from app.config import get_settings
 from app.logging_setup import get_logger
 from app.window import last_completed_week_ending, window_for
-from app.x_client import POST_READ_USD, XClient, rfc3339
+from app.x_client import BALANCE_PATH, POST_READ_USD, XClient, rfc3339
 
 NON_OWNED_RATE = 0.005
 TOLERANCE = 0.10          # §10: within 10% of the expected delta
@@ -59,10 +59,15 @@ def assess(posts_returned: int, balance_before: float | None,
 
     if balance_before is None or balance_after is None:
         return Verdict(ok=True, conclusive=False, delta_usd=None, **base,
-                       message="the credit balance endpoint returned nothing, so Owned "
-                               "Read pricing could not be verified — check the spend on "
-                               "the X Developer Console dashboard by hand before enabling "
-                               "the cron")
+                       message=f"the credit balance is not readable with an app-only bearer "
+                               f"token (GET {BALANCE_PATH} answers 404), so the rate could "
+                               f"not be verified here. Verify it by hand once, before "
+                               f"enabling the cron: note the balance in the X Developer "
+                               f"Console, run a pull of a week not already fetched today, "
+                               f"and check the drop — ${owned:.4f} means Owned Read pricing "
+                               f"applies, ${non_owned:.4f} means it does not. Dedup makes a "
+                               f"same-day re-pull free, so it must be a fresh week or the "
+                               f"balance will not move at all.")
     delta = round(balance_before - balance_after, 4)
     base_with_delta = dict(base, delta_usd=delta)
 

@@ -6,9 +6,11 @@ each API's own aggregates, stores per-post rows and weekly rollups in Postgres, 
 four-slide PDF and posts the findings summary plus a signed deck link to a Google Chat
 room.
 
-Runs on Railway: managed Postgres + an always-on FastAPI operator service (`api`) + a
-cron-scheduled runner (`weekly`). Both services run the same image and call the same
-pipeline function, so the Monday morning run and a manual run cannot drift apart.
+Runs on Railway: managed Postgres + one always-on FastAPI service (`api`). The weekly
+schedule lives in GitHub Actions and triggers `POST /v1/runs`, which starts the pipeline in
+the background — so the Monday run and a manual run are literally the same call, and cannot
+drift apart. (The brief's third service, a Railway cron runner, was dropped; see CLAUDE.md
+amendments.)
 
 - **Spec:** `RAILWAY_BRIEF.md` — authoritative for metric definitions, the API contract,
   cost rules and the verification checks. Its numbers are measured regression targets.
@@ -84,7 +86,8 @@ curl -s $BASE/v1/usage -H "Authorization: Bearer $API_TOKEN"
 
 CLI equivalents: `run [--week-ending ... --force --channels x --no-notify --dry-run]`,
 `render --week-ending ...`, `notify <run_id>`, `backfill --from ... --to ...
-[--confirm-cost-usd ...]`, `usage`, `smoke`, `dump-fixture <run_id>`, `init-db`.
+[--confirm-cost-usd ...]`, `usage`, `smoke`, `dump-fixture <run_id>`, `init-db`. The CLI is
+for shell access and for when the API is unreachable; the schedule does not go through it.
 
 Iterate on layout through `render`, never by re-running a pull: a re-pull on a later UTC
 day is billed in full, and a re-render costs nothing.
@@ -137,16 +140,27 @@ returning `Meta Graph 400` and the run posts a failure notice. Rotate before it 
    &access_token=$LONG_LIVED_USER_TOKEN"
    ```
    Confirm `expires_at`, and that `scopes` contains all four permissions.
-5. Set `META_ACCESS_TOKEN` on **both** the `api` and `weekly` services, then confirm with
-   `GET /readyz` and a `--dry-run` run.
+5. Set `META_ACCESS_TOKEN` on the `api` service, then confirm with `GET /readyz` and a
+   `--dry-run` run (which fetches and reconciles but writes and sends nothing).
 
 The same token serves Facebook and Instagram; the Instagram Business account is reached
 through the Page.
 
-### Changing the schedule
+### The schedule, and changing it
 
-Railway dashboard → `weekly` service → Settings → Cron Schedule. Cron is evaluated in
-**UTC** while the reporting week is **IST**, so the schedule is:
+A **Railway Function** — the `function-bun` service, Bun runtime, cron `30 23 * * 0`.
+Source of record is `deploy/railway-function-trigger.ts`; see `deploy/README.md` for how to
+push a change to it.
+
+It POSTs to `/v1/runs` on the api service and exits; the pipeline runs there, in the
+long-lived container. It holds three variables — `TARGET_URL`, `API_TOKEN`,
+`GOOGLE_CHAT_WEBHOOK` — all as Railway references to `api`, so no credential is duplicated.
+That is the point: the scheduler carries no vendor credentials, and there is exactly one
+place the pipeline ever runs.
+
+`python -m app.cli trigger` does the same in Python and is kept as the fallback.
+
+Cron is evaluated in **UTC** while the reporting week is **IST**, so the schedule is:
 
 ```
 30 23 * * 0        # 23:30 UTC Sunday == 05:00 IST Monday
@@ -155,7 +169,13 @@ Railway dashboard → `weekly` service → Settings → Cron Schedule. Cron is e
 That is a Sunday expression that fires on Monday in local terms, and it looks wrong until
 you convert it. Do not "simplify" it to a Monday UTC cron: that would run before the week
 closes. The 5.5-hour margin between the window closing (18:30 UTC Sunday) and the run is
-deliberate.
+deliberate, and it also absorbs GitHub's scheduling delay, which can be several minutes
+under load.
+
+To run a week by hand: the API directly (below), `cli trigger --week-ending ... --force`,
+or the **Run workflow** button on `.github/workflows/social-review-manual-run.yml`, which
+takes `week_ending` / `force` / `notify` and polls the run to completion. Any scheduler that
+can send an `Authorization` header works — nothing about the endpoint is Railway-specific.
 
 ### Why `WEEK_TZ=Asia/Kolkata`
 
@@ -180,8 +200,15 @@ Consequences worth knowing:
 
 - `GET /2/users/{id}/tweets` is $0.001 per post **only** when the token comes from the
   developer app @SwarajyaMag owns; otherwise it is $0.005, and nothing in any response
-  says which rate applied. `python -m app.cli smoke` measures it against the live credit
-  balance and fails loudly. Run it after deploying, before enabling the cron.
+  says which rate applied — $20/year against $105. `python -m app.cli smoke` checks it,
+  but **it cannot conclude on its own**: the credit balance endpoint answers 404 under the
+  app-only bearer token (see CLAUDE.md decision 8), so `smoke` reports "inconclusive" and
+  prints a manual procedure. Do that once before enabling the cron: note the balance in the
+  Developer Console, pull a week not already fetched today, check the drop against the two
+  figures `smoke` gives you. It must be a *fresh* week — reads are deduplicated within a
+  UTC day, so a same-day re-pull is free and the balance will not move at all.
+- The low-balance alert (`X_BALANCE_ALERT_USD`) depends on that same endpoint, so it never
+  fires. Watch the Console balance instead until a working path is found.
 - `GET /2/users/{id}/followers` is billed **per follower** — about $342 a run here, against
   $0.010 for the `user.fields=public_metrics` lookup. `app/x_client.py` refuses to build
   that path at all, and a test asserts it.
