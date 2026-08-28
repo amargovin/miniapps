@@ -1,6 +1,9 @@
-# One image, two entrypoints (brief §2):
-#   api    — default CMD below (always-on)
-#   weekly — Railway service overrides start command to: python -m app.cli run
+# One image, one deployed service: `api`, always on, started by the CMD below.
+#
+# The brief's §2 called for a second `weekly` service on a Railway cron. There isn't one
+# (see CLAUDE.md amendments): POST /v1/runs starts the same pipeline in the background, so
+# an external scheduler hitting that endpoint replaces the container entirely. The CLI is
+# still here for shell access and as the fallback when the API is unreachable.
 FROM python:3.12-slim
 
 WORKDIR /srv

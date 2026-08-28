@@ -1,11 +1,13 @@
 """CLI entrypoints (brief §2, §11).
 
-`python -m app.cli run` is the entrypoint for the Railway `weekly` cron service: the
-container starts, runs to completion, and exits. No web server, no scheduler loop —
-Railway starts it on the schedule `30 23 * * 0` (23:30 UTC Sunday == 05:00 IST Monday).
-
 Everything the HTTP API does is available here too, over the same `app.pipeline`
-functions, for when the api service is unreachable. Invoke with `railway run`.
+functions — this is the fallback for when the api service is unreachable, and the way to
+drive the service from a shell inside the container.
+
+The weekly schedule does NOT run through here. There is no Railway cron service (see
+CLAUDE.md amendments): the schedule lives outside and triggers `POST /v1/runs`, which
+starts the same `run_pipeline` function in the background. One invocation path in
+production, so nothing can drift.
 """
 from __future__ import annotations
 
@@ -49,9 +51,15 @@ def cmd_run(args: argparse.Namespace) -> int:
         log.error("cli.run_in_progress", holder_run_id=exc.holder_run_id)
         return 75            # EX_TEMPFAIL: another run holds the lock, try later
     except AlreadyStored as exc:
-        log.error("cli.week_already_stored", week_ending=exc.week_ending.isoformat(),
-                  run_id=exc.run_id, hint="pass --force to re-pull (this is billed again)")
-        return 1
+        # Not a failure: the cost guard did its job and the week's data is already stored.
+        # This exits 0 on purpose — a scheduler that retries a non-zero exit would page
+        # someone about a healthy system. The refusal itself is unchanged: nothing is
+        # re-pulled without --force.
+        log.info("cli.week_already_stored_noop",
+                 week_ending=exc.week_ending.isoformat(), run_id=exc.run_id,
+                 outcome="nothing to do; the week is already stored and was not re-pulled",
+                 hint="pass --force to re-pull it (this is billed again)")
+        return 0
     print(store.dumps(outcome.as_dict()))
     return 0 if outcome.status in ("ok", "partial") else 1
 

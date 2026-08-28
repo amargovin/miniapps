@@ -386,3 +386,28 @@ def test_a_failed_verification_is_persisted_too(conn):
     assert row["verification"]["ok"] is False
     failed = [c for c in row["verification"]["checks"] if not c["ok"]]
     assert any(c["check"] == "meta_reconciliation_facebook" for c in failed)
+
+
+def test_the_cli_treats_an_already_stored_week_as_a_no_op_success(conn, monkeypatch):
+    """A correct refusal must not present as a crash: a scheduler retrying a non-zero exit
+    would page someone about a healthy system. The refusal still stands — nothing is
+    re-pulled — but the process exits 0."""
+    from app import cli
+
+    run(conn, force=True, notify=False)          # week is now stored with source='api'
+    calls = []
+    monkeypatch.setattr(cli, "run_pipeline",
+                        lambda req, **kw: calls.append(req) or (_ for _ in ()).throw(
+                            AlreadyStored(WE, 1)))
+    rc = cli.main(["run", "--week-ending", "2026-08-16", "--no-notify"])
+    assert rc == 0
+    assert len(calls) == 1                        # it tried, and was refused
+
+
+def test_the_cli_still_fails_on_a_concurrent_run(conn, monkeypatch):
+    """A lock conflict is genuinely retryable-later, so it keeps EX_TEMPFAIL."""
+    from app import cli
+
+    monkeypatch.setattr(cli, "run_pipeline",
+                        lambda req, **kw: (_ for _ in ()).throw(ConcurrentRun(7)))
+    assert cli.main(["run", "--week-ending", "2026-08-16"]) == 75
