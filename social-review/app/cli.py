@@ -100,6 +100,23 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_trigger_url(args: argparse.Namespace) -> int:
+    """Print the signed trigger URL for a scheduler to hit.
+
+    This is what a scheduler needs, and all it needs: no bearer token, no header, no other
+    variables. Regenerate it after rotating API_TOKEN — the old URL stops working, which
+    the trigger function reports rather than failing silently.
+    """
+    from app.signing import trigger_url
+
+    settings = get_settings()
+    base = args.base_url or settings.public_base_url
+    if not base:
+        sys.exit("no base URL: set PUBLIC_BASE_URL or pass --base-url")
+    print(trigger_url(base, settings.api_token))
+    return 0
+
+
 def cmd_trigger(args: argparse.Namespace) -> int:
     """POST /v1/runs against this deployment, for a scheduler to invoke.
 
@@ -235,8 +252,11 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("smoke", help="prove Owned Read pricing against the live API (§10); "
                                  "run once after deploying, before enabling the schedule")
 
-    tr = sub.add_parser("trigger", help="POST /v1/runs against this deployment; the start "
-                                        "command for a scheduled service")
+    tu = sub.add_parser("trigger-url", help="print the signed URL a scheduler should hit")
+    tu.add_argument("--base-url", help="default: PUBLIC_BASE_URL")
+
+    tr = sub.add_parser("trigger", help="POST /v1/runs against this deployment; the "
+                                        "in-container fallback for a scheduler")
     tr.add_argument("--base-url", help="default: PUBLIC_BASE_URL")
     tr.add_argument("--week-ending", help="default: the last completed week")
     tr.add_argument("--force", action="store_true", help="re-pull a stored week (billed again)")
@@ -259,6 +279,7 @@ def main(argv: list[str] | None = None) -> int:
         "usage": cmd_usage,
         "smoke": cmd_smoke,
         "trigger": cmd_trigger,
+        "trigger-url": cmd_trigger_url,
         "dump-fixture": cmd_dump_fixture,
     }[args.command]
     return handler(args)

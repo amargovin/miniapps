@@ -21,10 +21,21 @@ same thing with fewer steps. Either way, update this file too.
 
 ### Why a function rather than a service running `app.cli`
 
-It needs no image build, no repo checkout and no Python. More to the point it holds only
-`TARGET_URL`, `API_TOKEN` and `GOOGLE_CHAT_WEBHOOK` — all three as Railway references to the
-`api` service, so no credential is duplicated and a rotation propagates by itself. The
-vendor credentials stay where the work happens.
+It needs no image build, no repo checkout and no Python. More to the point it holds **one
+variable**: `TRIGGER_URL`, the signed URL from `python -m app.cli trigger-url`.
+
+That URL carries no reusable credential. Its signature is scoped to a single action, so
+unlike `API_TOKEN` it cannot read a deck, list runs, force a re-pull or choose a week — all
+it can do is start the run the schedule would have started anyway, which the §10 cost guard
+then refuses if the week is already stored. The vendor credentials never leave the api
+service.
+
+`GOOGLE_CHAT_WEBHOOK` is optional: set it and an unreachable api service is reported to the
+room; leave it out and that one case is silent.
+
+**Regenerate `TRIGGER_URL` whenever `API_TOKEN` is rotated.** The old URL stops working —
+the function reports the 404 to the room rather than failing quietly, but the schedule is
+stopped until you replace it.
 
 `python -m app.cli trigger` does the same job and is kept as the fallback for when the
 function is unavailable, or for triggering from a shell.
