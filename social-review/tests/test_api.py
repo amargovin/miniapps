@@ -345,3 +345,85 @@ def test_an_unreachable_target_is_retryable_not_a_hard_failure(monkeypatch):
 
     monkeypatch.setattr("httpx.post", boom)
     assert cli.main(["trigger"]) == 75          # EX_TEMPFAIL
+
+
+# ---------------- the signed trigger URL ----------------
+
+def _trigger_sig() -> str:
+    from app.signing import TRIGGER_ACTION, sign_action
+    return sign_action(TRIGGER_ACTION, TEST_TOKEN)
+
+
+def test_the_trigger_starts_a_run_with_no_bearer_header(client, empty_conn, monkeypatch):
+    """The whole point: a scheduler holds one URL and nothing else."""
+    import app.api as api
+
+    started = []
+    monkeypatch.setattr(api, "_run_in_background", lambda req, rid: started.append((req, rid)))
+    r = client.post(f"/v1/trigger?sig={_trigger_sig()}")
+    assert r.status_code == 202
+    assert r.json()["run_id"] is not None
+    assert started and started[0][0].week_ending is not None
+    assert started[0][0].notify is True and started[0][0].force is False
+
+
+def test_get_works_too_because_some_pingers_only_do_get(client, empty_conn, monkeypatch):
+    import app.api as api
+
+    monkeypatch.setattr(api, "_run_in_background", lambda req, rid: None)
+    assert client.get(f"/v1/trigger?sig={_trigger_sig()}").status_code == 202
+
+
+@pytest.mark.parametrize("sig", ["", "deadbeef", "0" * 64])
+def test_a_bad_trigger_signature_is_404_and_says_nothing(client, sig):
+    r = client.post(f"/v1/trigger?sig={sig}")
+    assert r.status_code == 404
+    assert r.json()["error"]["message"] == ""
+
+
+def test_the_trigger_signature_is_not_the_deck_signature(client):
+    """Scoped to one action: a deck link must not double as a trigger, or vice versa."""
+    from app.signing import sign_week
+
+    deck_sig = sign_week(WE, TEST_TOKEN)
+    assert client.post(f"/v1/trigger?sig={deck_sig}").status_code == 404
+    assert client.get(f"/v1/decks/2026-08-16.pdf?sig={_trigger_sig()}").status_code == 404
+
+
+def test_the_trigger_cannot_force_a_re_pull_or_choose_a_week(client, conn, monkeypatch):
+    """Strictly weaker than the bearer token. Query parameters are ignored, and the cost
+    guard still refuses a week that is already stored."""
+    import app.api as api
+
+    monkeypatch.setattr(api, "_run_in_background", lambda req, rid: None)
+    with conn.cursor() as cur:
+        cur.execute("UPDATE weekly_totals SET source='api' WHERE week_ending=%s", (WE,))
+    conn.commit()
+    # even asking for force and a specific week, both are ignored
+    r = client.post(f"/v1/trigger?sig={_trigger_sig()}&force=true&week_ending=2026-08-16")
+    assert r.status_code in (202, 409)
+    if r.status_code == 409:
+        assert r.json()["error"]["code"] == "week_already_stored"
+
+
+def test_the_trigger_is_rate_limited_like_the_other_post_routes(client, empty_conn,
+                                                                monkeypatch):
+    import app.api as api
+
+    monkeypatch.setattr(api, "_run_in_background", lambda req, rid: None)
+    last = None
+    for _ in range(12):
+        last = client.post(f"/v1/trigger?sig={_trigger_sig()}")
+    assert last.status_code == 429
+
+
+def test_repeat_triggers_on_one_day_return_the_same_run(client, empty_conn, monkeypatch):
+    """The Idempotency-Key is the date, so a scheduler retry cannot start a second billed
+    run."""
+    import app.api as api
+
+    monkeypatch.setattr(api, "_run_in_background", lambda req, rid: None)
+    first = client.post(f"/v1/trigger?sig={_trigger_sig()}").json()
+    second = client.post(f"/v1/trigger?sig={_trigger_sig()}").json()
+    assert second["run_id"] == first["run_id"]
+    assert second.get("idempotent_replay") is True

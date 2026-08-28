@@ -19,7 +19,7 @@ import secrets
 import time
 from contextlib import asynccontextmanager
 from collections import deque
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Literal
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Request, Response
@@ -34,7 +34,7 @@ from app.pipeline import (AlreadyStored, ConcurrentRun, NoDataStored, PipelineEr
                           RunRequest, backfill, open_run, project_cost_usd,
                           render_stored_week, renotify_run, resolve_week_ending,
                           run_pipeline, usage_snapshot, week_range)
-from app.signing import verify_week
+from app.signing import TRIGGER_ACTION, verify_action, verify_week
 from app.window import WeekEndingError
 
 settings = get_settings()
@@ -185,6 +185,39 @@ def _validated_week(week: date | None) -> date:
 def create_run(body: RunBody, background: BackgroundTasks,
                idempotency_key: str | None = Header(default=None,
                                                     alias="Idempotency-Key")) -> dict:
+    return _start_run(body, background, idempotency_key)
+
+
+@app.api_route("/v1/trigger", methods=["GET", "POST"], status_code=202)
+def trigger(request: Request, background: BackgroundTasks, sig: str = "") -> dict:
+    """The scheduled trigger. Signed rather than bearer-authenticated, so a scheduler holds
+    one URL and nothing else — no token, no base URL, no header, no env vars to keep in
+    sync with this service.
+
+    The signature is over a fixed action string, which makes this URL strictly weaker than
+    API_TOKEN rather than an alias for it: it cannot read a deck, list runs, force a
+    re-pull, or choose a week. All it can do is start the run the schedule would have
+    started anyway — and the §10 cost guard refuses that if the week is already stored, so
+    replaying it costs nothing.
+
+    GET is accepted as well as POST because plenty of schedulers and uptime pingers only
+    do GET. That does mean a link unfurler or a prefetch could fire it; the blast radius is
+    one run of the week that was due, which the guard then no-ops on any repeat. Keep the
+    URL out of anywhere that unfurls links all the same.
+
+    404, not 401, on a bad signature — the route must not confirm it exists.
+    """
+    if not verify_action(TRIGGER_ACTION, sig, settings.api_token):
+        raise _err(404, "not_found", "")
+    rate_limit_post()
+    # One run per UTC day at most, whichever scheduler fires and however often it retries.
+    key = f"trigger-{datetime.now(timezone.utc):%Y-%m-%d}"
+    log.info("api.trigger", method=request.method)
+    return _start_run(RunBody(), background, key)
+
+
+def _start_run(body: RunBody, background: BackgroundTasks,
+               idempotency_key: str | None) -> dict:
     week_ending = _validated_week(body.week_ending)
     channels = tuple(body.channels) if body.channels else CHANNELS
 

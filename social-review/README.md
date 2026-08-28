@@ -152,13 +152,25 @@ A **Railway Function** — the `function-bun` service, Bun runtime, cron `30 23 
 Source of record is `deploy/railway-function-trigger.ts`; see `deploy/README.md` for how to
 push a change to it.
 
-It POSTs to `/v1/runs` on the api service and exits; the pipeline runs there, in the
-long-lived container. It holds three variables — `TARGET_URL`, `API_TOKEN`,
-`GOOGLE_CHAT_WEBHOOK` — all as Railway references to `api`, so no credential is duplicated.
-That is the point: the scheduler carries no vendor credentials, and there is exactly one
-place the pipeline ever runs.
+It hits `/v1/trigger` on the api service and exits; the pipeline runs there, in the
+long-lived container. It needs **one variable**, `TRIGGER_URL`:
 
-`python -m app.cli trigger` does the same in Python and is kept as the fallback.
+```bash
+python -m app.cli trigger-url
+# https://api-production-0bf0e.up.railway.app/v1/trigger?sig=<hmac>
+```
+
+No bearer token, no header, no base URL. The signature is scoped to that single action, so
+the URL is strictly weaker than `API_TOKEN`: it cannot read a deck, list runs, force a
+re-pull or pick a week. All it can do is start the run the schedule would have started, and
+the cost guard refuses that if the week is already stored — so a replay is free. GET is
+accepted as well as POST, for schedulers that only do GET.
+
+Any pinger works: Railway Functions, cron-job.org, an uptime monitor, `curl` in a crontab.
+**Regenerate the URL when `API_TOKEN` is rotated** — the old one stops working, and the
+function reports the 404 to the Chat room rather than stopping silently.
+
+`python -m app.cli trigger` does the same job from inside the container, as the fallback.
 
 Cron is evaluated in **UTC** while the reporting week is **IST**, so the schedule is:
 
