@@ -148,22 +148,17 @@ through the Page.
 
 ### The schedule, and changing it
 
-A Railway cron service — same repo, root directory `social-review` — with:
-
-```
-start command:  python -m app.cli trigger
-cron schedule:  30 23 * * 0
-```
+A **Railway Function** — the `function-bun` service, Bun runtime, cron `30 23 * * 0`.
+Source of record is `deploy/railway-function-trigger.ts`; see `deploy/README.md` for how to
+push a change to it.
 
 It POSTs to `/v1/runs` on the api service and exits; the pipeline runs there, in the
-long-lived container. It needs only `PUBLIC_BASE_URL` and `API_TOKEN`, not the vendor
-credentials, which is the point: the scheduler holds two variables instead of eleven, and
-there is exactly one place the pipeline ever runs.
+long-lived container. It holds three variables — `TARGET_URL`, `API_TOKEN`,
+`GOOGLE_CHAT_WEBHOOK` — all as Railway references to `api`, so no credential is duplicated.
+That is the point: the scheduler carries no vendor credentials, and there is exactly one
+place the pipeline ever runs.
 
-`cli trigger` rather than `curl` because the runtime image has no curl, and because a
-scheduler wants meaningful exit codes: **0** when a run started and when the cost guard
-refused one (both healthy), **75** when the api service is unreachable (retryable), **1**
-only when something is actually wrong.
+`python -m app.cli trigger` does the same in Python and is kept as the fallback.
 
 Cron is evaluated in **UTC** while the reporting week is **IST**, so the schedule is:
 

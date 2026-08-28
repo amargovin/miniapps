@@ -41,13 +41,22 @@ there are two (Postgres and `api`). Decided by Amar 2026-08-28, during the deplo
 - `POST /v1/runs` already starts the same `run_pipeline` function in the background,
   defaults to the last completed week and defaults `notify` to true, so the cron container
   was only ever a second way to invoke identical code.
-- The schedule is a **Railway cron service** whose start command is
-  `python -m app.cli trigger` on the schedule `30 23 * * 0` — same expression as before,
-  same UTC-vs-IST caveat. It needs only `PUBLIC_BASE_URL` and `API_TOKEN`, not the vendor
-  credentials, because it POSTs to the api service rather than running the pipeline itself.
-  `cli trigger` exists because the runtime image has no `curl`, and it gives a scheduler
-  the exit codes it wants: 0 when a run starts *and* when the cost guard correctly refuses
-  one, 75 when the target is unreachable (retryable), 1 only when something is wrong.
+- The schedule is a **Railway Function** — service `function-bun`
+  (`a006f8b1-eb35-4589-9200-a8e191e41bf2`), the Bun runtime, cron `30 23 * * 0`, restart
+  policy NEVER. Source of record: `deploy/railway-function-trigger.ts`; Railway keeps its
+  own copy base64-encoded in the start command, which is why the file is in the repo. It
+  POSTs `/v1/runs` and nothing else, so it holds only `TARGET_URL`, `API_TOKEN` and
+  `GOOGLE_CHAT_WEBHOOK` — all three as Railway **references** to the `api` service
+  (`${{api.PUBLIC_BASE_URL}}` and so on), so no credential is duplicated and a rotation
+  propagates by itself.
+  - 202 and 409 both exit 0. The cost guard and a run already in flight are correct
+    refusals by a healthy service; exiting non-zero is what had Railway reporting a crash
+    loop over nothing.
+  - Anything else, or an unreachable api service, exits 1 **and posts to the Chat room**.
+    The api service posts its own failure notices, but cannot report being down, and a
+    silent Monday is the failure mode §11 forbids.
+- `python -m app.cli trigger` does the same job in Python and is kept as the fallback, for
+  when the function is unavailable or for triggering from a shell.
 - `.github/workflows/social-review-manual-run.yml` is **manual only** — no `schedule:`
   block, deliberately, so there is exactly one scheduler. It is there for a run from a
   button with a form, and because it polls the run to completion, so a failed pull shows up
@@ -198,9 +207,9 @@ Done 2026-08-27/28: secrets on `api` (`X_BEARER_TOKEN`, `META_ACCESS_TOKEN`,
 Left to do:
 
 1. **Delete `MAIL_TO`** from `api` — a leftover from before the Chat amendment.
-2. **The Railway cron service** that replaces `weekly`: same repo, root directory
-   `social-review`, start command `python -m app.cli trigger`, cron `30 23 * * 0`. It needs
-   `PUBLIC_BASE_URL` and `API_TOKEN` set on it — and nothing else. (Optional:
+2. **Deploy the `function-bun` service.** Its config was set 2026-08-28 — start command,
+   cron `30 23 * * 0`, restart policy NEVER, and the three reference variables — but the
+   container still runs the stock demo until someone hits Deploy. (Optional:
    `SOCIAL_REVIEW_URL` / `SOCIAL_REVIEW_TOKEN` as GitHub repository secrets, if you also
    want the manual-run workflow's button.)
 3. **X Developer Console** — a $10/cycle spending limit and auto-recharge (§10 Guardrails).
